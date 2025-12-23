@@ -1,0 +1,822 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - Restaurant SaaS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notification-page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        border-radius: 12px;
+        border: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .notification-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .notification-item {
+        border-left: 4px solid transparent;
+        transition: all 0.2s ease;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .notification-item:hover {
+        background: #e9ecef;
+        border-left-color: #667eea;
+    }
+    
+    .notification-item.urgent {
+        border-left-color: #dc3545;
+        background: #fff5f5;
+    }
+    
+    .notification-item.warning {
+        border-left-color: #ffc107;
+        background: #fffbeb;
+    }
+    
+    .notification-item.info {
+        border-left-color: #0dcaf0;
+        background: #f0faff;
+    }
+    
+    .notification-item.success {
+        border-left-color: #198754;
+        background: #f0fff4;
+    }
+    
+    .notification-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .cart-item-preview {
+        background: white;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .tab-content {
+        padding-top: 1.5rem;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #667eea;
+        border-bottom: 3px solid #667eea;
+        background: transparent;
+    }
+    
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.75em;
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="notification-page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="fas fa-bell me-3"></i>Notifications
+                </h1>
+                <p class="mb-0 opacity-75">
+                    {% if scope == 'platform' %}
+                    Platform-wide activity and alerts
+                    {% elif scope == 'restaurant' %}
+                    Your restaurant orders and customer activity
+                    {% else %}
+                    Your orders and updates
+                    {% endif %}
+                </p>
+            </div>
+            <div class="text-end">
+                <a href="{% url 'dashboard' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        {% if scope == 'platform' %}
+        <!-- Admin Stats -->
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-warning text-white me-3">
+                            <i class="fas fa-clock fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ pending_count }}</h2>
+                            <small class="text-muted">Pending Orders</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-info text-white me-3">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ carts_count }}</h2>
+                            <small class="text-muted">Active Carts</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-success text-white me-3">
+                            <i class="fas fa-receipt fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ today_count }}</h2>
+                            <small class="text-muted">Orders Today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% elif scope == 'restaurant' %}
+        <!-- Restaurant Owner Stats -->
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-danger text-white me-3">
+                            <i class="fas fa-exclamation-circle fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ pending_count }}</h2>
+                            <small class="text-muted">Pending Orders</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-info text-white me-3">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ carts_count }}</h2>
+                            <small class="text-muted">Active Carts</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-success text-white me-3">
+                            <i class="fas fa-check-circle fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ today_count }}</h2>
+                            <small class="text-muted">Orders Today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <!-- Customer Stats -->
+        <div class="col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-primary text-white me-3">
+                            <i class="fas fa-utensils fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ active_count }}</h2>
+                            <small class="text-muted">Active Orders</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="notification-icon bg-success text-white me-3">
+                            <i class="fas fa-shopping-cart fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ cart_count }}</h2>
+                            <small class="text-muted">Items in Cart</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Notification Tabs -->
+    <div class="card notification-card">
+        <div class="card-header bg-white">
+            <ul class="nav nav-tabs card-header-tabs" id="notificationTabs" role="tablist">
+                {% if scope == 'platform' %}
+                <li class="nav-item">
+                    <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">
+                        <i class="fas fa-clock me-2"></i>Pending Orders
+                        {% if pending_count > 0 %}<span class="badge bg-danger ms-2">{{ pending_count }}</span>{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="carts-tab" data-bs-toggle="tab" href="#carts" role="tab">
+                        <i class="fas fa-shopping-cart me-2"></i>Active Carts
+                        {% if carts_count > 0 %}<span class="badge bg-info ms-2">{{ carts_count }}</span>{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="today-tab" data-bs-toggle="tab" href="#today" role="tab">
+                        <i class="fas fa-calendar-day me-2"></i>Today's Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="restaurants-tab" data-bs-toggle="tab" href="#restaurants" role="tab">
+                        <i class="fas fa-store me-2"></i>New Restaurants
+                    </a>
+                </li>
+                
+                {% elif scope == 'restaurant' %}
+                <li class="nav-item">
+                    <a class="nav-link active" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab">
+                        <i class="fas fa-exclamation-circle me-2"></i>Pending Orders
+                        {% if pending_count > 0 %}<span class="badge bg-danger ms-2">{{ pending_count }}</span>{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="carts-tab" data-bs-toggle="tab" href="#carts" role="tab">
+                        <i class="fas fa-shopping-cart me-2"></i>Active Carts
+                        {% if carts_count > 0 %}<span class="badge bg-info ms-2">{{ carts_count }}</span>{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="today-tab" data-bs-toggle="tab" href="#today" role="tab">
+                        <i class="fas fa-calendar-day me-2"></i>Today's Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="all-tab" data-bs-toggle="tab" href="#all" role="tab">
+                        <i class="fas fa-history me-2"></i>Order History
+                    </a>
+                </li>
+                
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link active" id="active-tab" data-bs-toggle="tab" href="#active" role="tab">
+                        <i class="fas fa-utensils me-2"></i>Active Orders
+                        {% if active_count > 0 %}<span class="badge bg-primary ms-2">{{ active_count }}</span>{% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#history" role="tab">
+                        <i class="fas fa-history me-2"></i>Order History
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <div class="card-body">
+            <div class="tab-content" id="notificationTabsContent">
+                
+                {% if scope == 'platform' %}
+                <!-- Admin Tabs Content -->
+                
+                <!-- Pending Orders Tab -->
+                <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                    {% if pending_orders %}
+                        {% for order in pending_orders %}
+                        <div class="notification-item urgent">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon bg-warning me-3">
+                                    <i class="fas fa-clock text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }} - {{ order.restaurant.name }}</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-user me-1"></i>{{ order.customer.username }}
+                                            </p>
+                                            <div class="timestamp-badge">
+                                                <i class="fas fa-calendar-alt ts-icon"></i>
+                                                <span class="ts-date">{{ order.created_at|date:"M d, Y" }}</span>
+                                                <span class="ts-divider">•</span>
+                                                <i class="fas fa-clock ts-icon"></i>
+                                                <span class="ts-time">{{ order.created_at|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="time-ago urgent mt-1">
+                                                <i class="fas fa-exclamation-circle"></i>{{ order.created_at|timesince }} ago
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning text-dark status-badge">Pending</span>
+                                            <div class="fw-bold text-success mt-1">₦{{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <h5 class="text-muted">No Pending Orders</h5>
+                            <p class="text-muted">All orders have been processed</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Active Carts Tab -->
+                <div class="tab-pane fade" id="carts" role="tabpanel">
+                    {% if active_carts %}
+                        {% for cart in active_carts %}
+                        <div class="notification-item info">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon bg-info me-3">
+                                    <i class="fas fa-shopping-cart text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ cart.customer.username }}'s Cart</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-store me-1"></i>{{ cart.restaurant.name }}
+                                            </p>
+                                            <div class="timestamp-badge">
+                                                <i class="fas fa-calendar-alt ts-icon"></i>
+                                                <span class="ts-date">{{ cart.updated_at|date:"M d, Y" }}</span>
+                                                <span class="ts-divider">•</span>
+                                                <i class="fas fa-clock ts-icon"></i>
+                                                <span class="ts-time">{{ cart.updated_at|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="time-ago mt-1">
+                                                <i class="fas fa-history"></i>Updated {{ cart.updated_at|timesince }} ago
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info status-badge">{{ cart.total_items }} items</span>
+                                            <div class="fw-bold text-success mt-1">₦{{ cart.total_price }}</div>
+                                        </div>
+                                    </div>
+                                    {% if cart.items.all %}
+                                    <div class="cart-item-preview mt-2">
+                                        <small class="text-muted">
+                                            {% for item in cart.items.all|slice:":3" %}
+                                            {{ item.quantity }}x {{ item.menu_item.name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                            {% if cart.items.count > 3 %}... and {{ cart.items.count|add:"-3" }} more{% endif %}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h5 class="text-muted">No Active Carts</h5>
+                            <p class="text-muted">No customers are currently shopping</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Today's Orders Tab -->
+                <div class="tab-pane fade" id="today" role="tabpanel">
+                    {% if today_orders %}
+                        {% for order in today_orders %}
+                        <div class="notification-item {% if order.status == 'pending' %}warning{% elif order.status == 'completed' %}success{% else %}info{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon {% if order.status == 'pending' %}bg-warning{% elif order.status == 'completed' %}bg-success{% else %}bg-info{% endif %} me-3">
+                                    <i class="fas {% if order.status == 'pending' %}fa-clock{% elif order.status == 'completed' %}fa-check{% else %}fa-spinner{% endif %} text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }} - {{ order.restaurant.name }}</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-user me-1"></i>{{ order.customer.username }}
+                                            </p>
+                                            <div class="timestamp-badge">
+                                                <i class="fas fa-clock ts-icon"></i>
+                                                <span class="ts-time">{{ order.created_at|time:"g:i A" }}</span>
+                                                <span class="ts-divider">•</span>
+                                                <span class="time-ago"><i class="fas fa-history me-1"></i>{{ order.created_at|timesince }} ago</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-{{ order.status|lower }} status-badge">{{ order.get_status_display }}</span>
+                                            <div class="fw-bold text-success mt-1">₦{{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-day"></i>
+                            <h5 class="text-muted">No Orders Today</h5>
+                            <p class="text-muted">No orders have been placed today</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- New Restaurants Tab -->
+                <div class="tab-pane fade" id="restaurants" role="tabpanel">
+                    {% if new_restaurants %}
+                        {% for restaurant in new_restaurants %}
+                        <div class="notification-item success">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon bg-success me-3">
+                                    <i class="fas fa-store text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ restaurant.name }}</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-user me-1"></i>Owner: {{ restaurant.owner.username }}
+                                            </p>
+                                            <div class="timestamp-badge">
+                                                <i class="fas fa-calendar-alt ts-icon"></i>
+                                                <span class="ts-date">{{ restaurant.created_at|date:"M d, Y" }}</span>
+                                                <span class="ts-divider">•</span>
+                                                <i class="fas fa-clock ts-icon"></i>
+                                                <span class="ts-time">{{ restaurant.created_at|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="time-ago mt-1">
+                                                <i class="fas fa-history"></i>Joined {{ restaurant.created_at|timesince }} ago
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-success status-badge">New</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-store"></i>
+                            <h5 class="text-muted">No New Restaurants</h5>
+                            <p class="text-muted">No restaurants added this week</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% elif scope == 'restaurant' %}
+                <!-- Restaurant Owner Tabs Content -->
+                
+                <!-- Pending Orders Tab -->
+                <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                    {% if pending_orders %}
+                        {% for order in pending_orders %}
+                        <div class="notification-item urgent">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon bg-danger me-3">
+                                    <i class="fas fa-exclamation-circle text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }} - Needs Attention!</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-user me-1"></i>{{ order.customer.username }} • 
+                                                <i class="fas fa-store me-1"></i>{{ order.restaurant.name }}
+                                            </p>
+                                            <div class="timestamp-badge">
+                                                <i class="fas fa-calendar-alt ts-icon"></i>
+                                                <span class="ts-date">{{ order.created_at|date:"M d, Y" }}</span>
+                                                <span class="ts-divider">•</span>
+                                                <i class="fas fa-clock ts-icon"></i>
+                                                <span class="ts-time">{{ order.created_at|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="time-ago urgent mt-1">
+                                                <i class="fas fa-exclamation-circle"></i>Waiting {{ order.created_at|timesince }}
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-danger status-badge">Pending</span>
+                                            <div class="fw-bold text-success mt-1">₦{{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary ms-3">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <h5 class="text-muted">No Pending Orders</h5>
+                            <p class="text-muted">All orders have been processed! 🎉</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Active Carts Tab -->
+                <div class="tab-pane fade" id="carts" role="tabpanel">
+                    {% if active_carts %}
+                        {% for cart in active_carts %}
+                        <div class="notification-item info">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon bg-info me-3">
+                                    <i class="fas fa-shopping-cart text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ cart.customer.username }} is shopping!</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-store me-1"></i>{{ cart.restaurant.name }}
+                                            </p>
+                                            <div class="timestamp-badge">
+                                                <i class="fas fa-calendar-alt ts-icon"></i>
+                                                <span class="ts-date">{{ cart.updated_at|date:"M d, Y" }}</span>
+                                                <span class="ts-divider">•</span>
+                                                <i class="fas fa-clock ts-icon"></i>
+                                                <span class="ts-time">{{ cart.updated_at|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="time-ago mt-1">
+                                                <i class="fas fa-history"></i>Updated {{ cart.updated_at|timesince }} ago
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-info status-badge">{{ cart.total_items }} items</span>
+                                            <div class="fw-bold text-success mt-1">₦{{ cart.total_price }}</div>
+                                        </div>
+                                    </div>
+                                    {% if cart.items.all %}
+                                    <div class="cart-item-preview mt-2">
+                                        <small class="text-muted">
+                                            <strong>Items:</strong>
+                                            {% for item in cart.items.all %}
+                                            {{ item.quantity }}x {{ item.menu_item.name }} (₦{{ item.line_total }}){% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h5 class="text-muted">No Active Carts</h5>
+                            <p class="text-muted">Customers are not currently shopping at your restaurant</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Today's Orders Tab -->
+                <div class="tab-pane fade" id="today" role="tabpanel">
+                    {% if today_orders %}
+                        {% for order in today_orders %}
+                        <div class="notification-item {% if order.status == 'pending' %}warning{% elif order.status == 'completed' %}success{% else %}info{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon {% if order.status == 'pending' %}bg-warning{% elif order.status == 'completed' %}bg-success{% else %}bg-info{% endif %} me-3">
+                                    <i class="fas {% if order.status == 'pending' %}fa-clock{% elif order.status == 'completed' %}fa-check{% else %}fa-spinner{% endif %} text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }}</h6>
+                                            <p class="mb-0 text-muted small">
+                                                <i class="fas fa-user me-1"></i>{{ order.customer.username }} • 
+                                                <i class="fas fa-clock me-1"></i>{{ order.created_at|time:"g:i A" }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge status-badge" style="background-color: {% if order.status == 'pending' %}#ffc107{% elif order.status == 'completed' %}#198754{% elif order.status == 'confirmed' %}#0d6efd{% elif order.status == 'preparing' %}#0dcaf0{% else %}#6c757d{% endif %}">{{ order.get_status_display }}</span>
+                                            <div class="fw-bold text-success mt-1">${{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary ms-3">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-day"></i>
+                            <h5 class="text-muted">No Orders Today</h5>
+                            <p class="text-muted">You haven't received any orders today</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- All Orders Tab -->
+                <div class="tab-pane fade" id="all" role="tabpanel">
+                    {% if all_orders %}
+                        {% for order in all_orders %}
+                        <div class="notification-item">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon bg-secondary me-3">
+                                    <i class="fas fa-receipt text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }}</h6>
+                                            <p class="mb-0 text-muted small">
+                                                <i class="fas fa-user me-1"></i>{{ order.customer.username }} • 
+                                                <i class="fas fa-calendar me-1"></i>{{ order.created_at|date:"M d, Y g:i A" }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge status-badge" style="background-color: {% if order.status == 'pending' %}#ffc107{% elif order.status == 'completed' %}#198754{% elif order.status == 'cancelled' %}#dc3545{% else %}#0dcaf0{% endif %}; color: {% if order.status == 'pending' %}#000{% else %}#fff{% endif %}">{{ order.get_status_display }}</span>
+                                            <div class="fw-bold text-success mt-1">${{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary ms-3">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <h5 class="text-muted">No Order History</h5>
+                            <p class="text-muted">You haven't received any orders yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% else %}
+                <!-- Customer Tabs Content -->
+                
+                <!-- Active Orders Tab -->
+                <div class="tab-pane fade show active" id="active" role="tabpanel">
+                    {% if active_orders %}
+                        {% for order in active_orders %}
+                        <div class="notification-item {% if order.status == 'pending' %}warning{% elif order.status == 'preparing' %}info{% else %}success{% endif %}">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon {% if order.status == 'pending' %}bg-warning{% elif order.status == 'ready' %}bg-success{% else %}bg-info{% endif %} me-3">
+                                    <i class="fas {% if order.status == 'pending' %}fa-clock{% elif order.status == 'ready' %}fa-check-circle{% else %}fa-utensils{% endif %} text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }} from {{ order.restaurant.name }}</h6>
+                                            <p class="mb-0 text-muted small">
+                                                <i class="fas fa-clock me-1"></i>Ordered {{ order.created_at|timesince }} ago
+                                            </p>
+                                            <p class="mb-0 mt-1">
+                                                {% if order.status == 'pending' %}
+                                                <span class="text-warning"><i class="fas fa-hourglass-half me-1"></i>Waiting for confirmation</span>
+                                                {% elif order.status == 'confirmed' %}
+                                                <span class="text-primary"><i class="fas fa-thumbs-up me-1"></i>Order confirmed!</span>
+                                                {% elif order.status == 'preparing' %}
+                                                <span class="text-info"><i class="fas fa-fire me-1"></i>Being prepared</span>
+                                                {% elif order.status == 'ready' %}
+                                                <span class="text-success"><i class="fas fa-check-circle me-1"></i>Ready for pickup!</span>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge status-badge" style="background-color: {% if order.status == 'pending' %}#ffc107{% elif order.status == 'ready' %}#198754{% else %}#0dcaf0{% endif %}; color: {% if order.status == 'pending' %}#000{% else %}#fff{% endif %}">{{ order.get_status_display }}</span>
+                                            <div class="fw-bold text-success mt-1">${{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary ms-3">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-utensils"></i>
+                            <h5 class="text-muted">No Active Orders</h5>
+                            <p class="text-muted">You don't have any orders being prepared</p>
+                            <a href="{% url 'browse_restaurants' %}" class="btn btn-primary mt-2">
+                                <i class="fas fa-search me-2"></i>Browse Restaurants
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Order History Tab -->
+                <div class="tab-pane fade" id="history" role="tabpanel">
+                    {% if all_orders %}
+                        {% for order in all_orders %}
+                        <div class="notification-item">
+                            <div class="d-flex align-items-center">
+                                <div class="notification-icon {% if order.status == 'completed' %}bg-success{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %} me-3">
+                                    <i class="fas {% if order.status == 'completed' %}fa-check{% elif order.status == 'cancelled' %}fa-times{% else %}fa-receipt{% endif %} text-white"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">Order #{{ order.id }} - {{ order.restaurant.name }}</h6>
+                                            <p class="mb-0 text-muted small">
+                                                <i class="fas fa-calendar me-1"></i>{{ order.created_at|date:"M d, Y g:i A" }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge status-badge" style="background-color: {% if order.status == 'completed' %}#198754{% elif order.status == 'cancelled' %}#dc3545{% else %}#6c757d{% endif %}">{{ order.get_status_display }}</span>
+                                            <div class="fw-bold text-success mt-1">${{ order.total_price }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary ms-3">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <h5 class="text-muted">No Order History</h5>
+                            <p class="text-muted">You haven't placed any orders yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

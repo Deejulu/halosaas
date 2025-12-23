@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Feedback Moderation - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Feedback Moderation for {{ restaurant.name }}</h3>
+    <p class="text-muted">Approve or hide feedback left by customers.</p>
+
+    <div class="list-group">
+        {% for f in feedback_list %}
+        <div class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+                <strong>{% if f.customer %}{{ f.customer.username }}{% else %}Guest{% endif %}</strong>
+                <small class="text-muted">{{ f.created_at|date:"Y-m-d H:i" }}</small>
+                <div>{{ f.comment }}</div>
+                <div class="mt-1"><small>Rating: {{ f.rating }}</small></div>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-success me-1 btn-approve" data-id="{{ f.id }}" {% if f.is_public %}style="display:none;"{% endif %}>Approve</button>
+                <button class="btn btn-sm btn-warning me-1 btn-unapprove" data-id="{{ f.id }}" {% if not f.is_public %}style="display:none;"{% endif %}>Unpublish</button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="list-group-item">No feedback submitted yet.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    function postToggle(id, action, btn){
+        fetch(`/reviews/feedback/${id}/approve/`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `action=${action}`
+        }).then(r=>r.json()).then(data=>{
+            if(data.success){
+                const approve = document.querySelector(`.btn-approve[data-id='${id}']`);
+                const unapprove = document.querySelector(`.btn-unapprove[data-id='${id}']`);
+                if(data.is_public){ approve.style.display='none'; unapprove.style.display='inline-block'; }
+                else { approve.style.display='inline-block'; unapprove.style.display='none'; }
+            } else {
+                alert('Failed to update feedback');
+            }
+        }).catch(()=>alert('Request failed'));
+    }
+
+    document.querySelectorAll('.btn-approve').forEach(b=>b.addEventListener('click', function(){ postToggle(this.dataset.id,'approve', this); }));
+    document.querySelectorAll('.btn-unapprove').forEach(b=>b.addEventListener('click', function(){ postToggle(this.dataset.id,'unapprove', this); }));
+});
+</script>
+
+{% endblock %}

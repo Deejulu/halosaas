@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Review - Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Rate Your Experience
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="order-info mb-4 p-3 bg-light rounded">
+                        <h5>Order #{{ order.id }}</h5>
+                        <p class="mb-1"><strong>Restaurant:</strong> {{ order.restaurant.name }}</p>
+                        <p class="mb-1"><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+                        <p class="mb-0"><strong>Total:</strong> ₦{{ order.total_price }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Rating Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">How would you rate your experience?</label>
+                            <div class="rating-stars text-center">
+                                {% for i in "54321" %}
+                                <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="d-none" {% if
+                                    forloop.first %}checked{% endif %}>
+                                <label for="star{{ i }}" class="star-label">
+                                    <i class="fas fa-star"></i>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <div class="text-center mt-2">
+                                <small class="text-muted" id="rating-text">Excellent - ⭐⭐⭐⭐⭐</small>
+                            </div>
+                        </div>
+
+                        <!-- Comment -->
+                        <div class="mb-4">
+                            <label for="comment" class="form-label fw-bold">Share your experience (optional)</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="4"
+                                placeholder="What did you like about the food and service? Any suggestions for improvement?"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review
+                            </button>
+                            <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Order
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rating-stars {
+        font-size: 2.5rem;
+        cursor: pointer;
+    }
+
+    .star-label {
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        margin: 0 2px;
+    }
+
+    .star-label:hover,
+    .star-label:hover~.star-label {
+        color: #ffc107 !important;
+    }
+
+    input[type="radio"]:checked~.star-label {
+        color: #ffc107;
+    }
+
+    input[type="radio"]:checked+.star-label {
+        color: #ffc107;
+    }
+
+    /* Fix the star coloring */
+    #star5:checked~.star-label {
+        color: #ffc107;
+    }
+
+    #star4:checked~.star-label {
+        color: #ffc107;
+    }
+
+    #star4:checked~.star-label:nth-child(n+7) {
+        color: #ddd;
+    }
+
+    #star3:checked~.star-label {
+        color: #ffc107;
+    }
+
+    #star3:checked~.star-label:nth-child(n+9) {
+        color: #ddd;
+    }
+
+    #star2:checked~.star-label {
+        color: #ffc107;
+    }
+
+    #star2:checked~.star-label:nth-child(n+11) {
+        color: #ddd;
+    }
+
+    #star1:checked~.star-label {
+        color: #ffc107;
+    }
+
+    #star1:checked~.star-label:nth-child(n+13) {
+        color: #ddd;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('input[name="rating"]');
+        const ratingText = document.getElementById('rating-text');
+
+        const ratingTexts = {
+            '5': 'Excellent - ⭐⭐⭐⭐⭐',
+            '4': 'Very Good - ⭐⭐⭐⭐',
+            '3': 'Good - ⭐⭐⭐',
+            '2': 'Fair - ⭐⭐',
+            '1': 'Poor - ⭐'
+        };
+
+        stars.forEach(star => {
+            star.addEventListener('change', function () {
+                ratingText.textContent = ratingTexts[this.value];
+            });
+        });
+    });
+</script>
+{% endblock %}

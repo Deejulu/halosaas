@@ -1,0 +1,1088 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard - Restaurant SaaS{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --cd-bg: #f0f2f5;
+        --cd-card-bg: #ffffff;
+        --cd-text: #1a1a2e;
+        --cd-text-muted: #6c757d;
+        --cd-text-light: #9ca3af;
+        --cd-border: #e5e7eb;
+        --cd-primary: #6366f1;
+        --cd-primary-light: #818cf8;
+        --cd-success: #10b981;
+        --cd-info: #06b6d4;
+        --cd-warning: #f59e0b;
+        --cd-danger: #ef4444;
+        --cd-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --cd-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --cd-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --cd-gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    [data-theme="dark"] {
+        --cd-bg: #0f0f1a;
+        --cd-card-bg: #1a1a2e;
+        --cd-text: #e9ecef;
+        --cd-text-muted: #9ca3af;
+        --cd-text-light: #6b7280;
+        --cd-border: #374151;
+    }
+    
+    .customer-dashboard {
+        background: var(--cd-bg);
+        min-height: 100vh;
+        padding-bottom: 60px;
+    }
+    
+    /* Animated Background */
+    .dashboard-header {
+        background: var(--cd-gradient-1);
+        padding: 40px 0 100px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .welcome-content {
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.8s ease-out;
+    }
+    
+    .welcome-content h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 8px;
+    }
+    
+    .welcome-content p {
+        color: rgba(255,255,255,0.85);
+        font-size: 1.1rem;
+    }
+    
+    .greeting-emoji {
+        display: inline-block;
+        animation: wave 2s ease-in-out infinite;
+    }
+    
+    @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(20deg); }
+        75% { transform: rotate(-10deg); }
+    }
+    
+    /* Stats Cards - Floating above header */
+    .stats-container {
+        margin-top: -60px;
+        position: relative;
+        z-index: 20;
+    }
+    
+    .stat-card {
+        background: var(--cd-card-bg);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid var(--cd-border);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: slideUp 0.6s ease-out backwards;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+    
+    .stat-card.gradient-1::before { background: var(--cd-gradient-1); }
+    .stat-card.gradient-2::before { background: var(--cd-gradient-2); }
+    .stat-card.gradient-3::before { background: var(--cd-gradient-3); }
+    .stat-card.gradient-4::before { background: var(--cd-gradient-4); }
+    
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+    }
+    
+    .stat-card.gradient-1 .stat-icon { background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2)); color: #667eea; }
+    .stat-card.gradient-2 .stat-icon { background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2)); color: #f5576c; }
+    .stat-card.gradient-3 .stat-icon { background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2)); color: #4facfe; }
+    .stat-card.gradient-4 .stat-icon { background: linear-gradient(135deg, rgba(67, 233, 123, 0.2), rgba(56, 249, 215, 0.2)); color: #43e97b; }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--cd-text);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--cd-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+    
+    .stat-change {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .stat-change.positive { background: rgba(16, 185, 129, 0.1); color: var(--cd-success); }
+    .stat-change.negative { background: rgba(239, 68, 68, 0.1); color: var(--cd-danger); }
+    
+    /* Cards */
+    .cd-card {
+        background: var(--cd-card-bg);
+        border: 1px solid var(--cd-border);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        animation: fadeIn 0.6s ease-out backwards;
+    }
+    
+    .cd-card:hover {
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .cd-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid var(--cd-border);
+        padding: 20px 24px;
+    }
+    
+    .cd-card .card-header h6 {
+        color: var(--cd-text);
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .cd-card .card-body {
+        padding: 24px;
+        color: var(--cd-text);
+    }
+    
+    .header-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    /* Active Orders Section */
+    .active-order-card {
+        background: var(--cd-card-bg);
+        border: 2px solid var(--cd-border);
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .active-order-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+    }
+    
+    .active-order-card.pending::before { background: var(--cd-warning); }
+    .active-order-card.preparing::before { background: var(--cd-info); }
+    .active-order-card.ready::before { background: var(--cd-success); }
+    
+    .active-order-card:hover {
+        border-color: var(--cd-primary);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .order-progress {
+        height: 6px;
+        background: var(--cd-border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 12px;
+    }
+    
+    .order-progress-bar {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    
+    .order-progress-bar.pending { width: 25%; background: var(--cd-warning); }
+    .order-progress-bar.confirmed { width: 40%; background: var(--cd-info); }
+    .order-progress-bar.preparing { width: 60%; background: var(--cd-info); }
+    .order-progress-bar.ready { width: 85%; background: var(--cd-success); }
+    .order-progress-bar.completed { width: 100%; background: var(--cd-success); }
+    
+    /* Quick Actions */
+    .quick-action-card {
+        background: var(--cd-card-bg);
+        border: 2px solid var(--cd-border);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .quick-action-card:hover {
+        border-color: var(--cd-primary);
+        transform: translateY(-6px);
+        box-shadow: 0 15px 40px rgba(99, 102, 241, 0.15);
+    }
+    
+    .quick-action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-card:hover .quick-action-icon {
+        transform: scale(1.1);
+    }
+    
+    .quick-action-card span {
+        color: var(--cd-text);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    /* Restaurant Cards */
+    .restaurant-card {
+        background: var(--cd-card-bg);
+        border: 1px solid var(--cd-border);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+    
+    .restaurant-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+    
+    .restaurant-card-image {
+        height: 140px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .restaurant-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .restaurant-card:hover .restaurant-card-image img {
+        transform: scale(1.1);
+    }
+    
+    .restaurant-card-logo {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        background: var(--cd-card-bg);
+        border: 3px solid var(--cd-card-bg);
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .restaurant-card-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .restaurant-card-body {
+        padding: 45px 20px 20px;
+        text-align: center;
+    }
+    
+    .restaurant-card-body h6 {
+        color: var(--cd-text);
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    
+    .restaurant-card-body p {
+        color: var(--cd-text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+    }
+    
+    /* Favorite Restaurant Mini Card */
+    .favorite-card {
+        background: var(--cd-card-bg);
+        border: 1px solid var(--cd-border);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+    
+    .favorite-card:hover {
+        border-color: var(--cd-primary);
+        transform: translateX(6px);
+    }
+    
+    .favorite-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--cd-gradient-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .favorite-info h6 {
+        color: var(--cd-text);
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+    
+    .favorite-info small {
+        color: var(--cd-text-muted);
+        font-size: 0.8rem;
+    }
+    
+    /* Order Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-badge.pending { background: rgba(245, 158, 11, 0.1); color: var(--cd-warning); }
+    .status-badge.preparing { background: rgba(6, 182, 212, 0.1); color: var(--cd-info); }
+    .status-badge.ready { background: rgba(16, 185, 129, 0.1); color: var(--cd-success); }
+    .status-badge.completed { background: rgba(16, 185, 129, 0.15); color: var(--cd-success); }
+    .status-badge.cancelled { background: rgba(239, 68, 68, 0.1); color: var(--cd-danger); }
+    
+    /* Recent Orders Table */
+    .orders-table {
+        width: 100%;
+    }
+    
+    .orders-table th {
+        color: var(--cd-text-muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--cd-border);
+    }
+    
+    .orders-table td {
+        padding: 16px;
+        color: var(--cd-text);
+        border-bottom: 1px solid var(--cd-border);
+        vertical-align: middle;
+    }
+    
+    .orders-table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .orders-table tbody tr:hover {
+        background: rgba(99, 102, 241, 0.03);
+    }
+    
+    .orders-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .order-restaurant {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .order-restaurant-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--cd-gradient-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    /* Payment Method Pills */
+    .payment-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .payment-pill.cash { background: rgba(16, 185, 129, 0.1); color: var(--cd-success); }
+    .payment-pill.card { background: rgba(99, 102, 241, 0.1); color: var(--cd-primary); }
+    .payment-pill.bank { background: rgba(6, 182, 212, 0.1); color: var(--cd-info); }
+    .payment-pill.mobile { background: rgba(245, 158, 11, 0.1); color: var(--cd-warning); }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: var(--cd-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+    
+    .empty-state-icon i {
+        font-size: 2.5rem;
+        color: var(--cd-text-muted);
+    }
+    
+    .empty-state h5 {
+        color: var(--cd-text);
+        margin-bottom: 8px;
+    }
+    
+    .empty-state p {
+        color: var(--cd-text-muted);
+        margin-bottom: 24px;
+    }
+    
+    /* Account Card */
+    .account-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: var(--cd-gradient-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 2.5rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .account-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--cd-border);
+    }
+    
+    .account-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .account-info-item span:first-child {
+        color: var(--cd-text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .account-info-item span:last-child {
+        color: var(--cd-text);
+        font-weight: 500;
+    }
+    
+    /* Preferred Restaurant Banner */
+    .preferred-banner {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+        animation: slideUp 0.5s ease-out;
+    }
+    
+    .preferred-banner-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .preferred-banner-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .preferred-banner h6 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .preferred-banner h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 30px 0 80px;
+        }
+        
+        .welcome-content h1 {
+            font-size: 1.75rem;
+        }
+        
+        .stats-container {
+            margin-top: -40px;
+        }
+        
+        .stat-card {
+            padding: 18px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="customer-dashboard">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="welcome-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1>
+                            <span class="greeting-emoji">👋</span> 
+                            Hello, {{ user.first_name|default:user.username }}!
+                        </h1>
+                        <p class="mb-0">Ready to discover delicious food today?</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <a href="{% url 'browse_restaurants' %}" class="btn btn-light btn-lg px-4">
+                            <i class="fas fa-utensils me-2"></i>Order Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card gradient-1">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-value">{{ total_orders }}</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card gradient-2">
+                        <div class="stat-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="stat-value">₦{{ total_spent|floatformat:0|default:"0" }}</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card gradient-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-value">₦{{ monthly_spent|floatformat:0|default:"0" }}</div>
+                        <div class="stat-label">This Month</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stat-card gradient-4">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="stat-value">{{ completed_orders }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preferred Restaurant Banner -->
+        {% if user.preferred_restaurant %}
+        <div class="preferred-banner mt-4">
+            <div class="preferred-banner-content">
+                <div class="preferred-banner-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <h6>Your Favorite Restaurant</h6>
+                    <h5>{{ user.preferred_restaurant.name }}</h5>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'restaurant_detail' user.preferred_restaurant.slug %}" class="btn btn-light">
+                    <i class="fas fa-utensils me-2"></i>Order Now
+                </a>
+                <a href="{% url 'remove_preferred_restaurant' %}" class="btn btn-outline-light">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Active Orders -->
+        {% if active_orders %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="cd-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--cd-warning);">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                            Active Orders
+                        </h6>
+                        <span class="badge bg-warning text-dark rounded-pill px-3">{{ active_orders|length }} Active</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% for order in active_orders %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="active-order-card {{ order.status }}">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <strong class="d-block">#{{ order.id }}</strong>
+                                            <small class="text-muted">{{ order.restaurant.name }}</small>
+                                        </div>
+                                        <span class="status-badge {{ order.status }}">
+                                            <i class="fas fa-{% if order.status == 'pending' %}hourglass-half{% elif order.status == 'preparing' %}fire{% elif order.status == 'ready' %}check{% else %}clock{% endif %}"></i>
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="fw-bold fs-5">₦{{ order.total_price|floatformat:0 }}</span>
+                                        <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                            <i class="fas fa-eye me-1"></i>Track
+                                        </a>
+                                    </div>
+                                    <div class="order-progress">
+                                        <div class="order-progress-bar {{ order.status }}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Quick Actions & Favorites Row -->
+        <div class="row mt-4 g-4">
+            <!-- Quick Actions -->
+            <div class="col-lg-8">
+                <div class="cd-card h-100">
+                    <div class="card-header">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--cd-primary);">
+                                <i class="fas fa-bolt"></i>
+                            </span>
+                            Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'browse_restaurants' %}" class="quick-action-card">
+                                    <div class="quick-action-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--cd-primary);">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <span>Browse</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'view_cart' %}" class="quick-action-card">
+                                    <div class="quick-action-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--cd-warning);">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <span>My Cart</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'order_history' %}" class="quick-action-card">
+                                    <div class="quick-action-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--cd-success);">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <span>Orders</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'payments:payment_history' %}" class="quick-action-card">
+                                    <div class="quick-action-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--cd-info);">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <span>Payments</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Account Summary -->
+            <div class="col-lg-4">
+                <div class="cd-card h-100">
+                    <div class="card-header">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(240, 147, 251, 0.1); color: #f093fb;">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            My Account
+                        </h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="account-avatar">
+                            {{ user.first_name|slice:":1"|upper|default:user.username|slice:":1"|upper }}
+                        </div>
+                        <h5 class="mb-1" style="color: var(--cd-text);">{{ user.get_full_name|default:user.username }}</h5>
+                        <p class="text-muted small mb-3">{{ user.email }}</p>
+                        <div class="text-start">
+                            <div class="account-info-item">
+                                <span><i class="fas fa-calendar me-2"></i>Member Since</span>
+                                <span>{{ user.date_joined|date:"M Y" }}</span>
+                            </div>
+                            <div class="account-info-item">
+                                <span><i class="fas fa-chart-line me-2"></i>This Week</span>
+                                <span>{{ recent_activity_count }} orders</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Restaurants -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="cd-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--cd-danger);">
+                                <i class="fas fa-fire"></i>
+                            </span>
+                            Featured Restaurants
+                        </h6>
+                        <a href="{% url 'browse_restaurants' %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                            View All <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if featured_restaurants %}
+                        <div class="row g-4">
+                            {% for restaurant in featured_restaurants %}
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <div class="restaurant-card">
+                                    <div class="restaurant-card-image" style="background: var(--cd-gradient-{% cycle '1' '2' '3' '4' %});">
+                                        {% if restaurant.banner_image %}
+                                        <img src="{{ restaurant.banner_image.url }}" alt="{{ restaurant.name }}">
+                                        {% elif restaurant.logo %}
+                                        <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.name }}">
+                                        {% else %}
+                                        <div class="restaurant-no-image" aria-hidden="true"></div>
+                                        {% endif %}
+                                        <div class="restaurant-card-logo">
+                                            {% if restaurant.logo %}
+                                            <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.name }}">
+                                            {% else %}
+                                            <i class="fas fa-utensils fa-lg" style="color: var(--cd-primary);"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="restaurant-card-body">
+                                        <h6>{{ restaurant.name|truncatewords:2 }}</h6>
+                                        <p>{{ restaurant.description|truncatewords:4|default:"Delicious food" }}</p>
+                                        <a href="{% url 'restaurant_detail' restaurant.slug %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                            Order
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <h5>No restaurants available</h5>
+                            <p>Check back soon for new restaurants!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Favorites & Recent Orders Row -->
+        <div class="row mt-4 g-4">
+            <!-- Favorite Restaurants -->
+            {% if favorite_restaurants %}
+            <div class="col-lg-4">
+                <div class="cd-card h-100">
+                    <div class="card-header">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--cd-danger);">
+                                <i class="fas fa-heart"></i>
+                            </span>
+                            Your Favorites
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% for fav in favorite_restaurants %}
+                        <a href="{% url 'restaurant_detail' fav.restaurant__slug %}" class="favorite-card text-decoration-none">
+                            <div class="favorite-logo">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="favorite-info flex-grow-1">
+                                <h6>{{ fav.restaurant__name }}</h6>
+                                <small>{{ fav.order_count }} orders • ₦{{ fav.total_spent|floatformat:0 }}</small>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recent Orders -->
+            <div class="{% if favorite_restaurants %}col-lg-8{% else %}col-12{% endif %}">
+                <div class="cd-card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--cd-primary);">
+                                <i class="fas fa-history"></i>
+                            </span>
+                            Recent Orders
+                        </h6>
+                        <a href="{% url 'order_history' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            View All
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if recent_orders %}
+                        <div class="table-responsive">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Restaurant</th>
+                                        <th>Amount</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in recent_orders %}
+                                    <tr>
+                                        <td><strong>#{{ order.id }}</strong></td>
+                                        <td>
+                                            <div class="order-restaurant">
+                                                <div class="order-restaurant-icon">
+                                                    <i class="fas fa-utensils"></i>
+                                                </div>
+                                                <div>
+                                                    <strong>{{ order.restaurant.name|truncatewords:2 }}</strong>
+                                                    <small class="d-block text-muted">{{ order.created_at|date:"M d" }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><strong>₦{{ order.total_price|floatformat:0 }}</strong></td>
+                                        <td>
+                                            <span class="payment-pill {% if order.payment_method == 'cash' %}cash{% elif order.payment_method == 'paystack' or order.payment_method == 'card' %}card{% elif order.payment_method == 'bank_transfer' %}bank{% else %}mobile{% endif %}">
+                                                <i class="fas fa-{% if order.payment_method == 'cash' %}money-bill{% elif order.payment_method == 'paystack' or order.payment_method == 'card' %}credit-card{% elif order.payment_method == 'bank_transfer' %}university{% else %}mobile{% endif %}"></i>
+                                                {{ order.get_payment_method_display|default:order.payment_method|truncatewords:1 }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge {{ order.status }}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <h5>No orders yet</h5>
+                            <p>Start exploring restaurants and place your first order!</p>
+                            <a href="{% url 'browse_restaurants' %}" class="btn btn-primary btn-lg rounded-pill px-4">
+                                <i class="fas fa-utensils me-2"></i>Browse Restaurants
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

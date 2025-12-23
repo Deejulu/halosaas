@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #28a745;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+        }
+
+        .order-details {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .button {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .urgent {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🆕 New Order Received!</h1>
+            <p>You have a new order from {{ order.customer_name }}</p>
+        </div>
+
+        <div class="content">
+            <div class="urgent">
+                <h3>🚀 Action Required</h3>
+                <p>Please review this order and start preparation as soon as possible.</p>
+            </div>
+
+            <h2>Order #{{ order.id }}</h2>
+
+            <div class="order-details">
+                <h3>Customer Information</h3>
+                <p><strong>{{ order.customer_name }}</strong></p>
+                <p>Phone: {{ order.customer_phone }}</p>
+                <p>Email: {{ order.customer_email }}</p>
+                {% if order.special_instructions %}
+                <p><strong>Special Instructions:</strong> {{ order.special_instructions }}</p>
+                {% endif %}
+            </div>
+
+            <div class="order-details">
+                <h3>Order Items</h3>
+                {% for item in order_items %}
+                <div class="order-item">
+                    <span>{{ item.quantity }}x {{ item.menu_item.name }}</span>
+                    <span>₦{{ item.total_price }}</span>
+                </div>
+                {% if item.special_requests %}
+                <p style="color: #666; font-size: 14px; margin: 5px 0 10px 20px;">
+                    <em>Special: {{ item.special_requests }}</em>
+                </p>
+                {% endif %}
+                {% endfor %}
+
+                <div style="border-top: 2px solid #28a745; margin-top: 15px; padding-top: 15px;">
+                    <div class="order-item" style="font-weight: bold;">
+                        <span>Total</span>
+                        <span>₦{{ order.total_price }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="http://localhost:8000/restaurant/{{ restaurant.id }}/orders/" class="button">Manage This
+                    Order</a>
+            </div>
+
+            <p style="text-align: center; color: #666;">
+                Order placed at: {{ order.created_at|date:"F j, Y g:i A" }}
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>Halo Sass - Making restaurant management easier</p>
+        </div>
+    </div>
+</body>
+
+</html>

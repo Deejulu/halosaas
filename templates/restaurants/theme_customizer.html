@@ -1,0 +1,481 @@
+{% load static %}
+
+<!-- Theme Customization Section -->
+<div class="card mt-4">
+    <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <h5 class="mb-0">
+            <i class="fas fa-palette me-2"></i>Appearance & Theme Customization
+        </h5>
+        {% if restaurant and restaurant.slug %}
+        <a href="{% url 'restaurant_detail' restaurant.slug %}" target="_blank" class="btn btn-sm btn-light">
+            <i class="fas fa-external-link-alt me-1"></i>Preview Restaurant
+        </a>
+        {% else %}
+        <span class="badge bg-light text-dark">
+            <i class="fas fa-info-circle me-1"></i>Save to preview
+        </span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-lightbulb me-2"></i>
+            {% if restaurant %}
+            <strong>Tip:</strong> Customize your restaurant's appearance. Changes will be visible after saving. Click "Preview Restaurant" to see how your page looks.
+            {% else %}
+            <strong>Tip:</strong> Set up your restaurant's look and feel. You can customize colors, fonts, layout, and more. These settings will be applied once you create the restaurant.
+            {% endif %}
+        </div>
+        
+        <!-- Template Style -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-layer-group me-2"></i>Template Style
+                </h6>
+            </div>
+            <div class="col-12">
+                <div class="row g-3">
+                    {% for value, label in template_choices %}
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <label class="template-option w-100 {% if restaurant.template_style == value %}selected{% endif %}">
+                            <input type="radio" name="template_style" value="{{ value }}" 
+                                   {% if restaurant.template_style == value %}checked{% endif %} class="d-none">
+                            <div class="template-preview template-{{ value }}">
+                                <div class="template-thumb">
+                                    {% if value == 'classic' %}
+                                    <div class="thumb-header"></div>
+                                    <div class="thumb-content">
+                                        <div class="thumb-box"></div>
+                                        <div class="thumb-box"></div>
+                                        <div class="thumb-box"></div>
+                                    </div>
+                                    {% elif value == 'modern' %}
+                                    <div class="thumb-header full"></div>
+                                    <div class="thumb-content modern">
+                                        <div class="thumb-card"></div>
+                                        <div class="thumb-card"></div>
+                                    </div>
+                                    {% elif value == 'minimal' %}
+                                    <div class="thumb-header slim"></div>
+                                    <div class="thumb-content minimal">
+                                        <div class="thumb-line"></div>
+                                        <div class="thumb-line"></div>
+                                        <div class="thumb-line"></div>
+                                    </div>
+                                    {% elif value == 'elegant' %}
+                                    <div class="thumb-header elegant"></div>
+                                    <div class="thumb-content elegant">
+                                        <div class="thumb-fancy"></div>
+                                    </div>
+                                    {% elif value == 'fastfood' %}
+                                    <div class="thumb-header fastfood"></div>
+                                    <div class="thumb-content fastfood">
+                                        <div class="thumb-btn"></div>
+                                        <div class="thumb-btn"></div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <span class="template-name">{{ label }}</span>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-fill-drip me-2"></i>Colors
+                </h6>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Primary Color</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="primary_color" 
+                           value="{{ restaurant.primary_color|default:'#007bff' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.primary_color|default:'#007bff' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Secondary Color</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="secondary_color" 
+                           value="{{ restaurant.secondary_color|default:'#6c757d' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.secondary_color|default:'#6c757d' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Accent Color</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="accent_color" 
+                           value="{{ restaurant.accent_color|default:'#28a745' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.accent_color|default:'#28a745' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Background Color</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="background_color" 
+                           value="{{ restaurant.background_color|default:'#ffffff' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.background_color|default:'#ffffff' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Text Color</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="text_color" 
+                           value="{{ restaurant.text_color|default:'#333333' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.text_color|default:'#333333' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Header Background</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="header_bg_color" 
+                           value="{{ restaurant.header_bg_color|default:'#000000' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.header_bg_color|default:'#000000' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3 mb-3">
+                <label class="form-label">Header Text</label>
+                <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="header_text_color" 
+                           value="{{ restaurant.header_text_color|default:'#ffffff' }}">
+                    <input type="text" class="form-control" value="{{ restaurant.header_text_color|default:'#ffffff' }}" 
+                           onchange="this.previousElementSibling.value=this.value" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Font & Button Style -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-font me-2"></i>Typography & Buttons
+                </h6>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Font Style</label>
+                <select name="font_style" class="form-select">
+                    {% for value, label in font_choices %}
+                    <option value="{{ value }}" {% if restaurant.font_style == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Button Style</label>
+                <select name="button_style" class="form-select">
+                    {% for value, label in button_choices %}
+                    <option value="{{ value }}" {% if restaurant.button_style == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Header Style</label>
+                <select name="header_style" class="form-select">
+                    {% for value, label in header_choices %}
+                    <option value="{{ value }}" {% if restaurant.header_style == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Menu Layout -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-th me-2"></i>Menu Layout
+                </h6>
+            </div>
+            <div class="col-12">
+                <div class="row g-3">
+                    {% for value, label in menu_layout_choices %}
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <label class="menu-layout-option w-100 {% if restaurant.menu_layout == value %}selected{% endif %}">
+                            <input type="radio" name="menu_layout" value="{{ value }}" 
+                                   {% if restaurant.menu_layout == value %}checked{% endif %} class="d-none">
+                            <div class="layout-preview">
+                                <div class="layout-thumb layout-{{ value }}">
+                                    {% if value == 'grid' %}
+                                    <div class="grid-item"></div>
+                                    <div class="grid-item"></div>
+                                    <div class="grid-item"></div>
+                                    <div class="grid-item"></div>
+                                    {% elif value == 'list' %}
+                                    <div class="list-item"></div>
+                                    <div class="list-item"></div>
+                                    <div class="list-item"></div>
+                                    {% elif value == 'gallery' %}
+                                    <div class="gallery-item big"></div>
+                                    <div class="gallery-item"></div>
+                                    <div class="gallery-item"></div>
+                                    {% elif value == 'compact' %}
+                                    <div class="compact-item"></div>
+                                    <div class="compact-item"></div>
+                                    <div class="compact-item"></div>
+                                    <div class="compact-item"></div>
+                                    {% elif value == 'magazine' %}
+                                    <div class="mag-item hero"></div>
+                                    <div class="mag-item"></div>
+                                    <div class="mag-item"></div>
+                                    {% endif %}
+                                </div>
+                                <span class="layout-name">{{ label }}</span>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Visibility -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-eye me-2"></i>Section Visibility
+                </h6>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_hero" id="show_hero"
+                           {% if restaurant.show_hero %}checked{% endif %}>
+                    <label class="form-check-label" for="show_hero">Show Hero Banner</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_about" id="show_about"
+                           {% if restaurant.show_about %}checked{% endif %}>
+                    <label class="form-check-label" for="show_about">Show About Section</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_gallery" id="show_gallery"
+                           {% if restaurant.show_gallery %}checked{% endif %}>
+                    <label class="form-check-label" for="show_gallery">Show Gallery</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_reviews" id="show_reviews"
+                           {% if restaurant.show_reviews %}checked{% endif %}>
+                    <label class="form-check-label" for="show_reviews">Show Reviews</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_contact" id="show_contact"
+                           {% if restaurant.show_contact %}checked{% endif %}>
+                    <label class="form-check-label" for="show_contact">Show Contact</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_social" id="show_social"
+                           {% if restaurant.show_social %}checked{% endif %}>
+                    <label class="form-check-label" for="show_social">Show Social Links</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_chef" id="show_chef"
+                           {% if restaurant.show_chef %}checked{% endif %}>
+                    <label class="form-check-label" for="show_chef">Show Chef Info</label>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3 mb-2">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="show_hours" id="show_hours"
+                           {% if restaurant.show_hours %}checked{% endif %}>
+                    <label class="form-check-label" for="show_hours">Show Hours</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom CSS -->
+        <div class="row">
+            <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3">
+                    <i class="fas fa-code me-2"></i>Advanced: Custom CSS
+                </h6>
+            </div>
+            <div class="col-12">
+                <textarea name="custom_css" class="form-control font-monospace" rows="4" 
+                          placeholder="/* Add custom CSS here */">{{ restaurant.custom_css }}</textarea>
+                <small class="text-muted">Add custom CSS to further customize your restaurant page.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Template Selection */
+.template-option, .menu-layout-option {
+    cursor: pointer;
+    display: block;
+}
+
+.template-preview, .layout-preview {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.template-option.selected .template-preview,
+.menu-layout-option.selected .layout-preview {
+    border-color: #007bff;
+    background: rgba(0, 123, 255, 0.1);
+}
+
+.template-option:hover .template-preview,
+.menu-layout-option:hover .layout-preview {
+    border-color: #007bff;
+}
+
+.template-thumb, .layout-thumb {
+    height: 60px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.template-name, .layout-name {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Template Thumbs */
+.thumb-header {
+    height: 15px;
+    background: #333;
+}
+.thumb-header.full { height: 25px; }
+.thumb-header.slim { height: 8px; }
+.thumb-header.elegant { height: 12px; background: linear-gradient(to right, #d4af37, #f4e4c1, #d4af37); }
+.thumb-header.fastfood { background: #dc3545; }
+
+.thumb-content {
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+.thumb-box {
+    width: 30%;
+    height: 15px;
+    background: #dee2e6;
+    border-radius: 2px;
+}
+.thumb-card {
+    width: 45%;
+    height: 20px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+}
+.thumb-line {
+    width: 100%;
+    height: 8px;
+    background: #dee2e6;
+    border-radius: 2px;
+}
+.thumb-fancy {
+    width: 100%;
+    height: 25px;
+    background: linear-gradient(to right, #f8f9fa, #e9ecef, #f8f9fa);
+    border-radius: 3px;
+}
+.thumb-btn {
+    width: 40%;
+    height: 12px;
+    background: #dc3545;
+    border-radius: 6px;
+}
+
+/* Layout Thumbs */
+.layout-thumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    padding: 5px;
+}
+.grid-item {
+    width: calc(50% - 3px);
+    height: 25px;
+    background: #dee2e6;
+    border-radius: 3px;
+}
+.list-item {
+    width: 100%;
+    height: 15px;
+    background: #dee2e6;
+    border-radius: 3px;
+}
+.gallery-item {
+    width: calc(50% - 3px);
+    height: 20px;
+    background: #dee2e6;
+    border-radius: 3px;
+}
+.gallery-item.big {
+    width: 100%;
+    height: 30px;
+}
+.compact-item {
+    width: 100%;
+    height: 10px;
+    background: #dee2e6;
+    border-radius: 2px;
+}
+.mag-item {
+    width: calc(50% - 3px);
+    height: 20px;
+    background: #dee2e6;
+    border-radius: 3px;
+}
+.mag-item.hero {
+    width: 100%;
+    height: 25px;
+}
+
+/* Color Input Styling */
+.form-control-color {
+    width: 50px;
+    padding: 0;
+}
+</style>
+
+<script>
+// Update color text input when color picker changes
+document.querySelectorAll('input[type="color"]').forEach(function(colorInput) {
+    colorInput.addEventListener('input', function() {
+        this.nextElementSibling.value = this.value;
+    });
+});
+
+// Template selection
+document.querySelectorAll('.template-option input, .menu-layout-option input').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        const parent = this.closest('.row');
+        parent.querySelectorAll('.template-option, .menu-layout-option').forEach(function(opt) {
+            opt.classList.remove('selected');
+        });
+        this.closest('.template-option, .menu-layout-option').classList.add('selected');
+    });
+});
+</script>

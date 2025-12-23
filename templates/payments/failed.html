@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Failed - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0 text-center">
+                        <i class="fas fa-times-circle me-2"></i>Payment Failed
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="failed-icon mb-3">
+                            <i class="fas fa-times-circle fa-5x text-danger"></i>
+                        </div>
+                        <h4 class="text-danger">Payment Not Processed</h4>
+                        <p class="lead">We couldn't process your payment. Please try again.</p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>What could have happened?</h5>
+                        <ul class="mb-0">
+                            <li>Insufficient funds in your account</li>
+                            <li>Card declined by your bank</li>
+                            <li>Network connectivity issues</li>
+                            <li>Payment timeout</li>
+                        </ul>
+                    </div>
+
+                    <div class="payment-details mb-4">
+                        <h5>Payment Details</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <p><strong>Reference:</strong> {{ payment.reference }}</p>
+                                <p><strong>Amount:</strong> ₦{{ payment.amount }}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-danger">{{ payment.get_status_display
+                                        }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-credit-card me-2"></i>Try Payment Again
+                            </a>
+                            <a href="{% url 'view_cart' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-shopping-cart me-2"></i>Back to Cart
+                            </a>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .failed-icon {
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+</style>
+{% endblock %}

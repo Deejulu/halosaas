@@ -1,0 +1,616 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Menu - {{ restaurant.name }} - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>
+                <i class="fas fa-utensils me-2"></i>Manage Menu
+            </h1>
+            <p class="text-muted mb-0">{{ restaurant.name }}</p>
+        </div>
+        <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h4 class="text-primary">{{ categories.count }}</h4>
+                    <p class="mb-0">Categories</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h4 class="text-success">{{ total_items }}</h4>
+                    <p class="mb-0">Total Items</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h4 class="text-warning">{{ available_items }}</h4>
+                    <p class="mb-0">Available</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h4 class="text-info">₦{{ total_revenue|default:0 }}</h4>
+                    <p class="mb-0">Revenue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Categories Section -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Categories
+                    </h5>
+                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="fas fa-plus me-1"></i>Add
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if categories %}
+                    <div class="list-group">
+                        {% for category in categories %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ category.name }}</h6>
+                                {% if category.description %}
+                                <p class="mb-1 text-muted small">{{ category.description }}</p>
+                                {% endif %}
+                                <small class="text-muted">{{ category.menuitem_set.count }} items</small>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                    data-bs-target="#addItemModal" data-category-id="{{ category.id }}"
+                                    data-category-name="{{ category.name }}">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                                    data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}"
+                                    data-category-name="{{ category.name }}"
+                                    data-category-description="{{ category.description }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="post" action="{% url 'delete_category' category.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Delete {{ category.name }} and all its items?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-list fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No categories yet. Add your first category to get started!</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                            <i class="fas fa-plus me-2"></i>Add First Category
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Items Section -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                    <h5 class="mb-0">
+                        <i class="fas fa-utensils me-2"></i>Menu Items
+                    </h5>
+                    <form class="mt-3 mt-md-0" style="max-width: 350px; width: 100%;" onsubmit="return false;">
+                        <div class="input-group">
+                            <input type="text" id="menu-search" class="form-control" placeholder="Search menu items..." aria-label="Search menu items">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body">
+                    {% if categories %}
+                    <div class="row">
+                        {% for category in categories %}
+                        {% for item in category.menuitem_set.all %}
+                        <div class="col-md-6 mb-3 menu-item-card" data-name="{{ item.name|lower }}" data-description="{{ item.description|default:''|lower }}">
+                            <div class="card h-100 {% if not item.can_be_ordered %}border-danger{% endif %}">
+                                {% if item.image %}
+                                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 150px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ item.name }}</h6>
+                                        <span class="badge {{ item.availability_status.2 }}">{{ item.availability_status.1 }}</span>
+                                    </div>
+                                    <p class="card-text text-muted small">{{ item.description|default:"No description" }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h6 text-success mb-0">₦{{ item.price }}</span>
+                                        <small class="text-muted"><i class="fas fa-clock me-1"></i>{{ item.preparation_time }}min</small>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">Category: {{ category.name }}</small>
+                                    {% if item.track_stock %}
+                                    <div class="mt-2 p-2 rounded bg-light border">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <small class="fw-bold"><i class="fas fa-box me-1"></i>Stock Management</small>
+                                            <span class="badge bg-secondary">Tracking ON</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <form method="post" action="{% url 'update_stock' item.id %}" class="d-flex gap-1 flex-grow-1">
+                                                {% csrf_token %}
+                                                <input type="number" name="quantity" class="form-control form-control-sm" style="width: 70px;" placeholder="Qty" min="1" value="10">
+                                                <button type="submit" name="action" value="add" class="btn btn-sm btn-success" title="Add to stock"><i class="fas fa-plus"></i></button>
+                                                <button type="submit" name="action" value="set" class="btn btn-sm btn-primary" title="Set stock to this amount"><i class="fas fa-equals"></i></button>
+                                            </form>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">Low stock alert at: {{ item.low_stock_threshold }} portions</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+{% else %}
+<div class="mt-2">
+<small class="text-muted"><i class="fas fa-info-circle me-1"></i>Stock tracking OFF - using manual availability</small>
+</div>
+{% endif %}
+{% if not item.is_available and item.disabled_reason %}
+<div class="mt-2 p-2 rounded bg-danger bg-opacity-10 border border-danger">
+<small class="text-danger fw-bold"><i class="fas fa-ban me-1"></i>Disabled: {{ item.get_disabled_reason_display }}</small>
+{% if item.disabled_reason_note %}
+<small class="d-block text-muted">{{ item.disabled_reason_note }}</small>
+{% endif %}
+{% if item.disabled_at %}
+<small class="d-block text-muted">Since: {{ item.disabled_at|date:"M d, Y H:i" }}</small>
+{% endif %}
+</div>
+{% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="btn-group w-100">
+<button type="button" class="btn btn-sm {% if item.is_available %}btn-warning{% else %}btn-success{% endif %} toggle-availability-btn" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-is-available="{{ item.is_available }}" data-track-stock="{{ item.track_stock }}" data-bs-toggle="modal" data-bs-target="#toggleAvailabilityModal"><i class="fas fa-power-off me-1"></i>{% if item.is_available %}Disable{% else %}Enable{% endif %}</button>
+<button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-item-description="{{ item.description }}" data-item-price="{{ item.price }}" data-item-prep-time="{{ item.preparation_time }}" data-item-category="{{ category.id }}" data-item-track-stock="{{ item.track_stock }}" data-item-stock="{{ item.stock_quantity }}" data-item-low-stock="{{ item.low_stock_threshold }}"><i class="fas fa-edit me-1"></i>Edit</button>
+                                        <form method="post" action="{% url 'delete_menu_item' item.id %}" class="d-inline">
+                                            {% csrf_token %}
+<button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete {{ item.name }}?')"><i class="fas fa-trash me-1"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="text-center py-4">
+                                <i class="fas fa-utensils fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No menu items in this category yet.</p>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                                    <i class="fas fa-plus me-2"></i>Add First Item
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Categories Yet</h5>
+                        <p class="text-muted">Start by adding categories to organize your menu items.</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                            <i class="fas fa-plus me-2"></i>Add First Category
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const searchInput = document.getElementById('menu-search');
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function () {
+                            const query = this.value.trim().toLowerCase();
+                            document.querySelectorAll('.menu-item-card').forEach(card => {
+                                const name = card.getAttribute('data-name') || '';
+                                const desc = card.getAttribute('data-description') || '';
+                                if (name.includes(query) || desc.includes(query)) {
+                                    card.style.display = '';
+                                } else {
+                                    card.style.display = 'none';
+                                }
+                            });
+                        });
+                    }
+                });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Add New Category
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'add_category' restaurant.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Category Name *</label>
+                        <input type="text" class="form-control" id="categoryName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="categoryDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="categoryDescription" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Edit Category
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCategoryForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="editCategoryId" name="category_id">
+                    <div class="mb-3">
+                        <label for="editCategoryName" class="form-label">Category Name *</label>
+                        <input type="text" class="form-control" id="editCategoryName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCategoryDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editCategoryDescription" name="description"
+                            rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Menu Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Add Menu Item to <span id="modalCategoryName"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'add_menu_item' restaurant.id 0 %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="categoryId" name="category_id">
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">Item Name *</label>
+                        <input type="text" class="form-control" id="itemName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="itemDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="itemImage" class="form-label">
+                            <i class="fas fa-image me-1"></i>Item Image
+                        </label>
+                        <input type="file" class="form-control" id="itemImage" name="image" accept="image/*">
+                        <small class="text-muted">Upload a delicious photo of your menu item (JPG, PNG)</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="itemPrice" class="form-label">Price (₦) *</label>
+                            <input type="number" class="form-control" id="itemPrice" name="price" step="0.01" min="0"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="itemPrepTime" class="form-label">Prep Time (mins) *</label>
+                            <input type="number" class="form-control" id="itemPrepTime" name="preparation_time"
+                                value="15" min="1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Menu Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Edit Menu Item
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editItemForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="editItemId" name="item_id">
+                    <div class="mb-3">
+                        <label for="editItemName" class="form-label">Item Name *</label>
+                        <input type="text" class="form-control" id="editItemName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editItemDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editItemDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editItemImage" class="form-label">
+                            <i class="fas fa-image me-1"></i>Update Image
+                        </label>
+                        <input type="file" class="form-control" id="editItemImage" name="image" accept="image/*">
+                        <small class="text-muted">Leave empty to keep current image</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editItemPrice" class="form-label">Price (₦) *</label>
+                            <input type="number" class="form-control" id="editItemPrice" name="price" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editItemPrepTime" class="form-label">Prep Time (mins) *</label>
+                            <input type="number" class="form-control" id="editItemPrepTime" name="preparation_time" min="1" required>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-box me-2"></i>Stock Tracking</h6>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="editTrackStock" name="track_stock">
+                        <label class="form-check-label" for="editTrackStock">Enable stock tracking</label>
+                    </div>
+                    <div class="row" id="stockFields">
+                        <div class="col-md-6 mb-3">
+                            <label for="editStockQty" class="form-label">Current Stock</label>
+                            <input type="number" class="form-control" id="editStockQty" name="stock_quantity" min="0" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editLowStock" class="form-label">Low Stock Alert</label>
+                            <input type="number" class="form-control" id="editLowStock" name="low_stock_threshold" min="1" value="5">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">Update Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Availability Modal -->
+<div class="modal fade" id="toggleAvailabilityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" id="toggleModalHeader">
+                <h5 class="modal-title" id="toggleModalTitle">
+                    <i class="fas fa-power-off me-2"></i><span id="toggleActionText">Toggle Availability</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="toggleAvailabilityForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="toggleItemId" name="item_id">
+                    <input type="hidden" id="toggleAction" name="toggle_action">
+                    
+                    <!-- Disable Options (shown when disabling) -->
+                    <div id="disableOptions">
+                        <p class="mb-3">You are about to disable <strong id="disableItemName"></strong>.</p>
+                        <div class="mb-3">
+                            <label class="form-label">Reason for disabling <span class="text-muted">(optional)</span></label>
+                            <select class="form-select" id="disableReason" name="disable_reason">
+                                <option value="">-- Select a reason --</option>
+                                <option value="sold_out">Sold Out</option>
+                                <option value="seasonal">Seasonal Item (Not in Season)</option>
+                                <option value="ingredients">Missing Ingredients</option>
+                                <option value="maintenance">Under Maintenance/Recipe Update</option>
+                                <option value="discontinued">Discontinued</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="customReasonDiv" style="display: none;">
+                            <label class="form-label">Custom Reason</label>
+                            <input type="text" class="form-control" id="customReason" name="custom_reason" placeholder="Enter your reason...">
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <small>Disabled items will not appear on the customer menu and cannot be ordered.</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Enable Options (shown when enabling) -->
+                    <div id="enableOptions" style="display: none;">
+                        <p class="mb-3">You are about to enable <strong id="enableItemName"></strong>.</p>
+                        
+                        <div id="stockEnableOptions" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <small>This item has stock tracking enabled. Set the initial stock quantity:</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Stock Quantity</label>
+                                <input type="number" class="form-control" id="enableStockQty" name="stock_quantity" min="1" value="10">
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <small>Enabled items will appear on the customer menu and can be ordered.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn" id="toggleSubmitBtn">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle Availability Modal
+        const toggleModal = document.getElementById('toggleAvailabilityModal');
+        toggleModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const itemId = button.getAttribute('data-item-id');
+            const itemName = button.getAttribute('data-item-name');
+            const isAvailable = button.getAttribute('data-is-available') === 'True';
+            const trackStock = button.getAttribute('data-track-stock') === 'True';
+            
+            document.getElementById('toggleItemId').value = itemId;
+            
+            const modalHeader = document.getElementById('toggleModalHeader');
+            const submitBtn = document.getElementById('toggleSubmitBtn');
+            const disableOptions = document.getElementById('disableOptions');
+            const enableOptions = document.getElementById('enableOptions');
+            const stockEnableOptions = document.getElementById('stockEnableOptions');
+            
+            if (isAvailable) {
+                // Disabling
+                document.getElementById('toggleAction').value = 'disable';
+                document.getElementById('toggleActionText').textContent = 'Disable Item';
+                document.getElementById('disableItemName').textContent = itemName;
+                modalHeader.className = 'modal-header bg-warning text-dark';
+                submitBtn.className = 'btn btn-warning';
+                submitBtn.innerHTML = '<i class="fas fa-power-off me-1"></i>Disable Item';
+                disableOptions.style.display = 'block';
+                enableOptions.style.display = 'none';
+            } else {
+                // Enabling
+                document.getElementById('toggleAction').value = 'enable';
+                document.getElementById('toggleActionText').textContent = 'Enable Item';
+                document.getElementById('enableItemName').textContent = itemName;
+                modalHeader.className = 'modal-header bg-success text-white';
+                submitBtn.className = 'btn btn-success';
+                submitBtn.innerHTML = '<i class="fas fa-check me-1"></i>Enable Item';
+                disableOptions.style.display = 'none';
+                enableOptions.style.display = 'block';
+                stockEnableOptions.style.display = trackStock ? 'block' : 'none';
+            }
+            
+            // Update form action
+            document.getElementById('toggleAvailabilityForm').action = "{% url 'toggle_menu_item' 0 %}".replace('0', itemId);
+        });
+        
+        // Show/hide custom reason field
+        document.getElementById('disableReason').addEventListener('change', function() {
+            document.getElementById('customReasonDiv').style.display = this.value === 'other' ? 'block' : 'none';
+        });
+        
+        // Edit Category Modal
+        const editCategoryModal = document.getElementById('editCategoryModal');
+        editCategoryModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const categoryId = button.getAttribute('data-category-id');
+            const categoryName = button.getAttribute('data-category-name');
+            const categoryDescription = button.getAttribute('data-category-description');
+
+            document.getElementById('editCategoryId').value = categoryId;
+            document.getElementById('editCategoryName').value = categoryName;
+            document.getElementById('editCategoryDescription').value = categoryDescription || '';
+
+            // Update form action
+            document.getElementById('editCategoryForm').action = "{% url 'edit_category' 0 %}".replace('0', categoryId);
+        });
+
+        // Add Item Modal
+        const addItemModal = document.getElementById('addItemModal');
+        addItemModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const categoryId = button.getAttribute('data-category-id');
+            const categoryName = button.getAttribute('data-category-name');
+
+            document.getElementById('modalCategoryName').textContent = categoryName;
+            document.getElementById('categoryId').value = categoryId;
+
+            // Update form action with correct category ID
+            const form = this.querySelector('form');
+            form.action = form.action.replace('/0/', '/' + categoryId + '/');
+        });
+
+        // Edit Item Modal
+        const editItemModal = document.getElementById('editItemModal');
+        editItemModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const itemId = button.getAttribute('data-item-id');
+            const itemName = button.getAttribute('data-item-name');
+            const itemDescription = button.getAttribute('data-item-description');
+            const itemPrice = button.getAttribute('data-item-price');
+            const itemPrepTime = button.getAttribute('data-item-prep-time');
+            const trackStock = button.getAttribute('data-item-track-stock') === 'True';
+            const stockQty = button.getAttribute('data-item-stock');
+            const lowStock = button.getAttribute('data-item-low-stock');
+
+            document.getElementById('editItemId').value = itemId;
+            document.getElementById('editItemName').value = itemName;
+            document.getElementById('editItemDescription').value = itemDescription || '';
+            document.getElementById('editItemPrice').value = itemPrice;
+            document.getElementById('editItemPrepTime').value = itemPrepTime;
+            document.getElementById('editTrackStock').checked = trackStock;
+            document.getElementById('editStockQty').value = stockQty || 0;
+            document.getElementById('editLowStock').value = lowStock || 5;
+            
+            // Show/hide stock fields based on toggle
+            document.getElementById('stockFields').style.display = trackStock ? 'flex' : 'none';
+
+            // Update form action
+            document.getElementById('editItemForm').action = "{% url 'edit_menu_item' 0 %}".replace('0', itemId);
+        });
+        
+        // Toggle stock fields visibility
+        document.getElementById('editTrackStock').addEventListener('change', function() {
+            document.getElementById('stockFields').style.display = this.checked ? 'flex' : 'none';
+        });
+    });
+</script>
+{% endblock %}

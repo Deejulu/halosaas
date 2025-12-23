@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if restaurant %}Edit{% else %}Add{% endif %} Restaurant - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-{% if restaurant %}edit{% else %}plus{% endif %} me-2"></i>
+                        {% if restaurant %}Edit{% else %}Add New{% endif %} Restaurant
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Basic Information Section -->
+                        <h5 class="border-bottom pb-2 mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Basic Information
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Restaurant Name *</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                    value="{{ restaurant.name|default:'' }}" required>
+                                <div class="form-text">This will be displayed to customers</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone"
+                                    value="{{ restaurant.phone|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description"
+                                rows="3">{{ restaurant.description|default:'' }}</textarea>
+                            <div class="form-text">Brief description of your restaurant</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address *</label>
+                            <textarea class="form-control" id="address" name="address" rows="2"
+                                required>{{ restaurant.address|default:'' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email"
+                                    value="{{ restaurant.email|default:'' }}" required>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="opening_time" class="form-label">Opening Time *</label>
+                                <input type="time" class="form-control" id="opening_time" name="opening_time"
+                                    value="{{ restaurant.opening_time|default:'08:00' }}" required>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label for="closing_time" class="form-label">Closing Time *</label>
+                                <input type="time" class="form-control" id="closing_time" name="closing_time"
+                                    value="{{ restaurant.closing_time|default:'22:00' }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Images Section -->
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">
+                            <i class="fas fa-image me-2"></i>Restaurant Images
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="logo" class="form-label">Restaurant Logo</label>
+                                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                                {% if restaurant.logo %}
+                                <div class="mt-2">
+                                    <img src="{{ restaurant.logo.url }}" alt="Current Logo" class="img-thumbnail"
+                                        style="max-height: 100px;">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="remove_logo"
+                                            id="remove_logo">
+                                        <label class="form-check-label" for="remove_logo">
+                                            Remove current logo
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Logo appears in the header (recommended: 200x200px)</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="banner_image" class="form-label">Banner/Hero Image</label>
+                                <input type="file" class="form-control" id="banner_image" name="banner_image"
+                                    accept="image/*">
+                                {% if restaurant.banner_image %}
+                                <div class="mt-2">
+                                    <img src="{{ restaurant.banner_image.url }}" alt="Current Banner"
+                                        class="img-thumbnail" style="max-height: 100px;">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="remove_banner"
+                                            id="remove_banner">
+                                        <label class="form-check-label" for="remove_banner">
+                                            Remove current banner
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Large hero image at the top (recommended: 1920x600px)</div>
+                            </div>
+                        </div>
+
+                        <!-- Gallery Images Section -->
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">
+                            <i class="fas fa-images me-2"></i>Gallery Images
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="gallery_images" class="form-label">Add Gallery Images</label>
+                            <input type="file" class="form-control" id="gallery_images" name="gallery_images"
+                                accept="image/*" multiple>
+                            <div class="form-text">You can select multiple images at once. These appear in the gallery
+                                section.</div>
+                        </div>
+
+                        {% if restaurant and restaurant.gallery_images.all %}
+                        <div class="mb-3">
+                            <label class="form-label">Current Gallery Images</label>
+                            <div class="row">
+                                {% for gallery_img in restaurant.gallery_images.all %}
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <img src="{{ gallery_img.image.url }}" class="card-img-top" alt="Gallery Image"
+                                            style="height: 150px; object-fit: cover;">
+                                        <div class="card-body p-2">
+                                            <input type="text" class="form-control form-control-sm mb-2"
+                                                name="gallery_caption_{{ gallery_img.id }}"
+                                                value="{{ gallery_img.caption }}" placeholder="Caption">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="remove_gallery_{{ gallery_img.id }}"
+                                                    id="remove_gallery_{{ gallery_img.id }}">
+                                                <label class="form-check-label small"
+                                                    for="remove_gallery_{{ gallery_img.id }}">
+                                                    Remove
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Payment Methods Section -->
+                        <h5 class="border-bottom pb-2 mb-3 mt-4">
+                            <i class="fas fa-credit-card me-2"></i>Payment Methods
+                        </h5>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tip:</strong> Select the payment methods you accept. Customers will see these options on your restaurant page.
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4 col-6 mb-3">
+                                <div class="form-check payment-option">
+                                    <input type="checkbox" class="form-check-input" id="accepts_cash" name="accepts_cash" 
+                                        {% if restaurant.accepts_cash %}checked{% endif %}>
+                                    <label class="form-check-label" for="accepts_cash">
+                                        <i class="fas fa-money-bill-wave text-success me-2"></i>Cash on Delivery
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-3">
+                                <div class="form-check payment-option">
+                                    <input type="checkbox" class="form-check-input" id="accepts_card" name="accepts_card"
+                                        {% if restaurant.accepts_card %}checked{% endif %}>
+                                    <label class="form-check-label" for="accepts_card">
+                                        <i class="fas fa-credit-card text-primary me-2"></i>Card Payment
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-3">
+                                <div class="form-check payment-option">
+                                    <input type="checkbox" class="form-check-input" id="accepts_bank_transfer" name="accepts_bank_transfer"
+                                        {% if restaurant.accepts_bank_transfer %}checked{% endif %}>
+                                    <label class="form-check-label" for="accepts_bank_transfer">
+                                        <i class="fas fa-university text-info me-2"></i>Bank Transfer
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-3">
+                                <div class="form-check payment-option">
+                                    <input type="checkbox" class="form-check-input" id="accepts_mobile_money" name="accepts_mobile_money"
+                                        {% if restaurant.accepts_mobile_money %}checked{% endif %}>
+                                    <label class="form-check-label" for="accepts_mobile_money">
+                                        <i class="fas fa-mobile-alt text-warning me-2"></i>Mobile Money
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-3">
+                                <div class="form-check payment-option">
+                                    <input type="checkbox" class="form-check-input" id="accepts_paystack" name="accepts_paystack"
+                                        {% if restaurant.accepts_paystack %}checked{% endif %}>
+                                    <label class="form-check-label" for="accepts_paystack">
+                                        <i class="fas fa-bolt text-danger me-2"></i>Paystack Online
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6 mb-3">
+                                <div class="form-check payment-option">
+                                    <input type="checkbox" class="form-check-input" id="accepts_pos" name="accepts_pos"
+                                        {% if restaurant.accepts_pos %}checked{% endif %}>
+                                    <label class="form-check-label" for="accepts_pos">
+                                        <i class="fas fa-calculator text-secondary me-2"></i>POS Terminal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Details (shown when bank transfer is checked) -->
+                        <div id="bank_details_section" style="{% if not restaurant.accepts_bank_transfer %}display: none;{% endif %}">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-university me-2"></i>Bank Transfer Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <label for="bank_name" class="form-label small">Bank Name</label>
+                                            <input type="text" class="form-control form-control-sm" id="bank_name" name="bank_name"
+                                                value="{{ restaurant.bank_name|default:'' }}" placeholder="e.g., GTBank, First Bank">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <label for="bank_account_number" class="form-label small">Account Number</label>
+                                            <input type="text" class="form-control form-control-sm" id="bank_account_number" name="bank_account_number"
+                                                value="{{ restaurant.bank_account_number|default:'' }}" placeholder="0123456789">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <label for="bank_account_name" class="form-label small">Account Name</label>
+                                            <input type="text" class="form-control form-control-sm" id="bank_account_name" name="bank_account_name"
+                                                value="{{ restaurant.bank_account_name|default:'' }}" placeholder="Account holder name">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Money Details (shown when mobile money is checked) -->
+                        <div id="mobile_money_section" style="{% if not restaurant.accepts_mobile_money %}display: none;{% endif %}">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-mobile-alt me-2"></i>Mobile Money Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label for="mobile_money_provider" class="form-label small">Provider</label>
+                                            <select class="form-select form-select-sm" id="mobile_money_provider" name="mobile_money_provider">
+                                                <option value="">Select Provider</option>
+                                                <option value="MTN" {% if restaurant.mobile_money_provider == 'MTN' %}selected{% endif %}>MTN Mobile Money</option>
+                                                <option value="Airtel" {% if restaurant.mobile_money_provider == 'Airtel' %}selected{% endif %}>Airtel Money</option>
+                                                <option value="Glo" {% if restaurant.mobile_money_provider == 'Glo' %}selected{% endif %}>Glo Mobile Money</option>
+                                                <option value="9Mobile" {% if restaurant.mobile_money_provider == '9Mobile' %}selected{% endif %}>9Mobile</option>
+                                                <option value="Opay" {% if restaurant.mobile_money_provider == 'Opay' %}selected{% endif %}>OPay</option>
+                                                <option value="PalmPay" {% if restaurant.mobile_money_provider == 'PalmPay' %}selected{% endif %}>PalmPay</option>
+                                                <option value="Other" {% if restaurant.mobile_money_provider == 'Other' %}selected{% endif %}>Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label for="mobile_money_number" class="form-label small">Mobile Money Number</label>
+                                            <input type="text" class="form-control form-control-sm" id="mobile_money_number" name="mobile_money_number"
+                                                value="{{ restaurant.mobile_money_number|default:'' }}" placeholder="+234 XXX XXX XXXX">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Theme & Appearance Section -->
+                        {% include 'restaurants/theme_customizer.html' %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                {% if restaurant %}Update{% else %}Create{% endif %} Restaurant
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Tips for Success
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Use a clear, descriptive name that represents your restaurant</li>
+                        <li>Provide accurate contact information for customer inquiries</li>
+                        <li>Set realistic opening hours that you can maintain</li>
+                        <li><strong>Upload a banner image</strong> - This appears as the hero section background</li>
+                        <li><strong>Add gallery images</strong> - Showcase your restaurant, dishes, and ambiance</li>
+                        <li>After creating your restaurant, add menu categories and items</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Theme-aware variables */
+    :root {
+        --mr-bg-card: #ffffff;
+        --mr-bg-secondary: #f8f9fa;
+        --mr-bg-hover: #e9ecef;
+        --mr-text-primary: #212529;
+        --mr-text-secondary: #6c757d;
+        --mr-text-muted: #868e96;
+        --mr-border-color: #dee2e6;
+        --mr-card-header-bg: #f8f9fa;
+    }
+    
+    [data-theme="dark"] {
+        --mr-bg-card: #1f1f1f;
+        --mr-bg-secondary: #2d2d2d;
+        --mr-bg-hover: #3d3d3d;
+        --mr-text-primary: #e0e0e0;
+        --mr-text-secondary: #a0a0a0;
+        --mr-text-muted: #808080;
+        --mr-border-color: rgba(255, 255, 255, 0.1);
+        --mr-card-header-bg: #2d2d2d;
+    }
+    
+    .card-img-top {
+        border-radius: 0.375rem 0.375rem 0 0;
+    }
+
+    .img-thumbnail {
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Form labels */
+    .form-label {
+        color: var(--mr-text-primary);
+    }
+    
+    .form-text {
+        color: var(--mr-text-muted) !important;
+    }
+    
+    /* Payment options */
+    .payment-option {
+        padding: 12px 15px;
+        background: var(--mr-bg-secondary);
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+    
+    .payment-option:hover {
+        background: var(--mr-bg-hover);
+        border-color: rgba(0, 123, 255, 0.3);
+    }
+    
+    .payment-option .form-check-label {
+        color: var(--mr-text-primary);
+    }
+    
+    .payment-option .form-check-input:checked ~ .form-check-label {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+    
+    /* Bank and Mobile Money detail cards */
+    #bank_details_section .card,
+    #mobile_money_section .card {
+        background: var(--mr-bg-secondary) !important;
+        border: 1px solid var(--mr-border-color);
+    }
+    
+    #bank_details_section .card-title,
+    #mobile_money_section .card-title {
+        color: var(--mr-text-primary);
+    }
+    
+    #bank_details_section .form-label,
+    #mobile_money_section .form-label {
+        color: var(--mr-text-secondary);
+    }
+    
+    /* Alert styling for dark mode */
+    [data-theme="dark"] .alert-info {
+        background-color: rgba(13, 202, 240, 0.15);
+        border-color: rgba(13, 202, 240, 0.3);
+        color: #6edff6;
+    }
+    
+    /* Help card */
+    .card-header.bg-light {
+        background-color: var(--mr-card-header-bg) !important;
+    }
+    
+    .card-header.bg-light h5 {
+        color: var(--mr-text-primary);
+    }
+    
+    .card-body ul li {
+        color: var(--mr-text-secondary);
+    }
+    
+    .card-body ul li strong {
+        color: var(--mr-text-primary);
+    }
+    
+    /* Section headers */
+    h5.border-bottom {
+        color: var(--mr-text-primary);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle bank details section
+    const bankCheckbox = document.getElementById('accepts_bank_transfer');
+    const bankSection = document.getElementById('bank_details_section');
+    
+    if (bankCheckbox && bankSection) {
+        bankCheckbox.addEventListener('change', function() {
+            bankSection.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    
+    // Toggle mobile money section
+    const mobileCheckbox = document.getElementById('accepts_mobile_money');
+    const mobileSection = document.getElementById('mobile_money_section');
+    
+    if (mobileCheckbox && mobileSection) {
+        mobileCheckbox.addEventListener('change', function() {
+            mobileSection.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+});
+</script>
+{% endblock %}

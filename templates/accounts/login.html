@@ -1,0 +1,198 @@
+
+
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login / Register - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<style>
+/* Container for the authentication forms */
+.auth-container {
+    max-width: 420px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+    overflow: hidden;
+    position: relative;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Tab navigation styles */
+.auth-tabs {
+    display: flex;
+    border-bottom: 1.5px solid #e0e0e0;
+    background: #f4f6fb;
+}
+.auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 18px 0 14px 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #7a7a7a;
+    letter-spacing: 0.5px;
+    font-size: 1.08rem;
+    transition: color 0.2s, background 0.2s;
+    user-select: none;
+}
+.auth-tab.active {
+    color: #2563eb;
+    border-bottom: 2.5px solid #2563eb;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.04);
+}
+
+/* Sliding animation for forms */
+/* Sliding animation for forms */
+.auth-slider {
+    display: flex;
+    width: 200%;
+    transition: transform 0.7s cubic-bezier(.77,0,.18,1), box-shadow 0.4s, filter 0.4s;
+    background: #f9fafb;
+    will-change: transform, box-shadow, filter;
+}
+.auth-slider.sliding {
+    box-shadow: 0 8px 32px rgba(37,99,235,0.10);
+    filter: brightness(0.98) blur(1px);
+}
+
+/* Individual form styling */
+.auth-form {
+    width: 100%;
+    padding: 36px 32px 28px 32px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 0 0 16px 16px;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Headings */
+.auth-form h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Form labels and inputs */
+.auth-form .form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.3rem;
+}
+.auth-form .form-control {
+    border-radius: 8px;
+    border: 1.5px solid #e0e0e0;
+    padding: 10px 12px;
+    font-size: 1rem;
+    margin-bottom: 1.1rem;
+    background: #f7f8fa;
+    transition: border-color 0.2s;
+}
+.auth-form .form-control:focus {
+    border-color: #2563eb;
+    outline: none;
+    background: #fff;
+}
+
+/* Buttons */
+.auth-form .btn-primary {
+    background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.08rem;
+    padding: 12px 0;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.auth-form .btn-primary:hover {
+    background: linear-gradient(90deg, #1e40af 60%, #2563eb 100%);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.12);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .auth-container {
+        max-width: 98vw;
+        border-radius: 0;
+        margin: 0;
+    }
+    .auth-form {
+        padding: 24px 8px 18px 8px;
+        min-height: 320px;
+    }
+    .auth-tabs {
+        font-size: 0.98rem;
+    }
+}
+
+/* Accessibility: focus for tabs */
+.auth-tab:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: -2px;
+}
+</style>
+<div class="auth-container">
+    <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab" onclick="showAuthForm('login')">Login</div>
+        <div class="auth-tab" id="registerTab" onclick="showAuthForm('register')">Create Account</div>
+    </div>
+    <div class="auth-slider" id="authSlider">
+        <div class="auth-form" id="loginForm">
+            <h4 class="mb-4">Login to Your Account</h4>
+            <form method="post" action="{% url 'login' %}" autocomplete="off">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+        </div>
+        <div class="auth-form" id="registerForm">
+            <h4 class="mb-4">Create Your Account</h4>
+            <form method="post" action="{% url 'register' %}" autocomplete="off">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function showAuthForm(form) {
+    const slider = document.getElementById('authSlider');
+    const loginTab = document.getElementById('loginTab');
+    const registerTab = document.getElementById('registerTab');
+    // Add sliding class for animation effect
+    slider.classList.add('sliding');
+    setTimeout(() => {
+        if (form === 'login') {
+            slider.style.transform = 'translateX(0)';
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+        } else {
+            slider.style.transform = 'translateX(-50%)';
+            loginTab.classList.remove('active');
+            registerTab.classList.add('active');
+        }
+    }, 10);
+    // Remove sliding class after animation
+    setTimeout(() => {
+        slider.classList.remove('sliding');
+    }, 800);
+}
+</script>
+{% endblock %}

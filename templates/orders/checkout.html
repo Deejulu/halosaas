@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - {{ restaurant.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --checkout-card-bg: #ffffff;
+        --checkout-text: #333333;
+        --checkout-border: #dee2e6;
+        --checkout-muted: #6c757d;
+        --checkout-highlight: #f8f9fa;
+    }
+    
+    [data-theme="dark"] {
+        --checkout-card-bg: #2d2d2d;
+        --checkout-text: #e9ecef;
+        --checkout-border: #495057;
+        --checkout-muted: #adb5bd;
+        --checkout-highlight: #3d3d3d;
+    }
+    
+    .checkout-card {
+        background: var(--checkout-card-bg);
+        border-color: var(--checkout-border);
+        color: var(--checkout-text);
+    }
+    
+    .checkout-card .card-header {
+        background: var(--checkout-highlight);
+        border-color: var(--checkout-border);
+        color: var(--checkout-text);
+    }
+    
+    .payment-method-option {
+        padding: 15px;
+        border: 2px solid var(--checkout-border);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--checkout-card-bg);
+    }
+    
+    .payment-method-option:hover {
+        border-color: #007bff;
+        background: var(--checkout-highlight);
+    }
+    
+    .payment-method-option.selected {
+        border-color: #28a745;
+        background: rgba(40, 167, 69, 0.1);
+    }
+    
+    .payment-method-option input[type="radio"] {
+        margin-right: 10px;
+    }
+    
+    .payment-method-icon {
+        font-size: 1.5rem;
+        width: 40px;
+        text-align: center;
+        margin-right: 15px;
+    }
+    
+    .payment-details-card {
+        display: none;
+        padding: 15px;
+        background: var(--checkout-highlight);
+        border-radius: 8px;
+        margin-top: 10px;
+        border: 1px solid var(--checkout-border);
+    }
+    
+    .payment-details-card.show {
+        display: block;
+    }
+    
+    .bank-info-copy {
+        cursor: pointer;
+        color: #007bff;
+    }
+    
+    .bank-info-copy:hover {
+        text-decoration: underline;
+    }
+    
+    .order-summary-table td, .order-summary-table th {
+        color: var(--checkout-text);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4"><i class="fas fa-credit-card me-2"></i>Checkout</h1>
+
+            <form id="checkoutForm" method="post" action="{% url 'process_checkout' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Order Details Card -->
+                        <div class="card checkout-card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Order Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-store me-2"></i>Restaurant: <strong>{{ restaurant.name }}</strong>
+                                </h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm order-summary-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Item</th>
+                                                <th class="text-center">Qty</th>
+                                                <th class="text-end">Price</th>
+                                                <th class="text-end">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in cart_items %}
+                                            <tr>
+                                                <td>{{ item.name }}</td>
+                                                <td class="text-center">{{ item.quantity }}</td>
+                                                <td class="text-end">₦{{ item.price|floatformat:2 }}</td>
+                                                <td class="text-end">₦{{ item.total_price|floatformat:2 }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="fw-bold">
+                                                <td colspan="3" class="text-end">Total:</td>
+                                                <td class="text-end text-success">₦{{ total_price|floatformat:2 }}</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Card -->
+                        <div class="card checkout-card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Select Payment Method</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if not restaurant.accepts_cash and not restaurant.accepts_card and not restaurant.accepts_bank_transfer and not restaurant.accepts_mobile_money and not restaurant.accepts_paystack and not restaurant.accepts_pos %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    This restaurant hasn't set up payment methods yet. Please contact them directly.
+                                </div>
+                                {% else %}
+                                
+                                <!-- Cash on Delivery -->
+                                {% if restaurant.accepts_cash %}
+                                <label class="payment-method-option d-flex align-items-center" for="payment_cash">
+                                    <input type="radio" name="payment_method" id="payment_cash" value="cash" checked>
+                                    <span class="payment-method-icon text-success"><i class="fas fa-money-bill-wave"></i></span>
+                                    <div>
+                                        <strong>Cash on Delivery</strong>
+                                        <small class="d-block text-muted">Pay when you receive your order</small>
+                                    </div>
+                                </label>
+                                {% endif %}
+                                
+                                <!-- Paystack (Card + Bank Transfer) -->
+                                {% if restaurant.accepts_paystack or restaurant.accepts_card %}
+                                <label class="payment-method-option d-flex align-items-center" for="payment_paystack">
+                                    <input type="radio" name="payment_method" id="payment_paystack" value="paystack" {% if not restaurant.accepts_cash %}checked{% endif %}>
+                                    <span class="payment-method-icon text-primary"><i class="fas fa-credit-card"></i></span>
+                                    <div>
+                                        <strong>Pay Online (Paystack)</strong>
+                                        <small class="d-block text-muted">Card, Bank Transfer, USSD - All in one</small>
+                                    </div>
+                                </label>
+                                {% endif %}
+                                
+                                <!-- Mobile Money -->
+                                {% if restaurant.accepts_mobile_money %}
+                                <label class="payment-method-option d-flex align-items-center" for="payment_mobile">
+                                    <input type="radio" name="payment_method" id="payment_mobile" value="mobile_money">
+                                    <span class="payment-method-icon text-warning"><i class="fas fa-mobile-alt"></i></span>
+                                    <div>
+                                        <strong>Mobile Money</strong>
+                                        <small class="d-block text-muted">MTN MoMo, Airtel Money, etc.</small>
+                                    </div>
+                                </label>
+                                
+                                <!-- Mobile Money Details -->
+                                <div id="mobileMoneyCard" class="payment-details-card">
+                                    <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Mobile Money Details</h6>
+                                    <p class="mb-2"><strong>Provider:</strong> {{ restaurant.mobile_money_provider|default:"Not provided" }}</p>
+                                    <p class="mb-2"><strong>Number:</strong> 
+                                        <span class="bank-info-copy" onclick="copyToClipboard('{{ restaurant.mobile_money_number }}')">
+                                            {{ restaurant.mobile_money_number|default:"Not provided" }}
+                                            <i class="fas fa-copy ms-2"></i>
+                                        </span>
+                                    </p>
+                                    <p class="mb-0"><strong>Amount to Send:</strong> 
+                                        <span class="text-success fw-bold">₦{{ total_price|floatformat:2 }}</span>
+                                    </p>
+                                    <div class="alert alert-info mt-3 mb-0">
+                                        <i class="fas fa-upload me-2"></i>
+                                        <strong>Important:</strong> After sending, upload your transaction screenshot below.
+                                    </div>
+                                    <div class="mt-3">
+                                        <label for="mobile_proof" class="form-label">Upload Transaction Screenshot</label>
+                                        <input type="file" class="form-control" id="mobile_proof" name="payment_proof" accept="image/*,.pdf">
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- POS Terminal -->
+                                {% if restaurant.accepts_pos %}
+                                <label class="payment-method-option d-flex align-items-center" for="payment_pos">
+                                    <input type="radio" name="payment_method" id="payment_pos" value="pos">
+                                    <span class="payment-method-icon text-secondary"><i class="fas fa-calculator"></i></span>
+                                    <div>
+                                        <strong>POS Terminal</strong>
+                                        <small class="d-block text-muted">Pay with card at pickup using POS machine</small>
+                                    </div>
+                                </label>
+                                {% endif %}
+                                
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary Sidebar -->
+                    <div class="col-lg-4">
+                        <div class="card checkout-card sticky-top" style="top: 20px;">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>Order Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Items ({{ cart.get_total_items }}):</span>
+                                    <strong>₦{{ total_price|floatformat:2 }}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Delivery:</span>
+                                    <strong>₦0.00</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tax:</span>
+                                    <strong>₦0.00</strong>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span><strong>Total:</strong></span>
+                                    <strong class="text-success fs-5">₦{{ total_price|floatformat:2 }}</strong>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" id="submitBtn" class="btn btn-success btn-lg">
+                                        <i class="fas fa-lock me-2"></i>
+                                        <span id="submitBtnText">Place Order</span>
+                                    </button>
+                                    <small class="text-muted text-center">
+                                        <i class="fas fa-shield-alt me-1"></i>Your order information is secure
+                                    </small>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentOptions = document.querySelectorAll('.payment-method-option');
+    const bankDetailsCard = document.getElementById('bankDetailsCard');
+    const mobileMoneyCard = document.getElementById('mobileMoneyCard');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    
+    // Handle payment method selection
+    paymentOptions.forEach(option => {
+        const radio = option.querySelector('input[type="radio"]');
+        
+        option.addEventListener('click', function() {
+            // Remove selected class from all options
+            paymentOptions.forEach(opt => opt.classList.remove('selected'));
+            // Add selected class to clicked option
+            this.classList.add('selected');
+            // Check the radio button
+            radio.checked = true;
+            
+            // Show/hide payment details
+            if (bankDetailsCard) bankDetailsCard.classList.remove('show');
+            if (mobileMoneyCard) mobileMoneyCard.classList.remove('show');
+            
+            const method = radio.value;
+            
+            if (method === 'bank_transfer' && bankDetailsCard) {
+                bankDetailsCard.classList.add('show');
+            } else if (method === 'mobile_money' && mobileMoneyCard) {
+                mobileMoneyCard.classList.add('show');
+            }
+            
+            // Update button text
+            updateButtonText(method);
+        });
+        
+        // Initialize selected state
+        if (radio.checked) {
+            option.classList.add('selected');
+            updateButtonText(radio.value);
+        }
+    });
+    
+    function updateButtonText(method) {
+        const texts = {
+            'cash': 'Place Order - Pay on Delivery',
+            'paystack': 'Pay ₦{{ total_price }} with Card',
+            'bank_transfer': 'Submit Order - Awaiting Transfer',
+            'mobile_money': 'Submit Order - Awaiting Payment',
+            'pos': 'Place Order - Pay at Pickup'
+        };
+        submitBtnText.textContent = texts[method] || 'Place Order';
+    }
+});
+
+function copyToClipboard(text) {
+    if (text && text !== 'Not provided') {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Copied to clipboard: ' + text);
+        }).catch(function() {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Copied to clipboard: ' + text);
+        });
+    }
+}
+</script>
+{% endblock %}

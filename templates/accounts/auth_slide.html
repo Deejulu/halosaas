@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login / Register - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<style>
+.auth-container {
+    max-width: 400px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    position: relative;
+}
+.auth-slider {
+    display: flex;
+    width: 200%;
+    transition: transform 0.5s cubic-bezier(.77,0,.18,1);
+}
+.auth-form {
+    width: 100%;
+    padding: 32px 28px 24px 28px;
+    box-sizing: border-box;
+}
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+}
+.auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 16px 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #888;
+    transition: color 0.2s;
+}
+.auth-tab.active {
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+    background: #fff;
+}
+</style>
+<div class="auth-container">
+    <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab" onclick="showAuthForm('login')">Login</div>
+        <div class="auth-tab" id="registerTab" onclick="showAuthForm('register')">Create Account</div>
+    </div>
+    <div class="auth-slider" id="authSlider">
+        <div class="auth-form" id="loginForm">
+            <h4 class="mb-4">Login to Your Account</h4>
+            <form method="post" action="{% url 'login' %}" autocomplete="off">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+        </div>
+        <div class="auth-form" id="registerForm">
+            <h4 class="mb-4">Create Your Account</h4>
+            <form method="post" action="{% url 'register' %}" autocomplete="off">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function showAuthForm(form) {
+    const slider = document.getElementById('authSlider');
+    const loginTab = document.getElementById('loginTab');
+    const registerTab = document.getElementById('registerTab');
+    if (form === 'login') {
+        slider.style.transform = 'translateX(0)';
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+    } else {
+        slider.style.transform = 'translateX(-50%)';
+        loginTab.classList.remove('active');
+        registerTab.classList.add('active');
+    }
+}
+</script>
+{% endblock %}

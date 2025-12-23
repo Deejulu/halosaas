@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Restaurant - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Restaurant
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Basic Information Section -->
+                        <div class="section-header mb-4">
+                            <h5 class="text-primary"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                            <hr>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Restaurant Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required 
+                                    placeholder="Enter restaurant name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="email" name="email" required
+                                    placeholder="restaurant@example.com">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required
+                                    placeholder="+234 XXX XXX XXXX">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="website" class="form-label">Website URL</label>
+                                <input type="url" class="form-control" id="website" name="website"
+                                    placeholder="https://yourrestaurant.com">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Short Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2"
+                                placeholder="A brief tagline or description for your restaurant..."></textarea>
+                            <small class="text-muted">This appears in restaurant listings and hero section.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Full Address *</label>
+                            <textarea class="form-control" id="address" name="address" rows="2" required
+                                placeholder="Street address, City, State, Country"></textarea>
+                            <small class="text-muted">This will be used for the map location.</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="opening_time" class="form-label">Opening Time *</label>
+                                <input type="time" class="form-control" id="opening_time" name="opening_time" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="closing_time" class="form-label">Closing Time *</label>
+                                <input type="time" class="form-control" id="closing_time" name="closing_time" required>
+                            </div>
+                        </div>
+
+                        <!-- Images Section -->
+                        <div class="section-header mb-4 mt-4">
+                            <h5 class="text-primary"><i class="fas fa-images me-2"></i>Images</h5>
+                            <hr>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="logo" class="form-label">Restaurant Logo</label>
+                                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+                                <small class="text-muted">Square image recommended (e.g., 200x200)</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="banner_image" class="form-label">Banner / Cover Image</label>
+                                <input type="file" class="form-control" id="banner_image" name="banner_image" accept="image/*">
+                                <small class="text-muted">Wide image for About section (e.g., 1200x600)</small>
+                            </div>
+                        </div>
+
+                        <!-- About Section -->
+                        <div class="section-header mb-4 mt-4">
+                            <h5 class="text-primary"><i class="fas fa-book-open me-2"></i>About / Our Story</h5>
+                            <p class="text-muted mb-0">Tell your customers about your restaurant's story, values, and what makes you special.</p>
+                            <hr>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="about_title" class="form-label">About Section Title</label>
+                            <input type="text" class="form-control" id="about_title" name="about_title" 
+                                value="Our Story" placeholder="Our Story">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="about_content" class="form-label">About Content</label>
+                            <textarea class="form-control" id="about_content" name="about_content" rows="5"
+                                placeholder="Share your restaurant's story, history, mission, and what makes your food special. This is your chance to connect with customers and tell them why they should dine with you.
+
+Example: Founded in 2015, our restaurant brings authentic African flavors to every dish. Our recipes have been passed down through generations, using only the freshest locally-sourced ingredients. We believe food is not just nourishment—it's a celebration of culture, family, and community."></textarea>
+                            <small class="text-muted">This content appears on your restaurant's About section.</small>
+                        </div>
+
+                        <!-- Chef Information -->
+                        <div class="section-header mb-4 mt-4">
+                            <h5 class="text-primary"><i class="fas fa-user-tie me-2"></i>Chef Information (Optional)</h5>
+                            <p class="text-muted mb-0">Add your head chef's profile to build trust with customers.</p>
+                            <hr>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="chef_name" class="form-label">Chef Name</label>
+                                <input type="text" class="form-control" id="chef_name" name="chef_name"
+                                    placeholder="Chef John Doe">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="chef_image" class="form-label">Chef Photo</label>
+                                <input type="file" class="form-control" id="chef_image" name="chef_image" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="chef_bio" class="form-label">Chef Bio</label>
+                            <textarea class="form-control" id="chef_bio" name="chef_bio" rows="3"
+                                placeholder="With over 15 years of culinary experience, Chef John trained at the prestigious Culinary Institute and has worked in top restaurants across West Africa..."></textarea>
+                        </div>
+
+                        <!-- Social Media Section -->
+                        <div class="section-header mb-4 mt-4">
+                            <h5 class="text-primary"><i class="fas fa-share-alt me-2"></i>Social Media (Optional)</h5>
+                            <hr>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="facebook" class="form-label"><i class="fab fa-facebook text-primary me-1"></i> Facebook</label>
+                                <input type="url" class="form-control" id="facebook" name="facebook"
+                                    placeholder="https://facebook.com/yourpage">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="instagram" class="form-label"><i class="fab fa-instagram text-danger me-1"></i> Instagram</label>
+                                <input type="url" class="form-control" id="instagram" name="instagram"
+                                    placeholder="https://instagram.com/yourpage">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="twitter" class="form-label"><i class="fab fa-twitter text-info me-1"></i> Twitter</label>
+                                <input type="url" class="form-control" id="twitter" name="twitter"
+                                    placeholder="https://twitter.com/yourpage">
+                            </div>
+                        </div>
+
+                        <!-- Payment Methods Section -->
+                        <div class="section-header mb-4 mt-4">
+                            <h5 class="text-primary"><i class="fas fa-credit-card me-2"></i>Payment Methods</h5>
+                            <p class="text-muted mb-0">Select the payment methods your restaurant will accept. Customers will see these options.</p>
+                            <hr>
+                        </div>
+
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tip:</strong> Offering multiple payment options increases customer convenience and can boost sales. Select all that apply to your restaurant.
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label mb-3 fw-bold">Accepted Payment Methods <span class="text-danger">*</span></label>
+                                <div class="row">
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <div class="form-check payment-method-check">
+                                            <input type="checkbox" class="form-check-input" id="accepts_cash" name="accepts_cash" checked>
+                                            <label class="form-check-label" for="accepts_cash">
+                                                <i class="fas fa-money-bill-wave text-success me-2"></i>Cash on Delivery
+                                                <small class="d-block text-muted">Pay when order arrives</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <div class="form-check payment-method-check">
+                                            <input type="checkbox" class="form-check-input" id="accepts_card" name="accepts_card">
+                                            <label class="form-check-label" for="accepts_card">
+                                                <i class="fas fa-credit-card text-primary me-2"></i>Card Payment
+                                                <small class="d-block text-muted">Visa, Mastercard, Verve</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <div class="form-check payment-method-check">
+                                            <input type="checkbox" class="form-check-input" id="accepts_bank_transfer" name="accepts_bank_transfer">
+                                            <label class="form-check-label" for="accepts_bank_transfer">
+                                                <i class="fas fa-university text-info me-2"></i>Bank Transfer
+                                                <small class="d-block text-muted">Direct bank payment</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <div class="form-check payment-method-check">
+                                            <input type="checkbox" class="form-check-input" id="accepts_mobile_money" name="accepts_mobile_money">
+                                            <label class="form-check-label" for="accepts_mobile_money">
+                                                <i class="fas fa-mobile-alt text-warning me-2"></i>Mobile Money
+                                                <small class="d-block text-muted">MTN, OPay, PalmPay, etc.</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <div class="form-check payment-method-check">
+                                            <input type="checkbox" class="form-check-input" id="accepts_paystack" name="accepts_paystack">
+                                            <label class="form-check-label" for="accepts_paystack">
+                                                <i class="fas fa-bolt text-danger me-2"></i>Paystack Online
+                                                <small class="d-block text-muted">Secure online payment</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <div class="form-check payment-method-check">
+                                            <input type="checkbox" class="form-check-input" id="accepts_pos" name="accepts_pos">
+                                            <label class="form-check-label" for="accepts_pos">
+                                                <i class="fas fa-calculator text-secondary me-2"></i>POS Terminal
+                                                <small class="d-block text-muted">In-store card machine</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Details -->
+                        <div id="bank_details_section" style="display: none;">
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-university me-2"></i>Bank Transfer Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="bank_name" class="form-label">Bank Name</label>
+                                            <input type="text" class="form-control" id="bank_name" name="bank_name"
+                                                placeholder="e.g., First Bank, GTBank">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="bank_account_number" class="form-label">Account Number</label>
+                                            <input type="text" class="form-control" id="bank_account_number" name="bank_account_number"
+                                                placeholder="0123456789">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="bank_account_name" class="form-label">Account Name</label>
+                                            <input type="text" class="form-control" id="bank_account_name" name="bank_account_name"
+                                                placeholder="Restaurant Name Ltd">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Money Details -->
+                        <div id="mobile_money_section" style="display: none;">
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-mobile-alt me-2"></i>Mobile Money Details</h6>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="mobile_money_provider" class="form-label">Provider</label>
+                                            <select class="form-select" id="mobile_money_provider" name="mobile_money_provider">
+                                                <option value="">Select Provider</option>
+                                                <option value="MTN">MTN Mobile Money</option>
+                                                <option value="Airtel">Airtel Money</option>
+                                                <option value="Glo">Glo Mobile Money</option>
+                                                <option value="9Mobile">9Mobile</option>
+                                                <option value="Opay">OPay</option>
+                                                <option value="PalmPay">PalmPay</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="mobile_money_number" class="form-label">Mobile Money Number</label>
+                                            <input type="text" class="form-control" id="mobile_money_number" name="mobile_money_number"
+                                                placeholder="+234 XXX XXX XXXX">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Create Restaurant
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.section-header h5 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.section-header hr {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+}
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.form-control, .form-select {
+    padding: 0.625rem 1rem;
+    border-radius: 8px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+.payment-method-check {
+    padding: 14px 18px;
+    background: var(--bg-secondary, #f8f9fa);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.payment-method-check:hover {
+    background: var(--bg-hover, #e9ecef);
+    border-color: rgba(13, 110, 253, 0.3);
+}
+.payment-method-check .form-check-input:checked ~ .form-check-label {
+    color: var(--accent-primary, #e94560);
+    font-weight: 600;
+}
+.payment-method-check .form-check-input:checked {
+    background-color: var(--accent-primary, #e94560);
+    border-color: var(--accent-primary, #e94560);
+}
+.card {
+    border: none;
+    border-radius: 16px;
+}
+.card-header {
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1.25rem 1.5rem;
+}
+.card-body {
+    padding: 1.75rem;
+}
+.btn-lg {
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+#bank_details_section .card,
+#mobile_money_section .card {
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+#bank_details_section .card-body,
+#mobile_money_section .card-body {
+    padding: 1.25rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle bank details section
+    const bankCheckbox = document.getElementById('accepts_bank_transfer');
+    const bankSection = document.getElementById('bank_details_section');
+    
+    bankCheckbox.addEventListener('change', function() {
+        bankSection.style.display = this.checked ? 'block' : 'none';
+    });
+    
+    // Toggle mobile money section
+    const mobileCheckbox = document.getElementById('accepts_mobile_money');
+    const mobileSection = document.getElementById('mobile_money_section');
+    
+    mobileCheckbox.addEventListener('change', function() {
+        mobileSection.style.display = this.checked ? 'block' : 'none';
+    });
+});
+</script>
+{% endblock %}

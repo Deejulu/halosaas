@@ -1,0 +1,1008 @@
+{% extends 'base.html' %}
+
+{% block title %}Restaurant Dashboard - Restaurant SaaS{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --rd-bg: #f0f2f5;
+        --rd-card-bg: #ffffff;
+        --rd-text: #1a1a2e;
+        --rd-text-muted: #6c757d;
+        --rd-text-light: #9ca3af;
+        --rd-border: #e5e7eb;
+        --rd-primary: #6366f1;
+        --rd-success: #10b981;
+        --rd-info: #06b6d4;
+        --rd-warning: #f59e0b;
+        --rd-danger: #ef4444;
+        --rd-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --rd-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --rd-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --rd-gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --rd-gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --rd-gradient-6: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    }
+    
+    [data-theme="dark"] {
+        --rd-bg: #0f0f1a;
+        --rd-card-bg: #1a1a2e;
+        --rd-text: #e9ecef;
+        --rd-text-muted: #9ca3af;
+        --rd-text-light: #6b7280;
+        --rd-border: #374151;
+    }
+    
+    .restaurant-dashboard {
+        background: var(--rd-bg);
+        min-height: 100vh;
+        padding-bottom: 60px;
+    }
+    
+    /* Header Section */
+    .dashboard-header {
+        background: var(--rd-gradient-1);
+        padding: 40px 0 100px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+    
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .welcome-content {
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.8s ease-out;
+    }
+    
+    .welcome-content h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 8px;
+    }
+    
+    .welcome-content p {
+        color: rgba(255,255,255,0.85);
+        font-size: 1.1rem;
+    }
+    
+    /* Stats Cards */
+    .stats-container {
+        margin-top: -60px;
+        position: relative;
+        z-index: 20;
+    }
+    
+    .stat-card {
+        background: var(--rd-card-bg);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid var(--rd-border);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: slideUp 0.6s ease-out backwards;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+    
+    .stat-card.gradient-1::before { background: var(--rd-gradient-1); }
+    .stat-card.gradient-2::before { background: var(--rd-gradient-2); }
+    .stat-card.gradient-3::before { background: var(--rd-gradient-3); }
+    .stat-card.gradient-4::before { background: var(--rd-gradient-4); }
+    .stat-card.gradient-5::before { background: var(--rd-gradient-5); }
+    .stat-card.gradient-6::before { background: var(--rd-gradient-6); }
+    
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+    }
+    
+    .stat-card.gradient-1 .stat-icon { background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2)); color: #667eea; }
+    .stat-card.gradient-2 .stat-icon { background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2)); color: #f5576c; }
+    .stat-card.gradient-3 .stat-icon { background: linear-gradient(135deg, rgba(79, 172, 254, 0.2), rgba(0, 242, 254, 0.2)); color: #4facfe; }
+    .stat-card.gradient-4 .stat-icon { background: linear-gradient(135deg, rgba(67, 233, 123, 0.2), rgba(56, 249, 215, 0.2)); color: #43e97b; }
+    .stat-card.gradient-5 .stat-icon { background: linear-gradient(135deg, rgba(250, 112, 154, 0.2), rgba(254, 225, 64, 0.2)); color: #fa709a; }
+    .stat-card.gradient-6 .stat-icon { background: linear-gradient(135deg, rgba(168, 237, 234, 0.2), rgba(254, 214, 227, 0.2)); color: #10b981; }
+    
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--rd-text);
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--rd-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+    
+    .stat-sublabel {
+        font-size: 0.75rem;
+        color: var(--rd-text-light);
+        margin-top: 8px;
+    }
+    
+    .stat-sublabel.positive { color: var(--rd-success); }
+    .stat-sublabel.negative { color: var(--rd-danger); }
+    
+    /* Cards */
+    .rd-card {
+        background: var(--rd-card-bg);
+        border: 1px solid var(--rd-border);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .rd-card:hover {
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .rd-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid var(--rd-border);
+        padding: 20px 24px;
+    }
+    
+    .rd-card .card-header h6 {
+        color: var(--rd-text);
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .rd-card .card-body {
+        padding: 24px;
+        color: var(--rd-text);
+    }
+    
+    .header-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    /* Restaurant Cards */
+    .restaurant-card {
+        background: var(--rd-card-bg);
+        border: 1px solid var(--rd-border);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        height: 100%;
+    }
+    
+    .restaurant-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+    }
+    
+    .restaurant-card-image {
+        height: 160px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .restaurant-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .restaurant-card:hover .restaurant-card-image img {
+        transform: scale(1.1);
+    }
+    
+    .restaurant-card-image .placeholder-img {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .restaurant-status {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+    
+    .restaurant-status.active {
+        background: rgba(16, 185, 129, 0.9);
+        color: white;
+    }
+    
+    .restaurant-status.inactive {
+        background: rgba(239, 68, 68, 0.9);
+        color: white;
+    }
+    
+    .restaurant-card-body {
+        padding: 20px;
+    }
+    
+    .restaurant-card-body h5 {
+        color: var(--rd-text);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .restaurant-card-body p {
+        color: var(--rd-text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+    }
+    
+    .restaurant-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 1px solid var(--rd-border);
+    }
+    
+    .restaurant-info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .restaurant-info-item i {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+    }
+    
+    .restaurant-info-item span {
+        font-size: 0.8rem;
+        color: var(--rd-text);
+        font-weight: 500;
+    }
+    
+    .restaurant-card-footer {
+        padding: 16px 20px;
+        border-top: 1px solid var(--rd-border);
+        background: rgba(0,0,0,0.02);
+    }
+    
+    .action-btn-group {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+    }
+    
+    .action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 8px;
+        border-radius: 12px;
+        border: 1px solid var(--rd-border);
+        background: var(--rd-card-bg);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn i {
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+    }
+    
+    .action-btn span {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .action-btn.view { color: var(--rd-primary); }
+    .action-btn.view:hover { background: rgba(99, 102, 241, 0.1); border-color: var(--rd-primary); }
+    
+    .action-btn.menu { color: var(--rd-success); }
+    .action-btn.menu:hover { background: rgba(16, 185, 129, 0.1); border-color: var(--rd-success); }
+    
+    .action-btn.orders { color: var(--rd-warning); }
+    .action-btn.orders:hover { background: rgba(245, 158, 11, 0.1); border-color: var(--rd-warning); }
+    
+    .action-btn.staff { color: var(--rd-info); }
+    .action-btn.staff:hover { background: rgba(6, 182, 212, 0.1); border-color: var(--rd-info); }
+    
+    .action-btn.settings { color: var(--rd-text-muted); }
+    .action-btn.settings:hover { background: rgba(107, 114, 128, 0.1); border-color: var(--rd-text-muted); }
+    
+    /* Active Order Card */
+    .active-order-card {
+        background: var(--rd-card-bg);
+        border: 2px solid var(--rd-border);
+        border-radius: 16px;
+        padding: 16px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .active-order-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+    }
+    
+    .active-order-card.pending::before { background: var(--rd-warning); }
+    .active-order-card.preparing::before { background: var(--rd-info); }
+    .active-order-card.ready::before { background: var(--rd-success); }
+    
+    .active-order-card:hover {
+        border-color: var(--rd-primary);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-badge.pending { background: rgba(245, 158, 11, 0.1); color: var(--rd-warning); }
+    .status-badge.preparing { background: rgba(6, 182, 212, 0.1); color: var(--rd-info); }
+    .status-badge.ready { background: rgba(16, 185, 129, 0.1); color: var(--rd-success); }
+    .status-badge.completed { background: rgba(16, 185, 129, 0.15); color: var(--rd-success); }
+    .status-badge.cancelled { background: rgba(239, 68, 68, 0.1); color: var(--rd-danger); }
+    .status-badge.confirmed { background: rgba(99, 102, 241, 0.1); color: var(--rd-primary); }
+    
+    /* Orders Table */
+    .orders-table {
+        width: 100%;
+    }
+    
+    .orders-table th {
+        color: var(--rd-text-muted);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--rd-border);
+    }
+    
+    .orders-table td {
+        padding: 14px 16px;
+        color: var(--rd-text);
+        border-bottom: 1px solid var(--rd-border);
+        vertical-align: middle;
+    }
+    
+    .orders-table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .orders-table tbody tr:hover {
+        background: rgba(99, 102, 241, 0.03);
+    }
+    
+    .orders-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* Quick Actions */
+    .quick-action-card {
+        background: var(--rd-card-bg);
+        border: 2px solid var(--rd-border);
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        height: 100%;
+    }
+    
+    .quick-action-card:hover {
+        border-color: var(--rd-primary);
+        transform: translateY(-6px);
+        box-shadow: 0 15px 40px rgba(99, 102, 241, 0.15);
+    }
+    
+    .quick-action-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin: 0 auto 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-card:hover .quick-action-icon {
+        transform: scale(1.1);
+    }
+    
+    .quick-action-card h6 {
+        color: var(--rd-text);
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    
+    .quick-action-card p {
+        color: var(--rd-text-muted);
+        font-size: 0.8rem;
+        margin: 0;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    
+    .empty-state-icon {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--rd-gradient-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .empty-state-icon i {
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .empty-state h3 {
+        color: var(--rd-text);
+        margin-bottom: 12px;
+    }
+    
+    .empty-state p {
+        color: var(--rd-text-muted);
+        margin-bottom: 24px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .action-btn-group {
+            grid-template-columns: repeat(5, 1fr);
+        }
+        
+        .restaurant-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 30px 0 80px;
+        }
+        
+        .welcome-content h1 {
+            font-size: 1.75rem;
+        }
+        
+        .stats-container {
+            margin-top: -40px;
+        }
+        
+        .stat-card {
+            padding: 18px;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+        }
+        
+        .action-btn-group {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .action-btn span {
+            display: none;
+        }
+        
+        .action-btn i {
+            margin-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="restaurant-dashboard">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="welcome-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1>
+                            <i class="fas fa-store me-3"></i>Restaurant Dashboard
+                        </h1>
+                        <p class="mb-0">Manage your restaurants, orders, and grow your business</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <a href="{% url 'manage_restaurant' %}" class="btn btn-light btn-lg px-4">
+                            <i class="fas fa-plus me-2"></i>Add Restaurant
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="row g-3">
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card gradient-1">
+                        <div class="stat-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="stat-value">{{ restaurants.count }}</div>
+                        <div class="stat-label">Restaurants</div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card gradient-2">
+                        <div class="stat-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="stat-value">{{ total_orders }}</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card gradient-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value">{{ pending_orders }}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card gradient-4">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="stat-value">{{ completed_orders }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card gradient-5">
+                        <div class="stat-icon">
+                            <i class="fas fa-naira-sign"></i>
+                        </div>
+                        <div class="stat-value">₦{{ total_revenue|floatformat:0|default:0 }}</div>
+                        <div class="stat-label">Revenue</div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <div class="stat-card gradient-6">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-value">₦{{ today_revenue|floatformat:0|default:0 }}</div>
+                        <div class="stat-label">Today</div>
+                        <div class="stat-sublabel positive">{{ today_orders }} orders</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Orders Alert -->
+        {% if active_orders %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="rd-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--rd-warning);">
+                                <i class="fas fa-bell"></i>
+                            </span>
+                            Active Orders Requiring Attention
+                        </h6>
+                        <span class="badge bg-warning text-dark rounded-pill px-3">{{ active_orders|length }} Active</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% for order in active_orders %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="active-order-card {{ order.status }}">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <strong class="d-block" style="color: var(--rd-text);">#{{ order.id }}</strong>
+                                            <small class="text-muted">{{ order.restaurant.name }}</small>
+                                        </div>
+                                        <span class="status-badge {{ order.status }}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <small class="text-muted d-block">{{ order.customer_name }}</small>
+                                            <strong style="color: var(--rd-text);">₦{{ order.total_price|floatformat:0 }}</strong>
+                                        </div>
+                                        <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Quick Actions -->
+        <div class="row mt-4 g-4">
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'manage_restaurant' %}" class="quick-action-card">
+                    <div class="quick-action-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--rd-primary);">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h6>Add Restaurant</h6>
+                    <p>Create a new restaurant</p>
+                </a>
+            </div>
+            {% if restaurants %}
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'restaurant_orders' restaurants.first.id %}" class="quick-action-card">
+                    <div class="quick-action-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--rd-warning);">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h6>View Orders</h6>
+                    <p>Manage incoming orders</p>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'manage_menu' restaurants.first.id %}" class="quick-action-card">
+                    <div class="quick-action-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--rd-success);">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h6>Menu Manager</h6>
+                    <p>Update menu items</p>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a href="{% url 'manage_staff' restaurants.first.slug %}" class="quick-action-card">
+                    <div class="quick-action-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--rd-info);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h6>Staff Management</h6>
+                    <p>Manage your team</p>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Restaurants Grid -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="rd-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--rd-primary);">
+                                <i class="fas fa-store"></i>
+                            </span>
+                            My Restaurants
+                        </h6>
+                        <span class="badge bg-primary rounded-pill px-3">{{ restaurants.count }} Restaurant{{ restaurants.count|pluralize }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if restaurants %}
+                        <div class="row g-4">
+                            {% for restaurant in restaurants %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="restaurant-card">
+                                    <div class="restaurant-card-image" style="background: var(--rd-gradient-{% cycle '1' '2' '3' '4' '5' %});">
+                                        {% if restaurant.banner_image %}
+                                        <img src="{{ restaurant.banner_image.url }}" alt="{{ restaurant.name }}">
+                                        {% elif restaurant.logo %}
+                                        <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.name }}">
+                                        {% else %}
+                                        <div class="placeholder-img">
+                                            <i class="fas fa-utensils"></i>
+                                        </div>
+                                        {% endif %}
+                                        <span class="restaurant-status {% if restaurant.is_active %}active{% else %}inactive{% endif %}">
+                                            {% if restaurant.is_active %}
+                                            <i class="fas fa-check-circle me-1"></i>Active
+                                            {% else %}
+                                            <i class="fas fa-times-circle me-1"></i>Inactive
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="restaurant-card-body">
+                                        <h5>{{ restaurant.name }}</h5>
+                                        <p>{{ restaurant.description|truncatewords:12|default:"Your restaurant awaits customers!" }}</p>
+                                        
+                                        <div class="restaurant-info-grid">
+                                            <div class="restaurant-info-item">
+                                                <i class="fas fa-clock" style="background: rgba(99, 102, 241, 0.1); color: var(--rd-primary);"></i>
+                                                <span>{{ restaurant.opening_time|time:"g:i A" }} - {{ restaurant.closing_time|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="restaurant-info-item">
+                                                <i class="fas fa-phone" style="background: rgba(16, 185, 129, 0.1); color: var(--rd-success);"></i>
+                                                <span>{{ restaurant.phone|truncatechars:12 }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="restaurant-card-footer">
+                                        <div class="action-btn-group">
+                                            <a href="{% url 'restaurant_detail' restaurant.slug %}" class="action-btn view" title="View Public Page">
+                                                <i class="fas fa-eye"></i>
+                                                <span>View</span>
+                                            </a>
+                                            <a href="{% url 'manage_menu' restaurant.id %}" class="action-btn menu" title="Manage Menu">
+                                                <i class="fas fa-utensils"></i>
+                                                <span>Menu</span>
+                                            </a>
+                                            <a href="{% url 'restaurant_orders' restaurant.id %}" class="action-btn orders" title="View Orders">
+                                                <i class="fas fa-receipt"></i>
+                                                <span>Orders</span>
+                                            </a>
+                                            <a href="{% url 'manage_staff' restaurant.slug %}" class="action-btn staff" title="Manage Staff">
+                                                <i class="fas fa-users"></i>
+                                                <span>Staff</span>
+                                            </a>
+                                            <a href="{% url 'manage_restaurant' restaurant.id %}" class="action-btn settings" title="Settings">
+                                                <i class="fas fa-cog"></i>
+                                                <span>Edit</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <h3>No Restaurants Yet</h3>
+                            <p>Start your journey by adding your first restaurant. Manage orders, create menus, and grow your business.</p>
+                            <a href="{% url 'manage_restaurant' %}" class="btn btn-primary btn-lg rounded-pill px-5">
+                                <i class="fas fa-plus me-2"></i>Add Your First Restaurant
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Orders -->
+        {% if recent_orders %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="rd-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(240, 147, 251, 0.1); color: #f093fb;">
+                                <i class="fas fa-history"></i>
+                            </span>
+                            Recent Orders
+                        </h6>
+                        {% if restaurants %}
+                        <a href="{% url 'restaurant_orders' restaurants.first.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            View All <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Restaurant</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Payment</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in recent_orders %}
+                                    <tr>
+                                        <td><strong>#{{ order.id }}</strong></td>
+                                        <td>{{ order.restaurant.name|truncatewords:2 }}</td>
+                                        <td>{{ order.customer_name|truncatewords:2 }}</td>
+                                        <td><strong>₦{{ order.total_price|floatformat:0 }}</strong></td>
+                                        <td>
+                                            <span class="badge {% if order.payment_method == 'cash' %}bg-success-subtle text-success{% elif order.payment_method == 'paystack' %}bg-primary-subtle text-primary{% else %}bg-secondary-subtle text-secondary{% endif %}" style="font-size: 0.7rem;">
+                                                {{ order.get_payment_method_display|default:order.payment_method }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge {{ order.status }}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ order.created_at|date:"M d, H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Summary Cards Row -->
+        <div class="row mt-4 g-4">
+            <div class="col-lg-4">
+                <div class="rd-card h-100">
+                    <div class="card-header">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(67, 233, 123, 0.1); color: var(--rd-success);">
+                                <i class="fas fa-chart-line"></i>
+                            </span>
+                            This Month
+                        </h6>
+                    </div>
+                    <div class="card-body text-center py-4">
+                        <div class="display-5 fw-bold mb-2" style="color: var(--rd-success);">₦{{ monthly_revenue|floatformat:0|default:0 }}</div>
+                        <p class="text-muted mb-0">{{ monthly_orders|default:0 }} orders this month</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rd-card h-100">
+                    <div class="card-header">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--rd-primary);">
+                                <i class="fas fa-utensils"></i>
+                            </span>
+                            Menu Items
+                        </h6>
+                    </div>
+                    <div class="card-body text-center py-4">
+                        <div class="display-5 fw-bold mb-2" style="color: var(--rd-primary);">{{ total_menu_items|default:0 }}</div>
+                        <p class="text-muted mb-0">Total menu items across all restaurants</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="rd-card h-100">
+                    <div class="card-header">
+                        <h6>
+                            <span class="header-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--rd-info);">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            Staff Members
+                        </h6>
+                    </div>
+                    <div class="card-body text-center py-4">
+                        <div class="display-5 fw-bold mb-2" style="color: var(--rd-info);">{{ total_staff|default:0 }}</div>
+                        <p class="text-muted mb-0">Active staff members</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

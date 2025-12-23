@@ -1,0 +1,887 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if scope == 'platform' %}Platform Analytics
+{% elif scope == 'restaurant' %}Restaurant Analytics
+{% else %}My Analytics{% endif %} - Restaurant SaaS
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        color: white;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 350px;
+        width: 100%;
+    }
+    
+    .metric-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .metric-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .metric-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .metric-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    
+    .metric-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    .metric-change {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .metric-change.positive {
+        color: #28a745;
+    }
+    
+    .metric-change.negative {
+        color: #dc3545;
+    }
+    
+    .time-filter .btn {
+        border-radius: 20px;
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .analytics-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    
+    .analytics-card .card-header {
+        background: white;
+        border-bottom: 1px solid #eee;
+        padding: 1rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .rank-badge {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+    }
+    
+    .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; }
+    .rank-2 { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); color: white; }
+    .rank-3 { background: linear-gradient(135deg, #CD7F32, #B87333); color: white; }
+    .rank-other { background: #e9ecef; color: #495057; }
+    
+    .progress-thin {
+        height: 6px;
+        border-radius: 3px;
+    }
+    
+    .status-distribution .progress {
+        height: 25px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .quick-stat {
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    
+    .order-status-card {
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="analytics-header p-4 mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-chart-bar me-3"></i>
+                    {% if scope == 'platform' %}Platform Analytics
+                    {% elif scope == 'restaurant' %}Restaurant Analytics
+                    {% else %}My Order Analytics{% endif %}
+                </h1>
+                <p class="mb-0 opacity-75">
+                    {% if scope == 'platform' %}Complete platform performance insights and metrics
+                    {% elif scope == 'restaurant' %}Track your restaurant's performance and growth
+                    {% else %}Your personal ordering history and insights{% endif %}
+                    {% if start_date %}<br><i class="fas fa-calendar me-1"></i>{{ start_date|date:"M d, Y" }} to {{ end_date|date:"M d, Y" }}{% endif %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="time-filter btn-group" role="group">
+                    <a href="?period=today" class="btn btn-sm {% if time_period == 'today' %}btn-light{% else %}btn-outline-light{% endif %}">
+                        Today
+                    </a>
+                    <a href="?period=week" class="btn btn-sm {% if time_period == 'week' %}btn-light{% else %}btn-outline-light{% endif %}">
+                        Week
+                    </a>
+                    <a href="?period=month" class="btn btn-sm {% if time_period == 'month' %}btn-light{% else %}btn-outline-light{% endif %}">
+                        Month
+                    </a>
+                    <a href="?period=all_time" class="btn btn-sm {% if time_period == 'all_time' %}btn-light{% else %}btn-outline-light{% endif %}">
+                        All Time
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if scope == 'platform' %}
+    <!-- ==================== ADMIN ANALYTICS ==================== -->
+    
+    <!-- Key Metrics -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Total Revenue</p>
+                            <h3 class="metric-value text-primary mb-1">₦{{ total_revenue|floatformat:0|default:"0" }}</h3>
+                            <span class="metric-change positive">
+                                <i class="fas fa-arrow-up me-1"></i>{{ time_period|title }}
+                            </span>
+                        </div>
+                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Total Orders</p>
+                            <h3 class="metric-value text-success mb-1">{{ total_orders|default:0 }}</h3>
+                            <span class="metric-change positive">
+                                <i class="fas fa-shopping-bag me-1"></i>{{ time_period|title }}
+                            </span>
+                        </div>
+                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Total Users</p>
+                            <h3 class="metric-value text-info mb-1">{{ total_users|default:0 }}</h3>
+                            <span class="metric-change">
+                                <i class="fas fa-users me-1"></i>All Time
+                            </span>
+                        </div>
+                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Restaurants</p>
+                            <h3 class="metric-value text-warning mb-1">{{ total_restaurants|default:0 }}</h3>
+                            <span class="metric-change">
+                                <i class="fas fa-store me-1"></i>All Time
+                            </span>
+                        </div>
+                        <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">New Users</p>
+                            <h3 class="metric-value text-secondary mb-1">{{ new_users|default:0 }}</h3>
+                            <span class="metric-change positive">
+                                <i class="fas fa-user-plus me-1"></i>{{ time_period|title }}
+                            </span>
+                        </div>
+                        <div class="metric-icon bg-secondary bg-opacity-10 text-secondary">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">New Restaurants</p>
+                            <h3 class="metric-value text-dark mb-1">{{ new_restaurants|default:0 }}</h3>
+                            <span class="metric-change">
+                                <i class="fas fa-store-alt me-1"></i>{{ time_period|title }}
+                            </span>
+                        </div>
+                        <div class="metric-icon bg-dark bg-opacity-10 text-dark">
+                            <i class="fas fa-store-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Revenue Chart -->
+        <div class="col-lg-8">
+            <div class="card analytics-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-line text-primary me-2"></i>Revenue Trend</h5>
+                    <span class="badge bg-primary">{{ time_period|title }}</span>
+                </div>
+                <div class="card-body">
+                    {% if revenue_trend %}
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-chart-line"></i>
+                        <h5 class="text-muted">No Revenue Data Yet</h5>
+                        <p class="text-muted mb-0">Revenue data will appear here when orders are completed and payments processed.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Status Distribution -->
+        <div class="col-lg-4">
+            <div class="card analytics-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie text-success me-2"></i>Order Status</h5>
+                </div>
+                <div class="card-body">
+                    {% if order_statuses %}
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        {% for status in order_statuses %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-{% if status.status == 'completed' %}success{% elif status.status == 'pending' %}warning{% elif status.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                                {{ status.status|title }}
+                            </span>
+                            <span class="fw-bold">{{ status.count }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state py-4">
+                        <i class="fas fa-chart-pie" style="font-size: 3rem;"></i>
+                        <h6 class="text-muted mt-2">No Order Data</h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Restaurants -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card analytics-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-trophy text-warning me-2"></i>Top Performing Restaurants</h5>
+                    <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if top_restaurants %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px;">Rank</th>
+                                    <th>Restaurant</th>
+                                    <th>Owner</th>
+                                    <th class="text-center">Orders</th>
+                                    <th class="text-end">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for restaurant in top_restaurants %}
+                                <tr>
+                                    <td>
+                                        <span class="rank-badge {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% else %}rank-other{% endif %}">
+                                            {{ forloop.counter }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if restaurant.logo %}
+                                            <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.name }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-store text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong>{{ restaurant.name }}</strong>
+                                                <br><small class="text-muted">{{ restaurant.cuisine_type|default:"Restaurant" }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ restaurant.owner.username }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">{{ restaurant.order_count|default:0 }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-bold text-success">₦{{ restaurant.total_revenue|default:0|floatformat:0 }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-store"></i>
+                        <h5 class="text-muted">No Restaurant Data</h5>
+                        <p class="text-muted mb-0">Restaurant performance data will appear here once orders are placed.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="col-lg-4">
+            <div class="card analytics-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="quick-stat bg-primary bg-opacity-10">
+                                <i class="fas fa-chart-line fa-2x text-primary mb-2"></i>
+                                <h4 class="mb-0">₦{{ avg_order_value|floatformat:0|default:"0" }}</h4>
+                                <small class="text-muted">Avg Order Value</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="quick-stat bg-success bg-opacity-10">
+                                <i class="fas fa-percentage fa-2x text-success mb-2"></i>
+                                <h4 class="mb-0">{{ completion_rate|floatformat:0|default:"0" }}%</h4>
+                                <small class="text-muted">Completion Rate</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="quick-stat bg-info bg-opacity-10">
+                                <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                                <h4 class="mb-0">{{ pending_orders|default:0 }}</h4>
+                                <small class="text-muted">Pending Orders</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="quick-stat bg-warning bg-opacity-10">
+                                <i class="fas fa-shopping-cart fa-2x text-warning mb-2"></i>
+                                <h4 class="mb-0">{{ active_carts|default:0 }}</h4>
+                                <small class="text-muted">Active Carts</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h6 class="mb-3"><i class="fas fa-calendar-check me-2"></i>Today's Summary</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Orders Today</span>
+                        <strong>{{ today_orders|default:0 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Revenue Today</span>
+                        <strong class="text-success">₦{{ today_revenue|floatformat:0|default:"0" }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">New Users Today</span>
+                        <strong>{{ today_new_users|default:0 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% elif scope == 'restaurant' %}
+    <!-- ==================== RESTAURANT OWNER ANALYTICS ==================== -->
+    
+    <!-- Key Metrics -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Revenue</p>
+                            <h3 class="metric-value text-primary mb-1">₦{{ total_revenue|floatformat:0|default:"0" }}</h3>
+                            <span class="metric-change positive">{{ time_period|title }}</span>
+                        </div>
+                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Total Orders</p>
+                            <h3 class="metric-value text-success mb-1">{{ total_orders|default:0 }}</h3>
+                            <span class="metric-change positive">{{ time_period|title }}</span>
+                        </div>
+                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Pending</p>
+                            <h3 class="metric-value text-warning mb-1">{{ pending_orders|default:0 }}</h3>
+                            <span class="metric-change">Needs Attention</span>
+                        </div>
+                        <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Completed</p>
+                            <h3 class="metric-value text-info mb-1">{{ completed_orders|default:0 }}</h3>
+                            <span class="metric-change positive">{{ time_period|title }}</span>
+                        </div>
+                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Customers</p>
+                            <h3 class="metric-value text-secondary mb-1">{{ unique_customers|default:0 }}</h3>
+                            <span class="metric-change">Unique</span>
+                        </div>
+                        <div class="metric-icon bg-secondary bg-opacity-10 text-secondary">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-lg-4 col-md-6">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Repeat Customers</p>
+                            <h3 class="metric-value text-dark mb-1">{{ repeat_customers|default:0 }}</h3>
+                            <span class="metric-change positive">Loyal Customers</span>
+                        </div>
+                        <div class="metric-icon bg-dark bg-opacity-10 text-dark">
+                            <i class="fas fa-redo"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card analytics-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar text-success me-2"></i>Order Trends</h5>
+                </div>
+                <div class="card-body">
+                    {% if order_trends %}
+                    <div class="chart-container">
+                        <canvas id="orderTrendChart"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <h5 class="text-muted">No Order Data Yet</h5>
+                        <p class="text-muted mb-0">Order trends will appear here when customers place orders.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card analytics-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-fire text-danger me-2"></i>Popular Items</h5>
+                </div>
+                <div class="card-body">
+                    {% if popular_items %}
+                    <div class="list-group list-group-flush">
+                        {% for item in popular_items %}
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ item.menu_item__name }}</strong>
+                                <br><small class="text-muted">{{ item.menu_item__category__name|default:"Uncategorized" }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-primary">{{ item.total_ordered }}x sold</span>
+                                <br><small class="text-success">₦{{ item.total_revenue|floatformat:0 }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state py-4">
+                        <i class="fas fa-utensils" style="font-size: 3rem;"></i>
+                        <h6 class="text-muted mt-2">No sales data yet</h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- ==================== CUSTOMER ANALYTICS ==================== -->
+    
+    <!-- Key Metrics -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Total Orders</p>
+                            <h3 class="metric-value text-primary mb-1">{{ total_orders|default:0 }}</h3>
+                            <span class="metric-change">{{ time_period|title }}</span>
+                        </div>
+                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Total Spent</p>
+                            <h3 class="metric-value text-success mb-1">₦{{ total_spent|floatformat:0|default:"0" }}</h3>
+                            <span class="metric-change">{{ time_period|title }}</span>
+                        </div>
+                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card metric-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="metric-label mb-2">Restaurants Visited</p>
+                            <h3 class="metric-value text-info mb-1">{{ favorite_restaurants|length|default:0 }}</h3>
+                            <span class="metric-change">Different Places</span>
+                        </div>
+                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Favorite Restaurants -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card analytics-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-heart text-danger me-2"></i>Your Favorite Restaurants</h5>
+                </div>
+                <div class="card-body">
+                    {% if favorite_restaurants %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Restaurant</th>
+                                    <th class="text-center">Orders</th>
+                                    <th class="text-end">Total Spent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for fav in favorite_restaurants %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-store text-muted me-2"></i>
+                                        <strong>{{ fav.restaurant__name }}</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ fav.order_count }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="fw-bold text-success">₦{{ fav.total_spent|floatformat:0 }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-utensils"></i>
+                        <h5 class="text-muted">No Order History</h5>
+                        <p class="text-muted mb-3">Start ordering from restaurants to see your favorites here!</p>
+                        <a href="{% url 'browse_restaurants' %}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Browse Restaurants
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if scope == 'platform' %}
+    
+    // Revenue Chart
+    {% if revenue_trend %}
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [{% for trend in revenue_trend %}"{{ trend.day|date:'M d' }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Daily Revenue (₦)',
+                    data: [{% for trend in revenue_trend %}{{ trend.daily_revenue|default:0 }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₦' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    {% endif %}
+    
+    // Status Pie Chart
+    {% if order_statuses %}
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        new Chart(statusCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: [{% for status in order_statuses %}"{{ status.status|title }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    data: [{% for status in order_statuses %}{{ status.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: [
+                        {% for status in order_statuses %}
+                        {% if status.status == 'completed' %}'#28a745'{% elif status.status == 'pending' %}'#ffc107'{% elif status.status == 'cancelled' %}'#dc3545'{% else %}'#17a2b8'{% endif %}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+    }
+    {% endif %}
+    
+    {% elif scope == 'restaurant' %}
+    
+    // Order Trends Chart
+    {% if order_trends %}
+    const orderCtx = document.getElementById('orderTrendChart');
+    if (orderCtx) {
+        new Chart(orderCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [{% for trend in order_trends %}"{{ trend.day|date:'M d' }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Orders',
+                    data: [{% for trend in order_trends %}{{ trend.daily_orders }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+    {% endif %}
+    
+    {% endif %}
+});
+</script>
+{% endblock %}

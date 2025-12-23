@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load restaurant_tags %}
+
+{% block title %}Manage Staff - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-users me-2"></i>Manage Staff</h1>
+            <p class="text-muted mb-0">{{ restaurant.name }}</p>
+        </div>
+        <div>
+            <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Invite New Staff Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Invite New Staff</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'invite_staff' restaurant.slug %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   placeholder="staff@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Staff Role</label>
+                            <select class="form-select" id="role" name="role" required>
+                                {% for value, label in role_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Send Invitation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Role Permissions Info -->
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Role Permissions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="roleAccordion">
+                        {% for role_key, role_name in role_choices %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2" type="button" 
+                                        data-bs-toggle="collapse" data-bs-target="#role_{{ role_key }}">
+                                    <strong>{{ role_name }}</strong>
+                                </button>
+                            </h2>
+                            <div id="role_{{ role_key }}" class="accordion-collapse collapse" 
+                                 data-bs-parent="#roleAccordion">
+                                <div class="accordion-body py-2">
+                                    <ul class="list-unstyled mb-0 small">
+                                        {% with perms=role_permissions|get_item:role_key %}
+                                        {% if perms.can_view_orders %}<li><i class="fas fa-check text-success me-1"></i> View Orders</li>{% endif %}
+                                        {% if perms.can_update_order_status %}<li><i class="fas fa-check text-success me-1"></i> Update Order Status</li>{% endif %}
+                                        {% if perms.can_confirm_payment %}<li><i class="fas fa-check text-success me-1"></i> Confirm Payments</li>{% endif %}
+                                        {% if perms.can_manage_menu %}<li><i class="fas fa-check text-success me-1"></i> Manage Menu</li>{% endif %}
+                                        {% if perms.can_view_reports %}<li><i class="fas fa-check text-success me-1"></i> View Reports</li>{% endif %}
+                                        {% if perms.can_manage_staff %}<li><i class="fas fa-check text-success me-1"></i> Manage Staff</li>{% endif %}
+                                        {% endwith %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Staff List -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-id-badge me-2"></i>Current Staff 
+                        <span class="badge bg-primary">{{ staff_members.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if staff_members %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Staff Member</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for staff in staff_members %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle bg-primary text-white me-2">
+                                                {{ staff.user.first_name|slice:":1"|upper }}{{ staff.user.last_name|slice:":1"|upper }}
+                                            </div>
+                                            <div>
+                                                <strong>{{ staff.user.get_full_name|default:staff.user.username }}</strong>
+                                                <br><small class="text-muted">{{ staff.user.email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <form method="post" action="{% url 'update_staff' restaurant.slug staff.id %}" 
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="update_role">
+                                            <select name="role" class="form-select form-select-sm" 
+                                                    onchange="this.form.submit()" style="width: auto;">
+                                                {% for value, label in role_choices %}
+                                                <option value="{{ value }}" {% if staff.role == value %}selected{% endif %}>
+                                                    {{ label }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        {% if staff.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ staff.hired_date|date:"M d, Y" }}</small>
+                                    </td>
+                                    <td>
+                                        <form method="post" action="{% url 'update_staff' restaurant.slug staff.id %}" 
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="toggle_active">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                                    title="{% if staff.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                                <i class="fas fa-{% if staff.is_active %}pause{% else %}play{% endif %}"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'update_staff' restaurant.slug staff.id %}" 
+                                              class="d-inline" 
+                                              onsubmit="return confirm('Remove this staff member?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="remove">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No staff members yet. Send an invitation to add your first staff member!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Pending Invitations -->
+            {% if pending_invites %}
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Pending Invitations 
+                        <span class="badge bg-dark">{{ pending_invites.count }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Sent</th>
+                                    <th>Expires</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invite in pending_invites %}
+                                <tr class="{% if invite.is_expired %}table-danger{% endif %}">
+                                    <td>{{ invite.email }}</td>
+                                    <td><span class="badge bg-info">{{ invite.get_role_display }}</span></td>
+                                    <td><small>{{ invite.invited_at|timesince }} ago</small></td>
+                                    <td>
+                                        {% if invite.is_expired %}
+                                        <span class="badge bg-danger">Expired</span>
+                                        {% else %}
+                                        <small>{{ invite.expires_at|date:"M d, Y" }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="post" 
+                                              action="{% url 'cancel_invite' restaurant.slug invite.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-times me-1"></i>Cancel
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
