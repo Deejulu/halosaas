@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: restaurant-saas
+    env: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn restaurantsaas.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: PYTHON_VERSION
+        value: "3.11.11"
+
+databases:
+  - name: restaurant-saas-db
+    databaseName: restaurant_saas
+    user: restaurant_user
+    plan: free
+services:
+  - type: web
+    name: restaurant-saas
+    env: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn restaurantsaas.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: PYTHON_VERSION
+        value: "3.11.11"
+
+databases:
+  - name: restaurant-saas-db
+    databaseName: restaurant_saas
+    user: restaurant_user
+    plan: free
