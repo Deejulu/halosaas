@@ -24,3 +24,18 @@ pip-log.txt
 *.cover
 htmlcov/
 venv/
+staticfiles/
+media/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+node_modules/
+/.pytest_cache/
+coverage.xml
+pip-log.txt
+*.cover
+htmlcov/
+venv/
+>>>>>>> fe5c918bd02fd5c2144df4712c19b335bca6f63f

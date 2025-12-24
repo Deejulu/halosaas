@@ -3,7 +3,6 @@
 import os
 import sys
 
-
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'restaurantsaas.settings')
@@ -17,6 +16,6 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-
 if __name__ == '__main__':
     main()
+>>>>>>> fe5c918bd02fd5c2144df4712c19b335bca6f63f
