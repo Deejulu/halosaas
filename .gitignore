@@ -1,3 +1,7 @@
+## Sensitive files (added after accidental commit)
+.env
+db.sqlite3
+tmp_admin_render*
 venv/
 restaurantsaas/venv/
 __pycache__/
