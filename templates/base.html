@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Restaurant SaaS - Online Ordering System{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        /* ========== CSS VARIABLES FOR THEMING ========== */
+        :root {
+            /* Light Theme Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --bg-card: #ffffff;
+            --bg-card-header: #f8f9fa;
+            --bg-input: #ffffff;
+            --bg-hover: #f1f3f5;
+            
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --text-heading: #1a1a1a;
+            
+            --border-color: #dee2e6;
+            --border-light: #e9ecef;
+            
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-heavy: rgba(0, 0, 0, 0.15);
+            
+            --accent-primary: #e94560;
+            --accent-secondary: #667eea;
+            --accent-gradient: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            
+            --navbar-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --nav-link-color: #ffffff;
+            --footer-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            
+            --table-bg: #ffffff;
+            --table-hover: #f8f9fa;
+            --table-border: #dee2e6;
+            
+            --modal-bg: #ffffff;
+            --dropdown-bg: #ffffff;
+            
+            --scrollbar-track: #f1f1f1;
+            --scrollbar-thumb: #c1c1c1;
+        }
+        
+        [data-theme="dark"] {
+            /* Dark Theme Colors */
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2d2d2d;
+            --bg-card: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%);
+            --bg-card-header: linear-gradient(135deg, #1f1f1f 0%, #151515 100%);
+            --bg-input: #1a1a1a;
+            --bg-hover: #2d2d2d;
+            
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-heading: #ffffff;
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.08);
+            
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --shadow-heavy: rgba(0, 0, 0, 0.5);
+            
+            --table-bg: transparent;
+            --table-hover: rgba(233, 69, 96, 0.1);
+            --table-border: rgba(255, 255, 255, 0.1);
+            
+            --modal-bg: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%);
+            --dropdown-bg: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%);
+            --nav-link-color: #ffffff;
+            
+            --scrollbar-track: #0d0d0d;
+            --scrollbar-thumb: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+        }
+
+        /* ========== THEME TOGGLE BUTTON ========== */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #ffc107;
+            font-size: 1.1rem;
+            margin-right: 10px;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 193, 7, 0.2);
+            border-color: #ffc107;
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .theme-toggle .fa-sun {
+            display: none;
+        }
+        
+        .theme-toggle .fa-moon {
+            display: inline-block;
+        }
+        
+        [data-theme="dark"] .theme-toggle .fa-sun {
+            display: inline-block;
+        }
+        
+        [data-theme="dark"] .theme-toggle .fa-moon {
+            display: none;
+        }
+        
+        /* Theme transition */
+        body, .card, .modal-content, .dropdown-menu, .form-control, .form-select, .btn, .table, .list-group-item, .alert {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* ========== MODERN HEADER STYLES ========== */
+        .navbar {
+            background: var(--navbar-bg) !important;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 0.8rem 0;
+            border-bottom: 2px solid var(--border-light);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Professional Logo Icon Container */
+        .brand-logo-icon {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(145deg, #e94560 0%, #d63850 50%, #c72c42 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 4px 15px rgba(233, 69, 96, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .brand-logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%);
+            animation: logoShine 3s infinite;
+        }
+        
+        .brand-logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+            border-radius: 10px 10px 50% 50%;
+            pointer-events: none;
+        }
+        
+        @keyframes logoShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .navbar-brand:hover .brand-logo-icon {
+            box-shadow: 
+                0 8px 25px rgba(233, 69, 96, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.1);
+            transform: rotate(-3deg) scale(1.05);
+        }
+        
+        .brand-logo-icon i {
+            color: white;
+            font-size: 1.2rem;
+            z-index: 1;
+        }
+        
+        /* Fork and Knife Icons Arrangement */
+        .brand-logo-icon .icon-fork,
+        .brand-logo-icon .icon-knife {
+            position: absolute;
+            font-size: 0.95rem;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .brand-logo-icon .icon-fork {
+            transform: rotate(-20deg) translateX(-5px) translateY(-1px);
+        }
+        
+        .brand-logo-icon .icon-knife {
+            transform: rotate(20deg) translateX(5px) translateY(-1px) scaleX(-1);
+        }
+        
+        .navbar-brand:hover .brand-logo-icon .icon-fork {
+            transform: rotate(-30deg) translateX(-7px) translateY(-2px);
+        }
+        
+        .navbar-brand:hover .brand-logo-icon .icon-knife {
+            transform: rotate(30deg) translateX(7px) translateY(-2px) scaleX(-1);
+        }
+        
+        /* Brand Text */
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+        
+        .brand-text .brand-name {
+            font-weight: 800;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-text .brand-tagline {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        
+        .user-welcome {
+            color: var(--text-heading);
+            margin-right: 15px;
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            padding: 0.6rem 1.1rem;
+            color: var(--nav-link-color) !important;
+            border-radius: 8px;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(233, 69, 96, 0.15);
+            color: var(--text-heading) !important;
+        }
+        
+        .navbar-nav .nav-link:hover::after {
+            width: 60%;
+        }
+        
+        .navbar-nav .nav-link i {
+            transition: transform 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover i {
+            transform: scale(1.1);
+        }
+        
+        /* User dropdown styling */
+        .navbar .dropdown-menu {
+            background: var(--dropdown-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px var(--shadow-heavy);
+            padding: 0.5rem;
+            margin-top: 10px;
+        }
+        
+        .navbar .dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 20px;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid var(--dropdown-bg);
+        }
+        
+        .navbar .dropdown-item {
+            color: var(--text-primary);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .navbar .dropdown-item:hover {
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            color: #fff;
+            transform: translateX(5px);
+        }
+        
+        .navbar .dropdown-item-text {
+            color: var(--text-muted);
+        }
+        
+        .navbar .dropdown-item-text strong {
+            color: var(--text-heading);
+        }
+        
+        .navbar .dropdown-divider {
+            border-color: var(--border-color);
+        }
+        
+        /* Badge styling */
+        .navbar .badge.bg-light {
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%) !important;
+            color: #fff !important;
+            font-size: 0.65rem;
+            padding: 0.3em 0.6em;
+            border-radius: 20px;
+        }
+        
+        /* Mobile toggler */
+        .navbar-toggler {
+            border: 2px solid rgba(233, 69, 96, 0.5);
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.3);
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28233, 69, 96, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* ========== FOOTER STYLES ========== */
+        .footer {
+            background: var(--footer-bg);
+            border-top: 3px solid #e94560;
+            margin-top: auto;
+            color: var(--text-primary);
+            transition: background 0.3s ease;
+        }
+        
+        .footer h5, .footer h6 {
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+        
+        .footer .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            margin-bottom: 1.25rem;
+        }
+        
+        .footer .footer-logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(145deg, #e94560 0%, #d63850 50%, #c72c42 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 
+                0 6px 25px rgba(233, 69, 96, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .footer .footer-logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%);
+            animation: footerShine 4s infinite;
+        }
+        
+        .footer .footer-logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
+            border-radius: 12px 12px 50% 50%;
+            pointer-events: none;
+        }
+        
+        @keyframes footerShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .footer .footer-logo-icon .icon-fork,
+        .footer .footer-logo-icon .icon-knife {
+            position: absolute;
+            font-size: 1.1rem;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        
+        .footer .footer-logo-icon .icon-fork {
+            transform: rotate(-20deg) translateX(-5px) translateY(-1px);
+        }
+        
+        .footer .footer-logo-icon .icon-knife {
+            transform: rotate(20deg) translateX(5px) translateY(-1px) scaleX(-1);
+        }
+        
+        .footer .footer-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .footer .footer-brand-text .footer-brand-name {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        
+        .footer .footer-brand-text .footer-brand-tagline {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .footer a {
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: #e94560;
+            padding-left: 5px;
+        }
+        
+        .footer hr {
+            border-color: var(--border-color);
+        }
+        
+        .footer .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .footer .social-links a:hover {
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            color: #fff;
+            transform: translateY(-3px);
+            padding-left: 0;
+        }
+        
+        .footer .juluworks-credit {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer .juluworks-credit a {
+            color: #e94560;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .footer .juluworks-credit a:hover {
+            text-decoration: underline;
+            padding-left: 0;
+        }
+
+        /* ========== GLOBAL THEME-AWARE STYLES ========== */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        main {
+            min-height: calc(100vh - 160px);
+            background: var(--bg-primary);
+        }
+        
+        /* Cards with theme support */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 20px var(--shadow-color);
+            color: var(--text-primary);
+        }
+        
+        .card-header {
+            background: var(--bg-card-header);
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-heading);
+        }
+        
+        .card-footer {
+            background: var(--bg-card-header);
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .card-title {
+            color: var(--text-heading);
+        }
+        
+        .card-text {
+            color: var(--text-secondary);
+        }
+        
+        /* Tables with theme support */
+        .table {
+            --bs-table-bg: var(--table-bg);
+            --bs-table-color: var(--text-primary);
+            --bs-table-border-color: var(--table-border);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: var(--table-hover);
+            color: var(--text-heading);
+        }
+        
+        .table-light {
+            --bs-table-bg: var(--bg-secondary);
+            --bs-table-color: var(--text-primary);
+        }
+        
+        thead {
+            background: var(--bg-card-header);
+        }
+        
+        /* Form controls theme support */
+        .form-control, .form-select {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-secondary);
+            border-color: var(--accent-primary);
+            color: var(--text-heading);
+            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .input-group-text {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        /* Buttons with theme accents */
+        .btn-primary {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ff5a75 0%, #e94560 100%);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--text-heading);
+        }
+        
+        .btn-outline-primary {
+            border-color: #e94560;
+            color: #e94560;
+        }
+        
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            border-color: transparent;
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--text-secondary);
+            color: var(--text-heading);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            border: none;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            border: none;
+            color: #000;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            border: none;
+        }
+        
+        /* List groups theme support */
+        .list-group-item {
+            background-color: var(--bg-secondary);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        .list-group-item:hover {
+            background-color: var(--bg-hover);
+        }
+        
+        .list-group-item.active {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            border-color: transparent;
+        }
+        
+        /* Modals theme support */
+        .modal-content {
+            background: var(--modal-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            color: var(--text-heading);
+        }
+        
+        [data-theme="dark"] .btn-close {
+            filter: invert(1);
+        }
+        
+        /* Badges refinement */
+        .badge.bg-light {
+            background-color: var(--bg-tertiary) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Breadcrumbs */
+        .breadcrumb {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+        
+        .breadcrumb-item a {
+            color: #e94560;
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--text-muted);
+        }
+        
+        /* Pagination */
+        .page-link {
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .page-link:hover {
+            background-color: var(--bg-hover);
+            border-color: #e94560;
+            color: #e94560;
+        }
+        
+        .page-item.active .page-link {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            border-color: transparent;
+        }
+        
+        /* Tabs */
+        .nav-tabs {
+            border-bottom-color: var(--border-color);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--text-heading);
+            border-bottom-color: rgba(233, 69, 96, 0.5);
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: transparent;
+            color: #e94560;
+            border-bottom-color: #e94560;
+        }
+        
+        .nav-pills .nav-link {
+            color: var(--text-primary);
+        }
+        
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+        }
+        
+        /* Progress bars */
+        .progress {
+            background-color: var(--bg-secondary);
+        }
+        
+        /* Alerts with theme support */
+        .alert {
+            border-radius: 0.5rem;
+            border: none;
+        }
+        
+        [data-theme="dark"] .alert-success {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.2) 0%, rgba(30, 126, 52, 0.2) 100%);
+            border-left: 4px solid #28a745;
+            color: #7dcea0;
+        }
+        
+        [data-theme="dark"] .alert-danger {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(189, 33, 48, 0.2) 100%);
+            border-left: 4px solid #dc3545;
+            color: #f1948a;
+        }
+        
+        [data-theme="dark"] .alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(224, 168, 0, 0.2) 100%);
+            border-left: 4px solid #ffc107;
+            color: #f9e79f;
+        }
+        
+        [data-theme="dark"] .alert-info {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.2) 0%, rgba(19, 132, 150, 0.2) 100%);
+            border-left: 4px solid #17a2b8;
+            color: #85c1e9;
+        }
+        
+        [data-theme="light"] .alert-success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        [data-theme="light"] .alert-danger {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        
+        [data-theme="light"] .alert-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        
+        [data-theme="light"] .alert-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+        
+        /* Text colors */
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        .text-dark {
+            color: var(--text-primary) !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-heading);
+        }
+        
+        /* Links */
+        a {
+            color: #e94560;
+            transition: color 0.3s ease;
+        }
+        
+        a:hover {
+            color: #ff6b6b;
+        }
+        
+        /* Dropdown menus (non-navbar) */
+        .dropdown-menu:not(.notification-dropdown) {
+            background: var(--dropdown-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 40px var(--shadow-heavy);
+        }
+        
+        .dropdown-menu:not(.notification-dropdown) .dropdown-item {
+            color: var(--text-primary);
+        }
+        
+        .dropdown-menu:not(.notification-dropdown) .dropdown-item:hover {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            color: #fff;
+        }
+        
+        .dropdown-divider {
+            border-color: var(--border-color);
+        }
+        
+        /* Horizontal rules */
+        hr {
+            border-color: var(--border-color);
+            opacity: 1;
+        }
+        
+        /* Background utilities override */
+        .bg-white {
+            background-color: var(--bg-primary) !important;
+        }
+        
+        .bg-light {
+            background-color: var(--bg-secondary) !important;
+        }
+        
+        /* Border utilities */
+        .border {
+            border-color: var(--border-color) !important;
+        }
+        
+        /* Shadow utilities */
+        .shadow, .shadow-sm, .shadow-lg {
+            box-shadow: 0 4px 20px var(--shadow-color) !important;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+        
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            border-radius: 4px;
+        }
+        
+        [data-theme="light"] ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff5a75 0%, #e94560 100%);
+        }
+        
+        /* Selection styling */
+        ::selection {
+            background-color: rgba(233, 69, 96, 0.3);
+            color: var(--text-heading);
+        }
+        
+        /* Container backgrounds */
+        .container, .container-fluid {
+            background-color: transparent;
+        }
+        /* ========== END GLOBAL THEME STYLES ========== */
+
+        .cart-badge {
+            font-size: 0.7rem;
+            padding: 0.25em 0.4em;
+        }
+        
+        /* ========== TIMESTAMP STYLES ========== */
+        .timestamp {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .timestamp i {
+            margin-right: 0.4rem;
+            color: #e94560;
+            font-size: 0.75rem;
+        }
+        
+        .timestamp-date {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .timestamp-time {
+            color: #ffc107;
+            font-weight: 600;
+            margin-left: 0.3rem;
+        }
+        
+        .timestamp-ago {
+            color: #17a2b8;
+            font-weight: 500;
+        }
+        
+        .timestamp-full {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.75rem;
+        }
+        
+        .timestamp-full .date-line {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .timestamp-full .time-line {
+            color: #ffc107;
+            font-weight: 600;
+        }
+        
+        /* Timestamp badge variations */
+        .timestamp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.15) 0%, rgba(23, 162, 184, 0.15) 100%);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            border-radius: 8px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .timestamp-badge .ts-icon {
+            color: #e94560;
+        }
+        
+        .timestamp-badge .ts-date {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .timestamp-badge .ts-time {
+            color: #ffc107;
+            font-weight: 600;
+        }
+        
+        .timestamp-badge .ts-divider {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Order timestamp card style */
+        .order-timestamp {
+            background: linear-gradient(135deg, #1f1f1f 0%, #151515 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .order-timestamp .ts-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.25rem;
+        }
+        
+        .order-timestamp .ts-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .order-timestamp .ts-value i {
+            color: #e94560;
+        }
+        
+        .order-timestamp .ts-value .date {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .order-timestamp .ts-value .time {
+            color: #ffc107;
+            font-weight: 600;
+        }
+        
+        /* Relative time (e.g., "5 mins ago") */
+        .time-ago {
+            display: inline-flex;
+            align-items: center;
+            color: #17a2b8;
+            font-size: 0.8rem;
+        }
+        
+        .time-ago i {
+            margin-right: 0.3rem;
+            font-size: 0.7rem;
+        }
+        
+        .time-ago.urgent {
+            color: #dc3545;
+            animation: urgentPulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes urgentPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        /* ========== END TIMESTAMP STYLES ========== */
+        
+        /* ========== FANCY NOTIFICATION BELL STYLES ========== */
+        .notification-bell {
+            position: relative;
+            padding: 8px 12px !important;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-bell:hover {
+            background-color: rgba(233, 69, 96, 0.2) !important;
+        }
+        
+        .notification-bell .fa-bell {
+            font-size: 1.3rem;
+            color: #fff;
+            transition: transform 0.3s ease;
+        }
+        
+        .notification-bell:hover .fa-bell {
+            transform: scale(1.1);
+        }
+        
+        /* Animated bell when has notifications */
+        .notification-bell.has-notifications .fa-bell {
+            animation: bellRing 0.5s ease-in-out infinite;
+            animation-delay: 2s;
+            color: #ffc107;
+        }
+        
+        @keyframes bellRing {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(15deg); }
+            20% { transform: rotate(-15deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(5deg); }
+            60% { transform: rotate(-5deg); }
+            70% { transform: rotate(0); }
+            100% { transform: rotate(0); }
+        }
+        
+        /* Glowing dot indicator */
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: #ff4757;
+            border-radius: 50%;
+            border: 2px solid #1a1a2e;
+            animation: glow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px #ff4757, 0 0 10px #ff4757; }
+            50% { box-shadow: 0 0 10px #ff4757, 0 0 20px #ff4757, 0 0 30px #ff4757; }
+        }
+        
+        /* Badge count */
+        .notification-count {
+            font-size: 0.65rem;
+            padding: 0.3em 0.5em;
+            min-width: 18px;
+            animation: bounce 0.5s ease infinite;
+            animation-delay: 3s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+        
+        /* Dropdown styling */
+        .notification-dropdown {
+            border: none;
+            max-height: 450px;
+            overflow-y: auto;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        
+        .notification-dropdown::before {
+            display: none;
+        }
+        
+        .notification-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .notification-header .fw-bold {
+            color: white;
+        }
+        
+        .notification-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            color: var(--text-primary) !important;
+        }
+        
+        .notification-item .fw-bold.text-dark {
+            color: var(--text-heading) !important;
+        }
+        
+        .notification-item .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        .notification-item:hover {
+            background-color: var(--bg-hover) !important;
+            border-left-color: #667eea;
+            transform: none;
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .notification-icon i {
+            font-size: 0.9rem;
+        }
+        
+        /* Notification dropdown footer */
+        .notification-dropdown .bg-light {
+            background: var(--bg-secondary) !important;
+        }
+        /* ========== END NOTIFICATION STYLES ========== */
+    </style>
+
+    <style>
+        /* ========== SITE ANNOUNCEMENT BANNER ========== */
+        .site-banner {
+            width: 100%;
+            background: linear-gradient(90deg, #ff7a7a 0%, #ffb199 50%, #ffd37a 100%);
+            color: #1a1a1a;
+            padding: 0.6rem 0.75rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .site-banner .banner-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .site-banner .banner-cta {
+            background: rgba(0,0,0,0.08);
+            border-radius: 8px;
+            padding: 0.35rem 0.6rem;
+            color: #111;
+            text-decoration: none;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .site-banner .banner-close {
+            position: absolute;
+            right: 12px;
+            top: 8px;
+            background: transparent;
+            border: none;
+            color: rgba(0,0,0,0.6);
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 576px) {
+            .site-banner { font-size: 0.95rem; padding: 0.5rem; }
+            .site-banner .banner-text { font-size: 0.95rem; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <div class="brand-logo-icon">
+                    <i class="fas fa-utensils icon-fork"></i>
+                    <i class="fas fa-utensils icon-knife"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Halo Sass</span>
+                    <span class="brand-tagline">Online Ordering System</span>
+                </div>
+            </a>
+
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Left Navigation -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                    <!-- Dashboard Link - Different for each role -->
+                    {% if user.role != 'restaurant_owner' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Restaurant Owner Links -->
+                    {% if user.role == 'restaurant_owner' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'restaurant_dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'manage_restaurant' %}">
+                            <i class="fas fa-store me-1"></i>My Restaurants
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Customer Links -->
+                    {% if user.role == 'customer' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'browse_restaurants' %}">
+                            <i class="fas fa-search me-1"></i>Browse Restaurants
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Orders Link for All Authenticated Users -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'order_history' %}">
+                            <i class="fas fa-receipt me-1"></i>Orders
+                        </a>
+                    </li>
+
+                    <!-- Admin Link -->
+                    {% if user.role == 'admin' or user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">
+                            <i class="fas fa-cog me-1"></i>Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    <!-- Public Links -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">
+                            <i class="fas fa-star me-1"></i>Features
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">
+                            <i class="fas fa-tag me-1"></i>Pricing
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <!-- Right Navigation -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    
+                    <!-- Theme Toggle Button -->
+                    <li class="nav-item me-2">
+                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Switch theme">
+                            <i class="fas fa-sun"></i>
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                    
+                    {% if user.is_authenticated %}
+                    
+                    <!-- NOTIFICATION BELL - Admin -->
+                    {% if user.role == 'admin' %}
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link position-relative notification-bell {% if admin_total_notifications > 0 %}has-notifications{% endif %}" href="#" id="adminNotificationBell" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell fa-lg"></i>
+                            {% if admin_total_notifications > 0 %}
+                            <span class="notification-dot"></span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count">
+                                {{ admin_total_notifications }}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg" style="min-width: 350px; border-radius: 12px;">
+                            <li class="notification-header">
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                                    <span class="fw-bold"><i class="fas fa-bell me-2"></i>Platform Activity</span>
+                                    {% if admin_total_notifications > 0 %}
+                                    <span class="badge bg-danger rounded-pill">{{ admin_total_notifications }} alerts</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            {% if admin_total_notifications > 0 %}
+                            <!-- All Pending Orders -->
+                            {% if admin_total_pending_orders > 0 %}
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'admin_dashboard' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-warning">
+                                            <i class="fas fa-clock text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ admin_total_pending_orders }} Pending Order{{ admin_total_pending_orders|pluralize }}</div>
+                                            <small class="text-muted">Across all restaurants</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <!-- Active Carts Platform-wide -->
+                            {% if admin_total_active_carts > 0 %}
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'admin_dashboard' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-info">
+                                            <i class="fas fa-shopping-cart text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ admin_total_active_carts }} Active Cart{{ admin_total_active_carts|pluralize }}</div>
+                                            <small class="text-muted">Potential orders incoming</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% else %}
+                            <li>
+                                <div class="text-center py-4">
+                                    <div class="notification-icon bg-light mx-auto mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-check-circle text-success" style="font-size: 1.2rem;"></i>
+                                    </div>
+                                    <p class="text-muted mb-0">All systems running smoothly</p>
+                                    <small class="text-muted">No urgent alerts 👍</small>
+                                </div>
+                            </li>
+                            {% endif %}
+                            <!-- Today's Stats -->
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <li class="px-3 py-2 bg-light">
+                                <div class="d-flex justify-content-around text-center">
+                                    <div>
+                                        <div class="fw-bold text-primary">{{ admin_today_orders }}</div>
+                                        <small class="text-muted">Today's Orders</small>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-success">{{ admin_new_restaurants }}</div>
+                                        <small class="text-muted">New This Week</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <li>
+                                <a class="dropdown-item text-center py-2 fw-bold text-primary" href="{% url 'notifications_dashboard' %}">
+                                    View All Notifications <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- NOTIFICATION BELL - Restaurant Owner -->
+                    {% if user.role == 'restaurant_owner' %}
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link position-relative notification-bell {% if owner_total_notifications > 0 %}has-notifications{% endif %}" href="#" id="notificationBell" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell fa-lg"></i>
+                            {% if owner_total_notifications > 0 %}
+                            <span class="notification-dot"></span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count">
+                                {{ owner_total_notifications }}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg" style="min-width: 320px; border-radius: 12px;">
+                            <li class="notification-header">
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                                    <span class="fw-bold"><i class="fas fa-bell me-2"></i>Notifications</span>
+                                    {% if owner_total_notifications > 0 %}
+                                    <span class="badge bg-danger rounded-pill">{{ owner_total_notifications }} new</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            {% if owner_total_notifications > 0 %}
+                            <!-- Pending Orders Alert -->
+                            {% if owner_pending_orders > 0 %}
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'restaurant_dashboard' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-warning">
+                                            <i class="fas fa-exclamation-circle text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ owner_pending_orders }} Pending Order{{ owner_pending_orders|pluralize }}</div>
+                                            <small class="text-muted">Needs immediate attention!</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <!-- Active Carts -->
+                            {% if owner_active_carts > 0 %}
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'restaurant_dashboard' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-info">
+                                            <i class="fas fa-shopping-cart text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ owner_active_carts }} Active Cart{{ owner_active_carts|pluralize }}</div>
+                                            <small class="text-muted">Customers ready to order</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <!-- Today's Orders Summary -->
+                            {% if owner_today_orders > 0 %}
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'restaurant_dashboard' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-success">
+                                            <i class="fas fa-check text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ owner_today_orders }} Order{{ owner_today_orders|pluralize }} Today</div>
+                                            <small class="text-muted">Great job!</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% else %}
+                            <li>
+                                <div class="text-center py-4">
+                                    <div class="notification-icon bg-light mx-auto mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-bell-slash text-muted" style="font-size: 1.2rem;"></i>
+                                    </div>
+                                    <p class="text-muted mb-0">No new notifications</p>
+                                    <small class="text-muted">You're all caught up! 🎉</small>
+                                </div>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <li>
+                                <a class="dropdown-item text-center py-2 fw-bold text-primary" href="{% url 'notifications_dashboard' %}">
+                                    View All Notifications <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- NOTIFICATION BELL - Customer -->
+                    {% if user.role == 'customer' %}
+                    <li class="nav-item dropdown me-2">
+                        <a class="nav-link position-relative notification-bell {% if customer_total_notifications > 0 %}has-notifications{% endif %}" href="#" id="customerNotificationBell" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell fa-lg"></i>
+                            {% if customer_total_notifications > 0 %}
+                            <span class="notification-dot"></span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count">
+                                {{ customer_total_notifications }}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg" style="min-width: 320px; border-radius: 12px;">
+                            <li class="notification-header">
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
+                                    <span class="fw-bold"><i class="fas fa-bell me-2"></i>My Orders</span>
+                                    {% if customer_total_notifications > 0 %}
+                                    <span class="badge bg-danger rounded-pill">{{ customer_total_notifications }} active</span>
+                                    {% endif %}
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            {% if customer_active_orders > 0 %}
+                            <!-- Active Orders -->
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'order_history' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-primary">
+                                            <i class="fas fa-utensils text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ customer_active_orders }} Active Order{{ customer_active_orders|pluralize }}</div>
+                                            <small class="text-muted">Being prepared for you</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% else %}
+                            <li>
+                                <div class="text-center py-4">
+                                    <div class="notification-icon bg-light mx-auto mb-2" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-receipt text-muted" style="font-size: 1.2rem;"></i>
+                                    </div>
+                                    <p class="text-muted mb-0">No active orders</p>
+                                    <small class="text-muted">Time to order something delicious! 🍔</small>
+                                </div>
+                            </li>
+                            {% endif %}
+                            <!-- Cart Summary -->
+                            {% if customer_cart_items > 0 %}
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <li>
+                                <a class="dropdown-item notification-item py-3" href="{% url 'view_cart' %}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="notification-icon bg-success">
+                                            <i class="fas fa-shopping-cart text-white"></i>
+                                        </div>
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="fw-bold text-dark">{{ customer_cart_items }} Item{{ customer_cart_items|pluralize }} in Cart</div>
+                                            <small class="text-muted">Ready to checkout</small>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <li>
+                                <a class="dropdown-item text-center py-2 fw-bold text-primary" href="{% url 'notifications_dashboard' %}">
+                                    View All Notifications <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Cart Icon for Customers -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'view_cart' %}">
+                            <i class="fas fa-shopping-cart me-1"></i>Cart
+                            {% if customer_cart_items > 0 %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
+                                {{ customer_cart_items }}
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- User Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ user.username }}
+                            <small class="badge bg-light text-dark ms-1">{{ user.get_role_display }}</small>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <span class="dropdown-item-text">
+                                    <small>Signed in as</small><br>
+                                    <strong>{{ user.username }}</strong>
+                                </span>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user me-2"></i>Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'order_history' %}">
+                                    <i class="fas fa-receipt me-2"></i>My Orders
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {% else %}
+                    <!-- Authentication Links -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Site-wide Announcement Banner (dismissible) -->
+    <div id="siteBanner" class="site-banner position-relative">
+        <div class="banner-text">
+            <i class="fas fa-gift" style="color: #fff; background: rgba(0,0,0,0.12); padding: 6px 8px; border-radius: 8px;"></i>
+            <span>Holiday Special: Free delivery from selected restaurants today — order now!</span>
+            <a href="{% url 'browse_restaurants' %}" class="banner-cta ms-2">Browse Restaurants</a>
+        </div>
+        <button class="banner-close" id="bannerClose" aria-label="Dismiss announcement">&times;</button>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            <div class="d-flex align-items-center">
+                <i class="fas 
+                            {% if message.tags == 'success' %}fa-check-circle
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle
+                            {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                            {% else %}fa-info-circle{% endif %}
+                            me-2"></i>
+                <div>{{ message }}</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}
+        <!-- Content will be injected here -->
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-5 py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand">
+                        <div class="footer-logo-icon">
+                            <i class="fas fa-utensils icon-fork"></i>
+                            <i class="fas fa-utensils icon-knife"></i>
+                        </div>
+                        <div class="footer-brand-text">
+                            <span class="footer-brand-name">Halo Sass</span>
+                            <span class="footer-brand-tagline">Online Ordering System</span>
+                        </div>
+                    </div>
+                    <p class="mb-4" style="color: rgba(255,255,255,0.6);">
+                        The complete solution for your restaurant's online presence. Manage orders, menus, and grow your business with ease.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Home</a></li>
+                        {% if user.is_authenticated %}
+                        <li class="mb-2"><a href="{% url 'dashboard' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Dashboard</a></li>
+                        <li class="mb-2"><a href="{% url 'order_history' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Orders</a></li>
+                        <li class="mb-2"><a href="{% url 'analytics_dashboard' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Analytics</a></li>
+                        {% else %}
+                        <li class="mb-2"><a href="{% url 'login' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Login</a></li>
+                        <li class="mb-2"><a href="{% url 'register' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3">Services</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Online Ordering</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Menu Management</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Analytics & Reports</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Payment Processing</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3">Contact Us</h6>
+                    <ul class="list-unstyled" style="color: rgba(255,255,255,0.6);">
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2" style="color: #e94560;"></i>
+                            123 Business Street, Lagos
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2" style="color: #e94560;"></i>
+                            support@halosass.com
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2" style="color: #e94560;"></i>
+                            +234 (0) 123 456 7890
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2" style="color: #e94560;"></i>
+                            Mon - Fri: 9:00 AM - 6:00 PM
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0" style="color: rgba(255,255,255,0.5);">
+                        &copy; 2025 Halo Sass. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <p class="juluworks-credit mb-0">
+                        Designed & Developed by <a href="https://juluworks.com" target="_blank" rel="noopener">JuluWorks</a>
+                        <i class="fas fa-heart ms-1" style="color: #e94560; font-size: 0.8rem;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+        // ========== THEME TOGGLE FUNCTIONALITY ==========
+        (function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+            const THEME_KEY = 'haloSassTheme';
+            
+            // Get saved theme or default to 'dark'
+            function getSavedTheme() {
+                return localStorage.getItem(THEME_KEY) || 'dark';
+            }
+            
+            // Apply theme
+            function applyTheme(theme) {
+                htmlElement.setAttribute('data-theme', theme);
+                localStorage.setItem(THEME_KEY, theme);
+                
+                // Update toggle button state
+                if (themeToggle) {
+                    themeToggle.classList.toggle('light-mode', theme === 'light');
+                }
+            }
+            
+            // Initialize theme on page load
+            function initTheme() {
+                const savedTheme = getSavedTheme();
+                applyTheme(savedTheme);
+            }
+            
+            // Toggle between light and dark
+            function toggleTheme() {
+                const currentTheme = htmlElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+            }
+            
+            // Initialize on DOM ready
+            initTheme();
+            
+            // Bind click event
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+        })();
+        // ========== END THEME TOGGLE ==========
+        
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+
+        // Announcement banner dismissal and persistence
+        (function() {
+            const banner = document.getElementById('siteBanner');
+            const closeBtn = document.getElementById('bannerClose');
+            const HIDE_KEY = 'haloSass_hideBanner_v1';
+
+            function hideBanner() {
+                if (banner) banner.style.display = 'none';
+            }
+
+            // Hide banner if user previously dismissed it
+            if (localStorage.getItem(HIDE_KEY) === '1') {
+                hideBanner();
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    localStorage.setItem(HIDE_KEY, '1');
+                    hideBanner();
+                });
+            }
+        })();
+
+        // Simple cart counter update (will be enhanced with AJAX later)
+        function updateCartCounter() {
+            // Placeholder for AJAX update; no console output in production
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

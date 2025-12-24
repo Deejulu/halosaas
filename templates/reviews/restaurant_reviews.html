@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Reviews - {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>
+                <i class="fas fa-star me-2"></i>Customer Reviews
+            </h1>
+            <p class="text-muted mb-0">{{ restaurant.name }}</p>
+        </div>
+        <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Rating Summary -->
+    <!-- Rating Summary - ULTRA SIMPLE VERSION -->
+    <div class="row mb-5">
+        <div class="col-lg-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="display-4 fw-bold text-primary mb-2">{{ avg_rating }}</div>
+                    <div class="mb-2">
+                        {% for i in "12345" %}
+                        {% if i|add:0 <= avg_rating %} <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                            <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                            {% endfor %}
+                    </div>
+                    <p class="text-muted mb-0">{{ total_reviews }} review{{ total_reviews|pluralize }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Rating Count</h5>
+                    <div class="row text-center">
+                        <div class="col">
+                            <h4 class="text-warning">{{ rating_distribution.5 }}</h4>
+                            <small>5 Stars</small>
+                        </div>
+                        <div class="col">
+                            <h4 class="text-warning">{{ rating_distribution.4 }}</h4>
+                            <small>4 Stars</small>
+                        </div>
+                        <div class="col">
+                            <h4 class="text-warning">{{ rating_distribution.3 }}</h4>
+                            <small>3 Stars</small>
+                        </div>
+                        <div class="col">
+                            <h4 class="text-warning">{{ rating_distribution.2 }}</h4>
+                            <small>2 Stars</small>
+                        </div>
+                        <div class="col">
+                            <h4 class="text-warning">{{ rating_distribution.1 }}</h4>
+                            <small>1 Star</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="fas fa-comments me-2"></i>All Reviews
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if reviews %}
+            {% for review in reviews %}
+            <div class="review-item border-bottom pb-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-1">{{ review.customer.get_full_name|default:review.customer.username }}</h6>
+                        <div class="text-warning mb-2">
+                            {{ review.get_rating_stars }}
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                </div>
+
+                {% if review.comment %}
+                <p class="mb-2">{{ review.comment }}</p>
+                {% else %}
+                <p class="text-muted mb-2"><em>No comment provided</em></p>
+                {% endif %}
+
+                <small class="text-muted">
+                    Order #{{ review.order.id }} •
+                    {{ review.order.created_at|date:"M d, Y" }}
+                </small>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Reviews Yet</h5>
+                <p class="text-muted">Customer reviews will appear here once they start rating their orders.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .review-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 10px;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+    }
+
+    .display-4 {
+        font-size: 3.5rem;
+        font-weight: 300;
+        line-height: 1.2;
+    }
+</style>
+{% endblock %}

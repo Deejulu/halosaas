@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1><i class="fas fa-shopping-cart me-2"></i>Shopping Cart</h1>
+
+            {% if cart_items %}
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                Order Items
+                                <span class="badge bg-primary">{{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }}</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Cart Session Info -->
+                            <div class="order-timestamp mb-3">
+                                <div class="ts-label">Cart Session</div>
+                                <div class="ts-value">
+                                    <i class="fas fa-clock"></i>
+                                    <span class="text-muted small">Items will be saved for your session</span>
+                                </div>
+                            </div>
+                            
+                            {% for item in cart_items %}
+                            <div class="row align-items-center mb-3 pb-3 border-bottom">
+                                <div class="col-md-6">
+                                    <h6 class="mb-1 text-primary">{{ item.name }}</h6>
+                                    {% if item.special_requests %}
+                                    <p class="text-muted small mb-1">
+                                        <i class="fas fa-sticky-note me-1"></i>
+                                        <em>{{ item.special_requests }}</em>
+                                    </p>
+                                    {% endif %}
+                                    <p class="text-success mb-0">
+                                        <strong>₦{{ item.price }} each</strong>
+                                    </p>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <form method="post" action="{% url 'update_cart_item' item.menu_item_id %}"
+                                        class="d-flex align-items-center">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm me-2" style="width: 130px;">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                onclick="decrementQuantity(this)">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                                                class="form-control text-center">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                onclick="incrementQuantity(this)">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <input type="hidden" name="special_requests"
+                                            value="{{ item.special_requests }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-sync-alt me-1"></i>Update
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="col-md-2 text-end">
+                                    <div class="mb-2">
+                                        <strong class="text-primary">₦{{ item.total_price|floatformat:2 }}</strong>
+                                    </div>
+                                    <form method="post" action="{% url 'remove_from_cart' item.menu_item_id %}"
+                                        class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove item">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                <form method="post" action="{% url 'clear_cart' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i>Clear Entire Cart
+                                    </button>
+                                </form>
+                                <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-utensils me-1"></i>Continue Shopping
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="card sticky-top" style="top: 100px;">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-receipt me-2"></i>Order Summary
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Items ({{ cart.get_total_items }}):</span>
+                                <strong>₦{{ total_price|floatformat:2 }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Delivery Fee:</span>
+                                <strong class="text-success">₦0.00</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Service Charge:</span>
+                                <strong>₦0.00</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax:</span>
+                                <strong>₦0.00</strong>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <span class="h5">Total:</span>
+                                <strong class="h4 text-success">₦{{ total_price|floatformat:2 }}</strong>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'checkout' %}" class="btn btn-success btn-lg">
+                                    <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                                </a>
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-lock me-1"></i>Secure SSL Encryption
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Restaurant Info -->
+                    {% if cart_items.0.restaurant_name %}
+                    <div class="card mt-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-store me-2"></i>Restaurant
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-1"><strong>{{ cart_items.0.restaurant_name }}</strong></p>
+                            <p class="text-muted small mb-0">All items from this restaurant</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty Cart State (but may have other restaurant subcarts) -->
+            {% with session_cart=request.session.cart %}
+                {% if session_cart %}
+                    <div class="py-4">
+                        <h5 class="mb-3">Your active cart is empty.</h5>
+                        <p class="text-muted">You have saved items in carts for other restaurants. Switch to one below to view them.</p>
+                        <div class="list-group mb-3">
+                            {% for rid, sub in session_cart.items %}
+                                {% if sub %}
+                                    {% with first=sub.values|first %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ first.restaurant_name }}</strong>
+                                            <div class="small text-muted">{{ sub|length }} item{{ sub|length|pluralize }}</div>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'switch_cart_restaurant' rid %}" class="btn btn-sm btn-outline-primary">Switch to this cart</a>
+                                        </div>
+                                    </div>
+                                    {% endwith %}
+                                {% endif %}
+                            {% empty %}
+                                <div class="text-center py-5">
+                                    <div class="empty-cart-icon mb-4">
+                                        <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                                    </div>
+                                    <h3 class="text-muted">Your cart is empty</h3>
+                                    <p class="text-muted mb-4">Looks like you haven't added any delicious items yet!</p>
+                                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                        <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                                            <i class="fas fa-utensils me-2"></i>Browse Restaurants
+                                        </a>
+                                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="empty-cart-icon mb-4">
+                            <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                        </div>
+                        <h3 class="text-muted">Your cart is empty</h3>
+                        <p class="text-muted mb-4">Looks like you haven't added any delicious items yet!</p>
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                            <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-utensils me-2"></i>Browse Restaurants
+                            </a>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function incrementQuantity(button) {
+        const input = button.parentNode.querySelector('input[type=number]');
+        input.stepUp();
+        // Auto-submit after increment
+        const form = button.closest('form');
+        form.submit();
+    }
+
+    function decrementQuantity(button) {
+        const input = button.parentNode.querySelector('input[type=number]');
+        if (parseInt(input.value) > 1) {
+            input.stepDown();
+            // Auto-submit after decrement
+            const form = button.closest('form');
+            form.submit();
+        }
+    }
+
+    // Auto-submit form when quantity is manually changed
+    document.addEventListener('DOMContentLoaded', function () {
+        const quantityInputs = document.querySelectorAll('input[name="quantity"]');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                this.closest('form').submit();
+            });
+        });
+    });
+</script>
+
+<style>
+    .empty-cart-icon {
+        opacity: 0.5;
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .sticky-top {
+        position: sticky;
+        z-index: 1020;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Restaurants - Restaurant SaaS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>
+                <i class="fas fa-utensils me-2"></i>Browse Restaurants
+            </h1>
+            <p class="lead text-muted">Discover amazing restaurants near you</p>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <form method="get" class="d-flex">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Search restaurants or cuisines..." value="{{ search_query }}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <form method="get" class="d-flex">
+                        <select name="category" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                            <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>
+                                {{ category }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if search_query or category_filter %}
+                        <a href="{% url 'browse_restaurants' %}" class="btn btn-outline-secondary ms-2">
+                            Clear
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Results Info -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0">
+            {% if search_query or category_filter %}
+            {{ total_restaurants }} restaurant{{ total_restaurants|pluralize }} found
+            {% if search_query %}for "{{ search_query }}"{% endif %}
+            {% if category_filter %}in {{ category_filter }}{% endif %}
+            {% else %}
+            All Restaurants ({{ total_restaurants }})
+            {% endif %}
+        </h5>
+    </div>
+
+    <!-- Restaurants Grid -->
+    <div class="row">
+        {% if restaurants %}
+        {% for restaurant in restaurants %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 restaurant-card">
+                {% if restaurant.logo %}
+                <img src="{{ restaurant.logo.url }}" class="card-img-top" alt="{{ restaurant.name }}"
+                    style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                    style="height: 200px;">
+                    <i class="fas fa-utensils fa-3x text-muted"></i>
+                </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ restaurant.name }}</h5>
+                    <p class="card-text text-muted">{{ restaurant.description|truncatewords:20 }}</p>
+
+                    <div class="restaurant-meta mb-3">
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>
+                                <i class="fas fa-clock me-1"></i>
+                                {{ restaurant.opening_time }} - {{ restaurant.closing_time }}
+                            </span>
+                            <span>
+                                <i class="fas fa-phone me-1"></i>
+                                {{ restaurant.phone }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="restaurant-features">
+                        {% with categories=restaurant.category_set.all %}
+                        {% if categories %}
+                        <div class="mb-2">
+                            <strong>Cuisines:</strong>
+                            {% for category in categories %}
+                            <span class="badge bg-light text-dark me-1">{{ category.name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'restaurant_detail' restaurant.slug %}" class="btn btn-primary">
+                            <i class="fas fa-utensils me-2"></i>View Menu & Order
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <!-- No Results -->
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No restaurants found</h4>
+                <p class="text-muted mb-4">
+                    {% if search_query %}
+                    No restaurants match your search for "{{ search_query }}". Try different keywords.
+                    {% else %}
+                    No restaurants available at the moment.
+                    {% endif %}
+                </p>
+                <a href="{% url 'browse_restaurants' %}" class="btn btn-primary">
+                    <i class="fas fa-undo me-2"></i>View All Restaurants
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Featured Categories -->
+    {% if not search_query and not category_filter and categories %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags me-2"></i>Popular Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for category in categories|slice:":6" %}
+                        <div class="col-md-4 col-lg-2 mb-3">
+                            <a href="{% url 'browse_restaurants' %}?category={{ category }}"
+                                class="text-decoration-none">
+                                <div class="card text-center h-100 category-card">
+                                    <div class="card-body">
+                                        <i class="fas fa-utensils fa-2x text-primary mb-2"></i>
+                                        <h6 class="card-title mb-0">{{ category }}</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .restaurant-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: 1px solid #e9ecef;
+    }
+
+    .restaurant-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .category-card {
+        transition: all 0.2s ease-in-out;
+        border: 1px solid #e9ecef;
+    }
+
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-color: #007bff;
+    }
+
+    .restaurant-meta {
+        border-top: 1px solid #e9ecef;
+        padding-top: 10px;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+    }
+
+    .card-img-top {
+        border-bottom: 1px solid #e9ecef;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add loading states to buttons
+        const viewButtons = document.querySelectorAll('.btn-primary');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Loading...';
+                this.disabled = true;
+
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }, 2000);
+            });
+        });
+    });
+</script>
+{% endblock %}

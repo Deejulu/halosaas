@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Logs - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient" style="background: linear-gradient(135deg, #434343 0%, #000000 100%);">
+                <div class="card-body py-4 text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-1">
+                                <i class="fas fa-history me-2"></i>Audit Logs
+                            </h2>
+                            <p class="mb-0 opacity-75">Track all administrative actions on the platform</p>
+                        </div>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-light">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Action Type</label>
+                    <select name="action" class="form-select">
+                        <option value="">All Actions</option>
+                        {% for action_code, action_name in action_types %}
+                        <option value="{{ action_code }}" {% if action_code == current_action %}selected{% endif %}>
+                            {{ action_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Admin User</label>
+                    <select name="user_id" class="form-select">
+                        <option value="">All Admins</option>
+                        {% for admin in admin_users %}
+                        <option value="{{ admin.id }}" {% if admin.id|stringformat:"s" == current_user_id %}selected{% endif %}>
+                            {{ admin.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Date</label>
+                    <input type="date" name="date" class="form-control" value="{{ current_date|default:'' }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div class="card shadow">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Activity Log (Last 500 entries)</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if logs %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 180px;">Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Description</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>
+                                <div class="timestamp-badge">
+                                    <span class="date-part">
+                                        <i class="fas fa-calendar-alt me-1"></i>{{ log.created_at|date:"M d, Y" }}
+                                    </span>
+                                    <span class="time-part">
+                                        <i class="fas fa-clock me-1"></i>{{ log.created_at|time:"g:i A" }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if log.user %}
+                                <span class="badge bg-primary">{{ log.user.username }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary">System</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if 'create' in log.action_type %}
+                                <span class="badge bg-success">{{ log.get_action_type_display }}</span>
+                                {% elif 'delete' in log.action_type %}
+                                <span class="badge bg-danger">{{ log.get_action_type_display }}</span>
+                                {% elif 'update' in log.action_type or 'change' in log.action_type or 'toggle' in log.action_type %}
+                                <span class="badge bg-warning text-dark">{{ log.get_action_type_display }}</span>
+                                {% elif 'export' in log.action_type %}
+                                <span class="badge bg-info">{{ log.get_action_type_display }}</span>
+                                {% elif 'login' in log.action_type or 'logout' in log.action_type %}
+                                <span class="badge bg-secondary">{{ log.get_action_type_display }}</span>
+                                {% else %}
+                                <span class="badge bg-dark">{{ log.get_action_type_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ log.description }}
+                                {% if log.target_model and log.target_id %}
+                                <small class="text-muted d-block">{{ log.target_model }} #{{ log.target_id }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.ip_address %}
+                                <code class="small">{{ log.ip_address }}</code>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No audit logs found</h5>
+                <p class="text-muted">Administrative actions will be recorded here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .timestamp-badge {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .timestamp-badge .date-part {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .timestamp-badge .time-part {
+        font-size: 0.8rem;
+        color: #adb5bd;
+    }
+    
+    code {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}

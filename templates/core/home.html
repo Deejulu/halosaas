@@ -1,0 +1,935 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Restaurant SaaS - Complete Online Ordering System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-80">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    Transform Your Restaurant Business Online
+                </h1>
+                <p class="lead text-white mb-5">
+                    Complete online ordering system, menu management, and customer analytics in one powerful platform.
+                    Start accepting orders 24/7 and grow your restaurant like never before.
+                </p>
+                <div class="hero-buttons">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                    </a>
+                    {% if user.role == 'restaurant_owner' %}
+                    <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-store me-2"></i>My Restaurants
+                    </a>
+                    {% elif user.role == 'customer' %}
+                    <a href="{% url 'browse_restaurants' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-utensils me-2"></i>Order Food
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-rocket me-2"></i>Start Free Trial
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Restaurant Login
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hero-stats mt-5">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-white mb-1">100+</h3>
+                                <small class="text-light">Restaurants</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-white mb-1">5,000+</h3>
+                                <small class="text-light">Orders Processed</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-white mb-1">₦10M+</h3>
+                                <small class="text-light">Revenue Generated</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-mobile-alt text-primary"></i>
+                        <span>Mobile Orders</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-chart-line text-success"></i>
+                        <span>Sales Analytics</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-bell text-warning"></i>
+                        <span>Real-time Alerts</span>
+                    </div>
+                    <!-- Decorative animated images to enliven hero -->
+                    <div class="hero-decor" aria-hidden="true">
+                        <img src="{% static 'images/restaurant-placeholder-1.svg' %}" class="decor decor-1" alt="decor1">
+                        <img src="{% static 'images/restaurant-placeholder-2.svg' %}" class="decor decor-2" alt="decor2">
+                        <img src="{% static 'images/restaurant-placeholder-3.svg' %}" class="decor decor-3" alt="decor3">
+                        <img src="{% static 'images/restaurant-placeholder-4.svg' %}" class="decor decor-4" alt="decor4">
+                    </div>
+                    <div class="mockup-container">
+                        <div class="mockup-screen">
+                            <div class="screen-content">
+                                <div class="app-header">
+                                    <i class="fas fa-utensils"></i>
+                                    <span>Halo Sass</span>
+                                </div>
+                                {% if sample_items %}
+                                    {% for item in sample_items %}
+                                    <div class="order-item">
+                                        <span>{{ item.name }}</span>
+                                        <span>₦{{ item.price|floatformat:0 }}</span>
+                                    </div>
+                                    {% endfor %}
+                                    <div class="order-total">
+                                        <span>Total: ₦{{ sample_total|floatformat:0 }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="order-item">
+                                        <span>🍕 Pizza Margherita</span>
+                                        <span>₦3,500</span>
+                                    </div>
+                                    <div class="order-item">
+                                        <span>🍔 Classic Burger</span>
+                                        <span>₦2,800</span>
+                                    </div>
+                                    <div class="order-item">
+                                        <span>🥗 Caesar Salad</span>
+                                        <span>₦2,200</span>
+                                    </div>
+                                    <div class="order-total">
+                                        <span>Total: ₦8,500</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5" style="background: #f8f9fa;">
+    <div class="container">
+        <!-- Large Colored Boxes Row (live available items from menu) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="big-box black h-100 p-3">
+                            <div class="box-header d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 text-white">Top Sellers</h5>
+                                <small class="text-white-50">Live</small>
+                            </div>
+                            <div class="box-body">
+                                {% for item in top_sellers %}
+                                <div class="box-item d-flex align-items-center py-2">
+                                    <div class="thumb me-3">
+                                        {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                                        {% else %}
+                                        <img src="{% static 'images/restaurant-placeholder.svg' %}" alt="no image" loading="lazy">
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="item-name text-white">{{ item.name }}</div>
+                                        <div class="item-meta small text-white-50">{{ item.category.restaurant.name }}</div>
+                                    </div>
+                                    <div class="item-price text-white fw-bold">₦{{ item.price|floatformat:0 }}</div>
+                                </div>
+                                {% empty %}
+                                <div class="text-white-50">No top sellers yet</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="big-box blue h-100 p-3">
+                            <div class="box-header d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 text-white">Today's Specials</h5>
+                                <small class="text-white-50">Fresh</small>
+                            </div>
+                            <div class="box-body">
+                                {% for item in todays_specials %}
+                                <div class="box-item d-flex align-items-center py-2">
+                                    <div class="thumb me-3">
+                                        {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                                        {% else %}
+                                        <img src="{% static 'images/restaurant-placeholder.svg' %}" alt="no image" loading="lazy">
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="item-name text-white">{{ item.name }}</div>
+                                        <div class="item-meta small text-white-50">{{ item.category.restaurant.name }}</div>
+                                    </div>
+                                    <div class="item-price text-white fw-bold">₦{{ item.price|floatformat:0 }}</div>
+                                </div>
+                                {% empty %}
+                                <div class="text-white-50">No specials right now</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="big-box green h-100 p-3">
+                            <div class="box-header d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 text-white">Combo Deals</h5>
+                                <small class="text-white-50">Popular</small>
+                            </div>
+                            <div class="box-body">
+                                {% for item in customer_picks|slice:":3" %}
+                                <div class="box-item d-flex align-items-center py-2">
+                                    <div class="thumb me-3">
+                                        {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                                        {% else %}
+                                        <img src="{% static 'images/restaurant-placeholder.svg' %}" alt="no image" loading="lazy">
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="item-name text-white">{{ item.name }}</div>
+                                        <div class="item-meta small text-white-50">{{ item.category.restaurant.name }}</div>
+                                    </div>
+                                    <div class="item-price text-white fw-bold">₦{{ item.price|floatformat:0 }}</div>
+                                </div>
+                                {% empty %}
+                                <div class="text-white-50">No combos available</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <div class="big-box purple h-100 p-3">
+                            <div class="box-header d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 text-white">Customer Picks</h5>
+                                <small class="text-white-50">Latest</small>
+                            </div>
+                            <div class="box-body">
+                                {% for item in customer_picks %}
+                                <div class="box-item d-flex align-items-center py-2">
+                                    <div class="thumb me-3">
+                                        {% if item.image %}
+                                        <img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">
+                                        {% else %}
+                                        <img src="{% static 'images/restaurant-placeholder.svg' %}" alt="no image" loading="lazy">
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="item-name text-white">{{ item.name }}</div>
+                                        <div class="item-meta small text-white-50">{{ item.category.restaurant.name }}</div>
+                                    </div>
+                                    <div class="item-price text-white fw-bold">₦{{ item.price|floatformat:0 }}</div>
+                                </div>
+                                {% empty %}
+                                <div class="text-white-50">No picks yet</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3" style="color: #1a1a1a;">Everything You Need to Succeed</h2>
+                <p class="lead" style="color: #6c757d;">Powerful tools designed specifically for modern restaurants</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-primary">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h4>Online Ordering</h4>
+                    <p>Accept orders 24/7 through your custom website with real-time notifications
+                        and order management.</p>
+                    <ul class="feature-list">
+                        <li>Custom restaurant pages</li>
+                        <li>Real-time order tracking</li>
+                        <li>Multiple payment options</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-success">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Mobile Optimized</h4>
+                    <p>Beautiful, responsive design that works perfectly on all devices - desktop,
+                        tablet, and mobile.</p>
+                    <ul class="feature-list">
+                        <li>Progressive Web App</li>
+                        <li>Fast loading speeds</li>
+                        <li>Mobile-first design</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-info">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h4>Smart Analytics</h4>
+                    <p>Track sales, popular items, and customer behavior with detailed reports and
+                        insights.</p>
+                    <ul class="feature-list">
+                        <li>Sales performance</li>
+                        <li>Customer insights</li>
+                        <li>Revenue reports</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-warning">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h4>Easy Management</h4>
+                    <p>Simple and intuitive dashboard to manage your menu, orders, and restaurant
+                        settings.</p>
+                    <ul class="feature-list">
+                        <li>Drag & drop menu editor</li>
+                        <li>Inventory management</li>
+                        <li>Staff accounts</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-danger">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Secure Payments</h4>
+                    <p>Integrated with Paystack for secure payment processing with multiple payment
+                        methods.</p>
+                    <ul class="feature-list">
+                        <li>Card payments</li>
+                        <li>Bank transfers</li>
+                        <li>Secure encryption</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card">
+                    <div class="feature-icon bg-purple">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h4>24/7 Support</h4>
+                    <p>Dedicated support team to help you set up and optimize your online ordering
+                        system.</p>
+                    <ul class="feature-list">
+                        <li>Phone & email support</li>
+                        <li>Setup assistance</li>
+                        <li>Regular updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5" style="background: #ffffff;">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3" style="color: #1a1a1a;">How It Works</h2>
+                <p class="lead" style="color: #6c757d;">Get your restaurant online in just 3 simple steps</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="step-card text-center">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h4>Sign Up</h4>
+                    <p>Create your restaurant account in under 5 minutes. No technical skills
+                        required.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="step-card text-center">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h4>Setup Your Menu</h4>
+                    <p>Add your menu items, prices, categories, and upload mouth-watering photos.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="step-card text-center">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h4>Start Receiving Orders</h4>
+                    <p>Go live and start accepting online orders immediately from your customers.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Restaurants -->
+{% if featured_restaurants %}
+<section class="py-5" style="background: #f8f9fa;">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3" style="color: #1a1a1a;">Featured Restaurants</h2>
+                <p class="lead" style="color: #6c757d;">Discover amazing restaurants already using our platform</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for restaurant in featured_restaurants %}
+            <div class="col-md-6 col-lg-3">
+                <div class="restaurant-card">
+                    {% if restaurant.banner_image %}
+                    <img src="{{ restaurant.banner_image.url }}" class="restaurant-logo" alt="{{ restaurant.name }}">
+                    {% elif restaurant.logo %}
+                    <img src="{{ restaurant.logo.url }}" class="restaurant-logo" alt="{{ restaurant.name }}">
+                    {% else %}
+                    <div class="restaurant-no-image" aria-hidden="true"></div>
+                    {% endif %}
+                    <div class="restaurant-info">
+                        <h5 class="restaurant-name">{{ restaurant.name }}</h5>
+                        <p class="restaurant-description small">{{ restaurant.description|truncatewords:10 }}
+                        </p>
+                        <div class="restaurant-meta">
+                            <small>
+                                <i class="fas fa-clock me-1"></i>
+                                {{ restaurant.opening_time }} - {{ restaurant.closing_time }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="restaurant-actions">
+                        <a href="{% url 'restaurant_detail' restaurant.slug %}"
+                            class="btn btn-sm btn-primary w-100">
+                            <i class="fas fa-eye me-1"></i>View Menu
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'browse_restaurants' %}" class="btn btn-primary">
+                <i class="fas fa-utensils me-2"></i>View All Restaurants
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="display-5 fw-bold mb-3">Ready to Grow Your Restaurant?</h2>
+                <p class="lead mb-4">Join hundreds of successful restaurants already increasing their sales with our
+                    platform.</p>
+                <div class="cta-features">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-check-circle me-2"></i>No setup fees
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-check-circle me-2"></i>14-day free trial
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-check-circle me-2"></i>24/7 support
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5">
+                    <i class="fas fa-rocket me-2"></i>Start Free Trial
+                </a>
+                {% else %}
+                <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg px-5">
+                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer CTA -->
+<section class="py-4 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h5 class="mb-0">Questions? Call us at <strong>+1 (555) 123-REST</strong></h5>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="mailto:support@halosass.com" class="btn btn-outline-light">
+                    <i class="fas fa-envelope me-2"></i>Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 100px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .min-vh-80 {
+        min-height: 80vh;
+    }
+
+    /* Floating Cards */
+    .floating-card {
+        position: absolute;
+        background: white;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        z-index: 10;
+        color: #1a1a1a;
+    }
+
+    .card-1 {
+        top: 20%;
+        left: 10%;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .card-2 {
+        top: 50%;
+        right: 15%;
+        animation: float 3s ease-in-out infinite 1s;
+    }
+
+    .card-3 {
+        bottom: 20%;
+        left: 20%;
+        animation: float 3s ease-in-out infinite 2s;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    /* Mockup Screen */
+    .mockup-container {
+        position: relative;
+        background: #1a1a1a;
+        border-radius: 30px;
+        padding: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .mockup-screen {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        height: 400px;
+    }
+
+    .screen-content {
+        padding: 20px;
+    }
+
+    .app-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        margin: -20px -20px 20px -20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: bold;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        color: #1a1a1a;
+    }
+
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-top: 2px solid #eee;
+        font-weight: bold;
+        margin-top: 20px;
+        color: #1a1a1a;
+    }
+
+    /* Override dark theme for home page sections */
+    .home-page-override .feature-card,
+    .home-page-override .step-card,
+    .home-page-override .restaurant-card {
+        background: white !important;
+        color: #1a1a1a !important;
+    }
+    
+    .home-page-override .feature-card h4,
+    .home-page-override .step-card h4,
+    .home-page-override .restaurant-name {
+        color: #1a1a1a !important;
+    }
+    
+    .home-page-override .feature-card p,
+    .home-page-override .step-card p,
+    .home-page-override .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .home-page-override .feature-list li {
+        color: #495057 !important;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-card h4 {
+        color: #1a1a1a;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .feature-card p {
+        color: #6c757d;
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        text-align: left;
+    }
+
+    .feature-list li {
+        padding: 5px 0;
+        position: relative;
+        padding-left: 25px;
+        color: #495057;
+    }
+
+    .feature-list li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .bg-purple {
+        background: #6f42c1 !important;
+    }
+
+    /* Section Headings - Light Background Sections */
+    section.bg-light h2,
+    section.py-5:not(.bg-primary):not(.bg-dark) h2 {
+        color: #1a1a1a !important;
+    }
+    
+    section.bg-light .lead,
+    section.py-5:not(.bg-primary):not(.bg-dark) .lead {
+        color: #6c757d !important;
+    }
+
+    /* Steps */
+    .step-card {
+        padding: 30px;
+        background: transparent;
+    }
+
+    .step-card h4 {
+        color: #1a1a1a;
+        font-weight: 700;
+    }
+
+    .step-card p {
+        color: #6c757d;
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0 auto 20px;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .step-icon {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 20px;
+    }
+
+    /* Restaurant Cards */
+    .restaurant-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .restaurant-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .restaurant-logo {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+
+    .restaurant-logo-placeholder {
+        width: 100%;
+        height: 120px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 2rem;
+    }
+
+    .restaurant-info {
+        padding: 20px;
+    }
+
+    .restaurant-name {
+        margin-bottom: 10px;
+        color: #1a1a1a;
+        font-weight: 700;
+    }
+
+    .restaurant-description {
+        color: #6c757d;
+    }
+
+    .restaurant-meta {
+        color: #6c757d;
+    }
+
+    .restaurant-actions {
+        padding: 0 20px 20px;
+    }
+
+    /* Info boxes under hero */
+    .info-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        border: 1px solid #eef2f5;
+    }
+    .info-box h6 {
+        margin-bottom: 8px;
+        color: #1a1a1a;
+    }
+    .info-box li { padding-left: 0; }
+
+    /* Big colored boxes styles */
+    .big-box {
+        border-radius: 12px;
+        color: #fff;
+        overflow: hidden;
+        border: 3px solid #000;
+    }
+    .big-box .box-header h5 { font-size: 1.05rem; }
+    .big-box .thumb img {
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid rgba(255,255,255,0.08);
+    }
+    .big-box .box-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .big-box .item-name { font-weight: 600; }
+    .big-box .item-meta { font-size: 0.8rem; }
+
+    .big-box.black { background: linear-gradient(180deg, #000000, #111111); border-color: #000; }
+    .big-box.blue { background: linear-gradient(180deg, #0d6efd, #0b5ed7); border-color: #073a9a; }
+    .big-box.green { background: linear-gradient(180deg, #28a745, #218838); border-color: #16692b; }
+    .big-box.purple { background: linear-gradient(180deg, #6f42c1, #5a2fa8); border-color: #3c1f73; }
+
+    @media (max-width: 768px) {
+        .big-box { padding: 14px; }
+        .big-box .thumb img { width: 46px; height: 46px; }
+    }
+
+    /* Hero decorative images */
+    .hero-decor { position: absolute; inset: 0; pointer-events: none; }
+    .hero-decor .decor { position: absolute; opacity: 0.95; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.25)); }
+    .hero-decor .decor-1 { width: 140px; top: 6%; right: 6%; animation: floatSlow 6s ease-in-out infinite; transform-origin: center; }
+    .hero-decor .decor-2 { width: 120px; bottom: 8%; left: 6%; animation: float 5s ease-in-out infinite 0.5s; }
+    .hero-decor .decor-3 { width: 100px; top: 22%; left: 18%; animation: float 6s ease-in-out infinite 1s; }
+    .hero-decor .decor-4 { width: 90px; bottom: 18%; right: 18%; animation: floatSlow 7s ease-in-out infinite 0.2s; }
+
+    @keyframes float {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+        50% { transform: translateY(-14px) translateX(6px) rotate(2deg); }
+        100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    }
+
+    @keyframes floatSlow {
+        0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) translateX(-8px) rotate(-2deg); }
+        100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+    }
+
+    /* Subtle hero overlay gradient for depth */
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0.12), transparent 40%), linear-gradient(180deg, rgba(0,0,0,0.06), transparent 40%);
+        pointer-events: none;
+        mix-blend-mode: overlay;
+    }
+
+    /* (gallery/carousel styles removed to restore original home layout) */
+
+    /* CTA Section */
+    .cta-features {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Footer CTA */
+    section.bg-dark h5 {
+        color: white !important;
+    }
+
+    /* Featured Section Background */
+    section.bg-light {
+        background: #f8f9fa !important;
+    }
+
+    /* How It Works Section - Force white background */
+    section.py-5:not(.bg-primary):not(.bg-dark):not(.bg-light) {
+        background: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .display-4 {
+            font-size: 2.5rem;
+        }
+
+        .floating-card {
+            position: relative;
+            margin: 10px;
+            display: inline-block;
+        }
+
+        .hero-buttons .btn {
+            display: block;
+            margin: 10px 0;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
