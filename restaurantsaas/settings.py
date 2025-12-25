@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
 ]
 
+# Password reset email customization
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'support@example.com')
+EMAIL_SUBJECT_PREFIX = '[Ong Platform] '
+PASSWORD_RESET_SUBJECT_TEMPLATE_NAME = 'registration/password_reset_subject.txt'
+
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
