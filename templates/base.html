@@ -1309,8 +1309,8 @@
                     <i class="fas fa-utensils icon-knife"></i>
                 </div>
                 <div class="brand-text">
-                    <span class="brand-name">Halo Sass</span>
-                    <span class="brand-tagline">Online Ordering System</span>
+                    <span class="brand-name">HaloSaaS</span>
+                    <span class="brand-tagline">Ordering</span>
                 </div>
             </a>
 
@@ -1325,7 +1325,7 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">
-                            <i class="fas fa-home me-1"></i>Home
+                            <i class="fas fa-home me-1"></i>Main
                         </a>
                     </li>
 
@@ -1334,7 +1334,7 @@
                     {% if user.role != 'restaurant_owner' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            <i class="fas fa-tachometer-alt me-1"></i>Dash
                         </a>
                     </li>
                     {% endif %}
@@ -1343,12 +1343,12 @@
                     {% if user.role == 'restaurant_owner' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'restaurant_dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            <i class="fas fa-tachometer-alt me-1"></i>Dash
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'manage_restaurant' %}">
-                            <i class="fas fa-store me-1"></i>My Restaurants
+                            <i class="fas fa-store me-1"></i>My Rests
                         </a>
                     </li>
                     {% endif %}
@@ -1357,7 +1357,7 @@
                     {% if user.role == 'customer' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'browse_restaurants' %}">
-                            <i class="fas fa-search me-1"></i>Browse Restaurants
+                            <i class="fas fa-search me-1"></i>Browse
                         </a>
                     </li>
                     {% endif %}
