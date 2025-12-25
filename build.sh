@@ -7,14 +7,9 @@ pip install -r requirements.txt
 
 python manage.py migrate --noinput
 
-# Load superuser fixture if no users exist
-echo "Checking if superuser needs to be created..."
-if python manage.py shell -c "from django.contrib.auth import get_user_model; exit(0 if get_user_model().objects.count() == 0 else 1)"; then
-	echo "Loading superuser fixture..."
-	python manage.py loaddata superuser.json
-	echo "✅ Superuser created from fixture"
-else
-	echo "⚠️ Users already exist, skipping superuser creation"
-fi
+
+# Create admin user if not exists using script
+echo "Checking/Creating admin user..."
+python create_admin.py
 
 python manage.py collectstatic --noinput
