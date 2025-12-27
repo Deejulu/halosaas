@@ -3,77 +3,210 @@ from restaurants.models import Restaurant, MenuItem, Category
 
 SAMPLE_MENUS = {
     'Naija Grill House': [
-        {'name': 'Lagos Suya Platter', 'description': 'Spicy beef, chicken, and ram suya, served with onions and yaji. A Lagos street classic.', 'price': 4000},
-        {'name': 'Grilled Catfish', 'description': 'Whole catfish grilled with secret spices, served with pepper sauce.', 'price': 5000},
-        {'name': 'Jollof Fiesta', 'description': 'Party-style jollof rice, fried plantain, and grilled turkey.', 'price': 3500},
-        {'name': 'Palmwine', 'description': 'Chilled, fresh palmwine from Ogun State.', 'price': 1200},
+        {
+            'category': 'Starters',
+            'description': 'Small bites to get you started',
+            'items': [
+                {'name': 'Lagos Suya Skewers', 'description': 'Beef and chicken suya, thinly sliced and spicy.', 'price': 1200, 'prep_time': 8},
+                {'name': 'Suya Onion Salad', 'description': 'Fresh sliced onion with yaji and cucumber.', 'price': 400, 'prep_time': 2},
+                {'name': 'Spiced Plantain Bites', 'description': 'Fried plantain with pepper dip.', 'price': 600, 'prep_time': 6},
+            ]
+        },
+        {
+            'category': 'Mains',
+            'description': 'Grilled and charcoal specialties',
+            'items': [
+                {'name': 'Grilled Catfish', 'description': 'Whole catfish with house spice rub and pepper sauce.', 'price': 5000, 'prep_time': 25},
+                {'name': 'Jollof Fiesta Platter', 'description': 'Smoky jollof rice, grilled turkey, fried plantain.', 'price': 3500, 'prep_time': 20},
+            ]
+        },
+        {
+            'category': 'Sides',
+            'description': 'Perfect complements',
+            'items': [
+                {'name': 'Fried Plantain', 'description': 'Sweet and crispy dodo.', 'price': 700, 'prep_time': 6},
+                {'name': 'Pepper Sauce', 'description': 'Signature spicy pepper sauce.', 'price': 200, 'prep_time': 1},
+            ]
+        },
+        {
+            'category': 'Drinks',
+            'description': 'Local and chilled',
+            'items': [
+                {'name': 'Palmwine (Small)', 'description': 'Freshly tapped palmwine.', 'price': 800, 'prep_time': 0},
+                {'name': 'Chapman', 'description': 'Classic Nigerian soft cocktail.', 'price': 900, 'prep_time': 3},
+            ]
+        }
     ],
     'Bukka Republic': [
-        {'name': 'Efo Riro Supreme', 'description': 'Spinach stew with assorted meats, ponmo, and stockfish. Ibadan’s favorite.', 'price': 3500},
-        {'name': 'Amala Gbegiri Combo', 'description': 'Soft amala, ewedu, gbegiri, and spicy goat meat.', 'price': 3200},
-        {'name': 'Ofada Rice & Ayamase', 'description': 'Local rice with green pepper sauce and fried beef.', 'price': 3800},
-        {'name': 'Zobo Drink', 'description': 'Refreshing hibiscus drink with pineapple and ginger.', 'price': 900},
+        {
+            'category': 'Soups & Stews',
+            'description': 'Traditional Yoruba soups and stews',
+            'items': [
+                {'name': 'Efo Riro Supreme', 'description': 'Spinach stew with assorted meats and fish.', 'price': 3500, 'prep_time': 18},
+                {'name': 'Gbegiri & Amala', 'description': 'Rich bean soup served with amala.', 'price': 3200, 'prep_time': 20},
+            ]
+        },
+        {
+            'category': 'Combos',
+            'description': 'Hearty combinations',
+            'items': [
+                {'name': 'Amala Gbegiri Combo', 'description': 'Amala, gbegiri, ewedu with assorted meat.', 'price': 3800, 'prep_time': 20},
+            ]
+        },
+        {
+            'category': 'Drinks',
+            'description': 'House beverages',
+            'items': [
+                {'name': 'Zobo (Hibiscus)', 'description': 'Refreshing zobo with ginger.', 'price': 700, 'prep_time': 2},
+            ]
+        }
     ],
     'Jollof City': [
-        {'name': 'Smoky Jollof Rice', 'description': 'Enugu-style jollof with grilled chicken and spicy sauce.', 'price': 3400},
-        {'name': 'Moi Moi Deluxe', 'description': 'Bean pudding with egg, fish, and corned beef.', 'price': 1800},
-        {'name': 'Fried Croaker', 'description': 'Crispy fried croaker fish, pepper sauce, and yam fries.', 'price': 4200},
-        {'name': 'Chapman', 'description': 'Classic Nigerian cocktail with bitters and citrus.', 'price': 1500},
+        {
+            'category': 'Jollof Specials',
+            'description': 'Different proteins with our coal-city jollof',
+            'items': [
+                {'name': 'Smoky Jollof Rice (Chicken)', 'description': 'Smoky jollof with charred chicken.', 'price': 3400, 'prep_time': 18},
+                {'name': 'Smoky Jollof Rice (Beef)', 'description': 'Smoky jollof with braised beef.', 'price': 3600, 'prep_time': 20},
+            ]
+        },
+        {
+            'category': 'Sides',
+            'description': 'Classic sides',
+            'items': [
+                {'name': 'Moi Moi Deluxe', 'description': 'Steamed bean pudding with fillings.', 'price': 1800, 'prep_time': 30},
+                {'name': 'Fried Croaker', 'description': 'Crispy croaker with pepper dip.', 'price': 4200, 'prep_time': 22},
+            ]
+        },
+        {
+            'category': 'Drinks',
+            'description': 'Local cocktails',
+            'items': [
+                {'name': 'Chapman', 'description': 'Bittersweet cocktail with garnish.', 'price': 1500, 'prep_time': 3},
+            ]
+        }
     ],
     'Palmwine Place': [
-        {'name': 'Isi Ewu', 'description': 'Tender goat head in spicy palm oil sauce, garnished Igbo-style.', 'price': 5000},
-        {'name': 'Nkwobi', 'description': 'Cow foot in spicy sauce, served with utazi leaves.', 'price': 4200},
-        {'name': 'Ukodo', 'description': 'Delta yam pepper soup with goat meat.', 'price': 3500},
-        {'name': 'Palmwine Jug', 'description': 'Large jug of fresh palmwine, perfect for sharing.', 'price': 2500},
+        {
+            'category': 'Main Plates',
+            'description': 'Igbo favorites and palmwine pairings',
+            'items': [
+                {'name': 'Isi Ewu', 'description': 'Spicy goat head served with utazi.', 'price': 5000, 'prep_time': 35},
+                {'name': 'Nkwobi', 'description': 'Seasoned cow foot in palm oil.', 'price': 4200, 'prep_time': 30},
+            ]
+        },
+        {
+            'category': 'Drinks',
+            'description': 'Fresh palmwine and accompaniments',
+            'items': [
+                {'name': 'Palmwine Jug (Medium)', 'description': 'Shared palmwine jug.', 'price': 2000, 'prep_time': 0},
+            ]
+        }
     ],
     'Pepper Soup Spot': [
-        {'name': 'Catfish Pepper Soup', 'description': 'Port Harcourt-style spicy catfish soup with scent leaves.', 'price': 3700},
-        {'name': 'Chicken Pepper Soup', 'description': 'Tender chicken in hot, aromatic broth.', 'price': 3400},
-        {'name': 'Yam Porridge', 'description': 'Yam cooked with palm oil, vegetables, and smoked fish.', 'price': 2800},
-        {'name': 'Palm Toddy', 'description': 'Sweet, chilled palm toddy drink.', 'price': 1000},
+        {
+            'category': 'Soups',
+            'description': 'Hot, restorative soups from the Delta',
+            'items': [
+                {'name': 'Catfish Pepper Soup', 'description': 'Spicy catfish soup with scent leaves.', 'price': 3700, 'prep_time': 15},
+                {'name': 'Chicken Pepper Soup', 'description': 'Aromatic chicken broth with herbs.', 'price': 3400, 'prep_time': 14},
+            ]
+        },
+        {
+            'category': 'Comfort',
+            'description': 'Hearty plates to warm you',
+            'items': [
+                {'name': 'Yam Porridge', 'description': 'Yam cooked in palm oil with fish.', 'price': 2800, 'prep_time': 25},
+            ]
+        }
     ],
     'Chop Life Lounge': [
-        {'name': 'Asun Deluxe', 'description': 'Peppery grilled goat meat, onions, and bell peppers. Abuja’s party favorite.', 'price': 4800},
-        {'name': 'Grilled Prawns', 'description': 'Charcoal grilled prawns with spicy pepper dip.', 'price': 6000},
-        {'name': 'Peppered Snails', 'description': 'Large snails sautéed in hot pepper sauce.', 'price': 5500},
-        {'name': 'Tigernut Punch', 'description': 'Creamy, sweet tigernut and coconut drink.', 'price': 1200},
+        {
+            'category': 'Grill & Share',
+            'description': 'Party style plates and sharables',
+            'items': [
+                {'name': 'Asun Deluxe', 'description': 'Smoky peppered goat, onions, peppers.', 'price': 4800, 'prep_time': 18},
+                {'name': 'Grilled Prawns', 'description': 'Charcoal grilled prawns with lemon butter.', 'price': 6000, 'prep_time': 20},
+            ]
+        },
+        {
+            'category': 'Drinks',
+            'description': 'Trendy bar beverages',
+            'items': [
+                {'name': 'Tigernut Punch', 'description': 'Creamy tigernut and coconut punch.', 'price': 1200, 'prep_time': 5},
+            ]
+        }
     ],
     'Ofada Kitchen': [
-        {'name': 'Ofada Rice & Designer Stew', 'description': 'Abeokuta’s finest: local rice, spicy assorted meat stew.', 'price': 4000},
-        {'name': 'Stewed Snails', 'description': 'Snails in rich tomato and pepper sauce.', 'price': 5000},
-        {'name': 'Fried Dodo', 'description': 'Golden fried plantain, sweet and crispy.', 'price': 1500},
-        {'name': 'Kunu Drink', 'description': 'Northern Nigerian millet drink, served cold.', 'price': 1000},
+        {
+            'category': 'Ofada Specials',
+            'description': 'Local rice dishes and rich stews',
+            'items': [
+                {'name': 'Ofada Rice & Designer Stew', 'description': 'Local rice served with ayamase and assorted meat.', 'price': 4000, 'prep_time': 25},
+                {'name': 'Stewed Snails', 'description': 'Snails in rich pepper-tomato stew.', 'price': 5000, 'prep_time': 30},
+            ]
+        },
+        {
+            'category': 'Sides & Drinks',
+            'description': 'Traditional sides and drinks',
+            'items': [
+                {'name': 'Fried Dodo', 'description': 'Sweet fried plantain.', 'price': 1500, 'prep_time': 6},
+                {'name': 'Kunu', 'description': 'Chilled millet drink.', 'price': 800, 'prep_time': 2},
+            ]
+        }
     ],
-    # Add more restaurants and unique menus as needed
 }
 
 class Command(BaseCommand):
     help = 'Populate beautiful sample menu items for each restaurant.'
 
     def handle(self, *args, **options):
+        # Optional style updates per restaurant for visual testing
+        STYLE_UPDATES = {
+            'Naija Grill House': {'primary_color': '#e25822', 'secondary_color': '#f7b731', 'menu_layout': 'grid'},
+            'Bukka Republic': {'primary_color': '#2e8b57', 'secondary_color': '#daa520', 'menu_layout': 'list'},
+            'Jollof City': {'primary_color': '#dc143c', 'secondary_color': '#ffd700', 'menu_layout': 'compact'},
+            'Palmwine Place': {'primary_color': '#8b4513', 'secondary_color': '#deb887', 'menu_layout': 'masonry'},
+            'Pepper Soup Spot': {'primary_color': '#ff4500', 'secondary_color': '#32cd32', 'menu_layout': 'large'},
+            'Chop Life Lounge': {'primary_color': '#4b0082', 'secondary_color': '#9370db', 'menu_layout': 'grid'},
+            'Ofada Kitchen': {'primary_color': '#228b22', 'secondary_color': '#f4a460', 'menu_layout': 'list'},
+        }
+
         for restaurant in Restaurant.objects.all():
-            # Ensure a default category exists
-            category, _ = Category.objects.get_or_create(
-                restaurant=restaurant,
-                name="Main Dishes",
-                defaults={"description": "Signature and popular dishes."}
-            )
-            menu = SAMPLE_MENUS.get(restaurant.name)
-            if not menu:
-                menu = [
-                    {'name': 'Chef Special', 'description': 'Signature dish of the house.', 'price': 3000},
-                    {'name': 'Classic Rice', 'description': 'Rice with sauce and protein.', 'price': 2500},
-                    {'name': 'Fresh Juice', 'description': 'Seasonal fruit juice.', 'price': 1000},
-                ]
-            for item in menu:
-                MenuItem.objects.get_or_create(
-                    category=category,
-                    name=item['name'],
-                    defaults={
-                        'description': item['description'],
-                        'price': item['price'],
-                        'is_available': True,
-                    }
+            menu_def = SAMPLE_MENUS.get(restaurant.name)
+            # Apply visual style overrides if present
+            style = STYLE_UPDATES.get(restaurant.name)
+            if style:
+                for k, v in style.items():
+                    setattr(restaurant, k, v)
+                restaurant.save()
+
+            if not menu_def:
+                # skip if no structured menu defined
+                self.stdout.write(self.style.WARNING(f"No structured menu for {restaurant.name}, skipping."))
+                continue
+
+            total_items = 0
+            for cat_def in menu_def:
+                cat_name = cat_def.get('category', 'Main Dishes')
+                cat_desc = cat_def.get('description', '')
+                category, _ = Category.objects.get_or_create(
+                    restaurant=restaurant,
+                    name=cat_name,
+                    defaults={'description': cat_desc}
                 )
-            self.stdout.write(self.style.SUCCESS(f"✅ Menu created for {restaurant.name}"))
+                for item in cat_def.get('items', []):
+                    MenuItem.objects.get_or_create(
+                        category=category,
+                        name=item['name'],
+                        defaults={
+                            'description': item.get('description', ''),
+                            'price': item.get('price', 0),
+                            'is_available': True,
+                            'preparation_time': item.get('prep_time', 10),
+                        }
+                    )
+                    total_items += 1
+
+            self.stdout.write(self.style.SUCCESS(f"✅ {total_items} items added for {restaurant.name}"))
         self.stdout.write(self.style.SUCCESS("All sample menus created!"))
