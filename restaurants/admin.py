@@ -64,33 +64,47 @@ class RestaurantAdmin(admin.ModelAdmin):
     deactivate_restaurants.short_description = "Deactivate selected restaurants"
     
     def populate_menu(self, request, queryset):
+        import traceback, logging
+        logger = logging.getLogger("django")
         total_items = 0
-        for restaurant in queryset:
-            # Ensure a default category exists
-            category, _ = Category.objects.get_or_create(
-                restaurant=restaurant,
-                name="Main Dishes",
-                defaults={"description": "Signature and popular dishes."}
-            )
-            menu = SAMPLE_MENUS.get(restaurant.name)
-            if not menu:
-                menu = [
-                    {'name': 'Chef Special', 'description': 'Signature dish of the house.', 'price': 3000},
-                    {'name': 'Classic Rice', 'description': 'Rice with sauce and protein.', 'price': 2500},
-                    {'name': 'Fresh Juice', 'description': 'Seasonal fruit juice.', 'price': 1000},
-                ]
-            for item in menu:
-                MenuItem.objects.get_or_create(
-                    category=category,
-                    name=item['name'],
-                    defaults={
-                        'description': item['description'],
-                        'price': item['price'],
-                        'is_available': True,
-                    }
+        try:
+            for restaurant in queryset:
+                # Ensure a default category exists
+                category, _ = Category.objects.get_or_create(
+                    restaurant=restaurant,
+                    name="Main Dishes",
+                    defaults={"description": "Signature and popular dishes."}
                 )
-                total_items += 1
-        self.message_user(request, f'Menu populated successfully! Added {total_items} items across {queryset.count()} restaurants.')
+                menu = SAMPLE_MENUS.get(restaurant.name)
+                if not menu:
+                    menu = [
+                        {'name': 'Chef Special', 'description': 'Signature dish of the house.', 'price': 3000},
+                        {'name': 'Classic Rice', 'description': 'Rice with sauce and protein.', 'price': 2500},
+                        {'name': 'Fresh Juice', 'description': 'Seasonal fruit juice.', 'price': 1000},
+                    ]
+                for item in menu:
+                    try:
+                        MenuItem.objects.get_or_create(
+                            category=category,
+                            name=item['name'],
+                            defaults={
+                                'description': item['description'],
+                                'price': item['price'],
+                                'is_available': True,
+                                # If preparation_time is missing, skip it
+                                **({'preparation_time': item['prep_time']} if 'prep_time' in item else {})
+                            }
+                        )
+                        total_items += 1
+                    except Exception as e:
+                        logger.error(f"Error creating menu item for {restaurant.name}: {item['name']}")
+                        logger.error(traceback.format_exc())
+                        self.message_user(request, f"Error creating menu item: {item['name']} ({e})", level='error')
+            self.message_user(request, f'Menu populated successfully! Added {total_items} items across {queryset.count()} restaurants.')
+        except Exception as e:
+            logger.error("Error in populate_menu admin action:")
+            logger.error(traceback.format_exc())
+            self.message_user(request, f"Error populating menu: {e}", level='error')
     populate_menu.short_description = "Populate menu with sample items"
 
 @admin.register(Category)
