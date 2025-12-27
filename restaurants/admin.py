@@ -1,7 +1,12 @@
+from . import admin_menu_loader  # Enables menu data upload admin
+
+# Register custom admin view for menu data loader
+admin.site.get_urls = (lambda get_urls: lambda self: [admin_menu_loader.get_menu_data_loader_url()] + get_urls(self))(admin.site.get_urls)
 from django.contrib import admin
 from .models import Restaurant, Category, MenuItem, GalleryImage
 from restaurants.management.commands.populate_sample_menus import SAMPLE_MENUS
 from .admin_actions import add_buca_sample_menu
+from . import admin_menu_loader  # Enables menu data upload admin
 
 class GalleryImageInline(admin.TabularInline):
     model = GalleryImage
@@ -65,40 +70,35 @@ class RestaurantAdmin(admin.ModelAdmin):
     deactivate_restaurants.short_description = "Deactivate selected restaurants"
     
     def populate_menu(self, request, queryset):
-        import traceback, logging
+        import random, traceback, logging
         logger = logging.getLogger("django")
+        from restaurants.management.commands.generate_sample_menus import SAMPLE_MENUS as MENU_TEMPLATES
         total_items = 0
         try:
             for restaurant in queryset:
-                menu_def = SAMPLE_MENUS.get(restaurant.name)
-                if not menu_def:
-                    self.message_user(request, f"No structured menu for {restaurant.name}, skipping.", level='warning')
-                    continue
-                for cat_def in menu_def:
-                    cat_name = cat_def.get('category', 'Main Dishes')
-                    cat_desc = cat_def.get('description', '')
+                menu_template = random.choice(MENU_TEMPLATES)
+                for cat_data in menu_template['categories']:
                     category, _ = Category.objects.get_or_create(
                         restaurant=restaurant,
-                        name=cat_name,
-                        defaults={'description': cat_desc}
+                        name=cat_data['name'],
+                        defaults={'description': f"{cat_data['name']} at {restaurant.name}"}
                     )
-                    for item in cat_def.get('items', []):
+                    for item_name in cat_data['items']:
                         try:
                             MenuItem.objects.get_or_create(
                                 category=category,
-                                name=item['name'],
+                                name=item_name,
                                 defaults={
-                                    'description': item.get('description', ''),
-                                    'price': item.get('price', 0),
-                                    'is_available': True,
-                                    'preparation_time': item.get('prep_time', 10),
+                                    'description': f"{item_name} served at {restaurant.name}",
+                                    'price': random.randint(1000, 5000),
+                                    'is_available': True
                                 }
                             )
                             total_items += 1
                         except Exception as e:
-                            logger.error(f"Error creating menu item for {restaurant.name}: {item.get('name', 'UNKNOWN')}")
+                            logger.error(f"Error creating menu item for {restaurant.name}: {item_name}")
                             logger.error(traceback.format_exc())
-                            self.message_user(request, f"Error creating menu item: {item.get('name', 'UNKNOWN')} ({e})", level='error')
+                            self.message_user(request, f"Error creating menu item: {item_name} ({e})", level='error')
             self.message_user(request, f'Menu populated successfully! Added {total_items} items across {queryset.count()} restaurants.')
         except Exception as e:
             logger.error("Error in populate_menu admin action:")
