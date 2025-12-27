@@ -69,37 +69,35 @@ class RestaurantAdmin(admin.ModelAdmin):
         total_items = 0
         try:
             for restaurant in queryset:
-                # Ensure a default category exists
-                category, _ = Category.objects.get_or_create(
-                    restaurant=restaurant,
-                    name="Main Dishes",
-                    defaults={"description": "Signature and popular dishes."}
-                )
-                menu = SAMPLE_MENUS.get(restaurant.name)
-                if not menu:
-                    menu = [
-                        {'name': 'Chef Special', 'description': 'Signature dish of the house.', 'price': 3000},
-                        {'name': 'Classic Rice', 'description': 'Rice with sauce and protein.', 'price': 2500},
-                        {'name': 'Fresh Juice', 'description': 'Seasonal fruit juice.', 'price': 1000},
-                    ]
-                for item in menu:
-                    try:
-                        MenuItem.objects.get_or_create(
-                            category=category,
-                            name=item['name'],
-                            defaults={
-                                'description': item['description'],
-                                'price': item['price'],
-                                'is_available': True,
-                                # If preparation_time is missing, skip it
-                                **({'preparation_time': item['prep_time']} if 'prep_time' in item else {})
-                            }
-                        )
-                        total_items += 1
-                    except Exception as e:
-                        logger.error(f"Error creating menu item for {restaurant.name}: {item['name']}")
-                        logger.error(traceback.format_exc())
-                        self.message_user(request, f"Error creating menu item: {item['name']} ({e})", level='error')
+                menu_def = SAMPLE_MENUS.get(restaurant.name)
+                if not menu_def:
+                    self.message_user(request, f"No structured menu for {restaurant.name}, skipping.", level='warning')
+                    continue
+                for cat_def in menu_def:
+                    cat_name = cat_def.get('category', 'Main Dishes')
+                    cat_desc = cat_def.get('description', '')
+                    category, _ = Category.objects.get_or_create(
+                        restaurant=restaurant,
+                        name=cat_name,
+                        defaults={'description': cat_desc}
+                    )
+                    for item in cat_def.get('items', []):
+                        try:
+                            MenuItem.objects.get_or_create(
+                                category=category,
+                                name=item['name'],
+                                defaults={
+                                    'description': item.get('description', ''),
+                                    'price': item.get('price', 0),
+                                    'is_available': True,
+                                    'preparation_time': item.get('prep_time', 10),
+                                }
+                            )
+                            total_items += 1
+                        except Exception as e:
+                            logger.error(f"Error creating menu item for {restaurant.name}: {item.get('name', 'UNKNOWN')}")
+                            logger.error(traceback.format_exc())
+                            self.message_user(request, f"Error creating menu item: {item.get('name', 'UNKNOWN')} ({e})", level='error')
             self.message_user(request, f'Menu populated successfully! Added {total_items} items across {queryset.count()} restaurants.')
         except Exception as e:
             logger.error("Error in populate_menu admin action:")
