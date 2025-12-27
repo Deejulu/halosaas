@@ -11,6 +11,9 @@ python manage.py migrate --noinput
 # TEMP: Create admin user if missing on next deploy
 python manage.py create_admin_user
 
+# TEMP: Import restaurants and assign to admin on next deploy
+python add_restaurants.py
+
 # Load restaurant data if none exist
 if python manage.py shell -c "from restaurants.models import Restaurant; exit(0 if Restaurant.objects.count() == 0 else 1)"; then
 	echo "Loading initial restaurant data..."
