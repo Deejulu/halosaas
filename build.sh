@@ -1,3 +1,5 @@
+# TEMP: Reset admin password on next deploy
+python manage.py reset_admin_password
 #!/usr/bin/env bash
 set -euo pipefail
 python -m pip install --upgrade pip
