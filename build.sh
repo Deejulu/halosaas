@@ -16,8 +16,5 @@ else
 	echo "⚠️ Data already exists, skipping restaurant data load"
 fi
 
-# Create admin user if not exists using script
-echo "Checking/Creating admin user..."
-python create_admin.py
 
 python manage.py collectstatic --noinput
