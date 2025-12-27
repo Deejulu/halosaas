@@ -1,0 +1,100 @@
+[
+    {
+        "model": "accounts.customuser",
+        "pk": 2,
+        "fields": {
+            "username": "owner2",
+            "email": "owner2@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    },
+    {
+        "model": "accounts.customuser",
+        "pk": 3,
+        "fields": {
+            "username": "owner3",
+            "email": "owner3@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    },
+    {
+        "model": "accounts.customuser",
+        "pk": 4,
+        "fields": {
+            "username": "owner4",
+            "email": "owner4@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    },
+    {
+        "model": "accounts.customuser",
+        "pk": 5,
+        "fields": {
+            "username": "owner5",
+            "email": "owner5@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    },
+    {
+        "model": "accounts.customuser",
+        "pk": 6,
+        "fields": {
+            "username": "owner6",
+            "email": "owner6@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    },
+    {
+        "model": "accounts.customuser",
+        "pk": 7,
+        "fields": {
+            "username": "owner7",
+            "email": "owner7@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    },
+    {
+        "model": "accounts.customuser",
+        "pk": 8,
+        "fields": {
+            "username": "owner8",
+            "email": "owner8@example.com",
+            "password": "pbkdf2_sha256$260000$dummy$dummyhash",
+            "is_active": true,
+            "is_staff": false,
+            "is_superuser": false,
+            "created_at": "2025-12-25T11:23:22.545",
+            "updated_at": "2025-12-25T11:23:22.545"
+        }
+    }
+]
