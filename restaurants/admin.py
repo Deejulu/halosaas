@@ -1,12 +1,12 @@
-from . import admin_menu_loader  # Enables menu data upload admin
 
-# Register custom admin view for menu data loader
-admin.site.get_urls = (lambda get_urls: lambda self: [admin_menu_loader.get_menu_data_loader_url()] + get_urls(self))(admin.site.get_urls)
 from django.contrib import admin
 from .models import Restaurant, Category, MenuItem, GalleryImage
 from restaurants.management.commands.populate_sample_menus import SAMPLE_MENUS
 from .admin_actions import add_buca_sample_menu
 from . import admin_menu_loader  # Enables menu data upload admin
+
+# Register custom admin view for menu data loader
+admin.site.get_urls = (lambda get_urls: lambda self: [admin_menu_loader.get_menu_data_loader_url()] + get_urls(self))(admin.site.get_urls)
 
 class GalleryImageInline(admin.TabularInline):
     model = GalleryImage
