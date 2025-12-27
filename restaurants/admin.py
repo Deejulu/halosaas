@@ -6,7 +6,9 @@ from .admin_actions import add_buca_sample_menu
 from . import admin_menu_loader  # Enables menu data upload admin
 
 # Register custom admin view for menu data loader
-admin.site.get_urls = (lambda get_urls: lambda self: [admin_menu_loader.get_menu_data_loader_url()] + get_urls(self))(admin.site.get_urls)
+def get_custom_admin_urls(self):
+    return [admin_menu_loader.get_menu_data_loader_url()] + self.__class__.get_urls(self)
+admin.site.get_urls = get_custom_admin_urls.__get__(admin.site)
 
 class GalleryImageInline(admin.TabularInline):
     model = GalleryImage
