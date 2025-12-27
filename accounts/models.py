@@ -12,18 +12,53 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True)
     is_verified = models.BooleanField(default=False)
     
-    # Preferred Restaurant (for direct access feature)
-    preferred_restaurant = models.ForeignKey(
-        'restaurants.Restaurant', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True,
-        related_name='preferred_customers',
-        help_text='Customer\'s default/preferred restaurant for direct access'
+    # Security Questions for Account Recovery
+    SECURITY_QUESTIONS = (
+        ('birth_city', 'What city were you born in?'),
+        ('first_school', 'What was the name of your first school?'),
+        ('favorite_color', 'What is your favorite color?'),
+        ('mothers_maiden', "What is your mother's maiden name?"),
+        ('first_pet', 'What was the name of your first pet?'),
     )
     
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    security_question1 = models.CharField(
+        max_length=20, 
+        choices=SECURITY_QUESTIONS, 
+        blank=True, 
+        null=True,
+        help_text='First security question for account recovery'
+    )
+    security_answer1 = models.CharField(
+        max_length=100, 
+        blank=True, 
+        help_text='Answer to first security question'
+    )
+    
+    security_question2 = models.CharField(
+        max_length=20, 
+        choices=SECURITY_QUESTIONS, 
+        blank=True, 
+        null=True,
+        help_text='Second security question for account recovery'
+    )
+    security_answer2 = models.CharField(
+        max_length=100, 
+        blank=True, 
+        help_text='Answer to second security question'
+    )
+    
+    security_question3 = models.CharField(
+        max_length=20, 
+        choices=SECURITY_QUESTIONS, 
+        blank=True, 
+        null=True,
+        help_text='Third security question for account recovery'
+    )
+    security_answer3 = models.CharField(
+        max_length=100, 
+        blank=True, 
+        help_text='Answer to third security question'
+    )
 
     # Add related_name to avoid clashes with default User model
     groups = models.ManyToManyField(

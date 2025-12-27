@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, AccountRecoveryForm
 from .models import CustomUser
 
 def register(request):
@@ -37,3 +37,24 @@ def user_login(request):
             messages.error(request, 'Invalid username or password.')
     
     return render(request, 'accounts/login.html')
+
+
+def account_recovery(request):
+    if request.method == 'POST':
+        form = AccountRecoveryForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data.get('user')
+            # Show recovery information
+            context = {
+                'form': form,
+                'recovered': True,
+                'username': user.username,
+                'email': user.email,
+                'role': user.get_role_display(),
+            }
+            messages.success(request, 'Account information recovered successfully!')
+            return render(request, 'accounts/account_recovery.html', context)
+    else:
+        form = AccountRecoveryForm()
+    
+    return render(request, 'accounts/account_recovery.html', {'form': form})
