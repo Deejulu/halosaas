@@ -7,6 +7,12 @@ class CustomUserCreationForm(UserCreationForm):
     phone_number = forms.CharField(max_length=15, required=False, label='Phone (optional)')
     role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, label='I am a')
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username and CustomUser.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError('This username is already taken. Please choose another.')
+        return username
+
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'phone_number', 'role', 'password1', 'password2')

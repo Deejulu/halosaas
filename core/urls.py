@@ -4,6 +4,9 @@ from . import views
 urlpatterns = [
     # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
+    # TEMP: Load restaurants.json into DB (superuser only)
+    from .views_load_restaurants import load_restaurants
+    path('admin/load-restaurants/', load_restaurants, name='load_restaurants'),
     path('admin-dashboard/', views.dashboard, name='admin_dashboard'),  # Alias for admin notifications
     
     # Public pages
