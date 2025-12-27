@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Naija Grill House",
+    "description": "A vibrant spot for suya, grilled fish, and classic Nigerian barbecue.",
+    "address": "12 Awolowo Rd, Ikoyi, Lagos",
+    "phone": "+2348012345671",
+    "email": "info@naijagrill.com",
+    "is_active": true
+  },
+  {
+    "name": "Bukka Republic",
+    "description": "Authentic Nigerian home-cooked meals, amala, efo riro, and more.",
+    "address": "22 Herbert Macaulay Way, Yaba, Lagos",
+    "phone": "+2348012345672",
+    "email": "info@bukkarepublic.com",
+    "is_active": true
+  },
+  {
+    "name": "Jollof City",
+    "description": "The best jollof rice, fried rice, and party platters in Lagos.",
+    "address": "5 Admiralty Way, Lekki Phase 1, Lagos",
+    "phone": "+2348012345673",
+    "email": "info@jollofcity.com",
+    "is_active": true
+  },
+  {
+    "name": "Palmwine Place",
+    "description": "Chill spot for palm wine, nkwobi, and Nigerian small chops.",
+    "address": "18 Allen Ave, Ikeja, Lagos",
+    "phone": "+2348012345674",
+    "email": "info@palmwineplace.com",
+    "is_active": true
+  },
+  {
+    "name": "Pepper Soup Spot",
+    "description": "Spicy catfish, goat meat pepper soup, and Nigerian drinks.",
+    "address": "7 Gimbiya St, Area 11, Abuja",
+    "phone": "+2348012345675",
+    "email": "info@peppersoupspot.com",
+    "is_active": true
+  },
+  {
+    "name": "Chop Life Lounge",
+    "description": "Trendy lounge for Nigerian snacks, cocktails, and live music.",
+    "address": "3 Wuse Market Rd, Abuja",
+    "phone": "+2348012345676",
+    "email": "info@choplifelounge.com",
+    "is_active": true
+  },
+  {
+    "name": "Ofada Kitchen",
+    "description": "Specialist in ofada rice, ayamase, and Nigerian local delicacies.",
+    "address": "10 Broad St, Marina, Lagos",
+    "phone": "+2348012345677",
+    "email": "info@ofadakitchen.com",
+    "is_active": true
+  }
+]
