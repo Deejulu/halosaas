@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from .forms import CustomUserCreationForm, AccountRecoveryForm
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm, AccountRecoveryForm, SecurityQuestionsForm
 from .models import CustomUser
 
 def register(request):
@@ -58,3 +59,17 @@ def account_recovery(request):
         form = AccountRecoveryForm()
     
     return render(request, 'accounts/account_recovery.html', {'form': form})
+
+
+@login_required
+def security_questions(request):
+    if request.method == 'POST':
+        form = SecurityQuestionsForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Security questions updated successfully!')
+            return redirect('dashboard')
+    else:
+        form = SecurityQuestionsForm(instance=request.user)
+    
+    return render(request, 'accounts/security_questions.html', {'form': form})

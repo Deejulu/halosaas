@@ -176,3 +176,40 @@ class AccountRecoveryForm(forms.Form):
         if user and user.security_answer3 and answer != user.security_answer3:
             raise forms.ValidationError('Incorrect answer to security question 3.')
         return answer
+
+
+class SecurityQuestionsForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['security_question1', 'security_answer1', 'security_question2', 'security_answer2', 'security_question3', 'security_answer3']
+        widgets = {
+            'security_answer1': forms.PasswordInput(),
+            'security_answer2': forms.PasswordInput(),
+            'security_answer3': forms.PasswordInput(),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in ['security_question1', 'security_question2', 'security_question3']:
+            self.fields[field].required = True
+        for field in ['security_answer1', 'security_answer2', 'security_answer3']:
+            self.fields[field].required = True
+            self.fields[field].widget.attrs.update({'placeholder': 'Your answer'})
+    
+    def clean_security_answer1(self):
+        answer = self.cleaned_data.get('security_answer1', '').strip()
+        if len(answer) < 2:
+            raise forms.ValidationError('Answer must be at least 2 characters long.')
+        return answer.lower()
+    
+    def clean_security_answer2(self):
+        answer = self.cleaned_data.get('security_answer2', '').strip()
+        if len(answer) < 2:
+            raise forms.ValidationError('Answer must be at least 2 characters long.')
+        return answer.lower()
+    
+    def clean_security_answer3(self):
+        answer = self.cleaned_data.get('security_answer3', '').strip()
+        if len(answer) < 2:
+            raise forms.ValidationError('Answer must be at least 2 characters long.')
+        return answer.lower()
