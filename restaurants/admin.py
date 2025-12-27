@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Restaurant, Category, MenuItem, GalleryImage
 from restaurants.management.commands.populate_sample_menus import SAMPLE_MENUS
+from .admin_actions import add_buca_sample_menu
 
 class GalleryImageInline(admin.TabularInline):
     model = GalleryImage
@@ -51,7 +52,7 @@ class RestaurantAdmin(admin.ModelAdmin):
     )
     
     prepopulated_fields = {'slug': ('name',)}
-    actions = ['activate_restaurants', 'deactivate_restaurants', 'populate_menu']
+    actions = ['activate_restaurants', 'deactivate_restaurants', 'populate_menu', 'add_buca_sample_menu']
     
     def activate_restaurants(self, request, queryset):
         updated = queryset.update(is_active=True)

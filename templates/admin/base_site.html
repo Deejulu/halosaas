@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin_brand/loader.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin_brand/loader.js' %}"></script>
+{% endblock %}
+
+{% block title %}Hello Sauce Admin | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{# The rest of the admin will be rendered as usual #}

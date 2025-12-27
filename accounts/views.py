@@ -27,12 +27,12 @@ def user_login(request):
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {username}!')
-            
+            # Set session flag for welcome overlay
+            request.session['show_welcome_overlay'] = True
             # If customer has a preferred restaurant, redirect there
             if user.role == 'customer' and user.preferred_restaurant:
                 messages.info(request, f'Taking you to {user.preferred_restaurant.name}!')
                 return redirect('restaurant_detail', slug=user.preferred_restaurant.slug)
-            
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid username or password.')

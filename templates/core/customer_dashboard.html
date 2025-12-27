@@ -5,6 +5,38 @@
 
 {% block extra_css %}
 <style>
+    /* Back Button Styles */
+    .dashboard-back-btn {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+        z-index: 1050;
+        background: var(--cd-primary, #6366f1);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 10px 22px 10px 16px;
+        font-size: 1rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(99,102,241,0.12);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s;
+    }
+    .dashboard-back-btn:hover, .dashboard-back-btn:focus {
+        background: var(--cd-primary-light, #818cf8);
+        color: #fff;
+        text-decoration: none;
+    }
+    @media (max-width: 768px) {
+        .dashboard-back-btn {
+            top: 10px;
+            left: 10px;
+            padding: 8px 16px 8px 12px;
+            font-size: 0.95rem;
+        }
+    }
     :root {
         --cd-bg: #f0f2f5;
         --cd-card-bg: #ffffff;
@@ -687,6 +719,49 @@
 {% endblock %}
 
 {% block content %}
+{% if request.session.show_welcome_overlay %}
+<div id="welcomeOverlay" style="position:fixed;z-index:3000;top:0;left:0;width:100vw;height:100vh;background:rgba(20,20,40,0.65);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;transition:opacity 0.7s;">
+    <div style="text-align:center;animation:slideUp 0.7s cubic-bezier(.77,0,.18,1);max-width:90vw;">
+        <div style="display:flex;justify-content:center;gap:1.5rem;align-items:center;margin-bottom:0.5rem;">
+            <!-- Modern Rocket SVG -->
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:pulse 1.2s infinite alternate;"><defs><radialGradient id="rocketBody" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#a5b4fc"/><stop offset="100%" stop-color="#6366f1"/></radialGradient></defs><g><ellipse cx="32" cy="56" rx="10" ry="4" fill="#e0e7ff" opacity="0.5"/><path d="M32 6c7 7 14 25 10 36-2 6-8 10-10 10s-8-4-10-10C18 31 25 13 32 6z" fill="url(#rocketBody)" stroke="#312e81" stroke-width="2"/><circle cx="32" cy="28" r="5" fill="#fff" stroke="#6366f1" stroke-width="2"/><path d="M32 46v8" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/><path d="M28 54c2 2 4 2 8 0" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/></g></svg>
+            <!-- Modern Spoon/Fork SVG -->
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:pulse 1.2s infinite alternate;">
+                <g>
+                    <rect x="28" y="8" width="8" height="32" rx="4" fill="#e94560"/>
+                    <rect x="30.5" y="40" width="3" height="16" rx="1.5" fill="#e94560"/>
+                    <rect x="40" y="8" width="4" height="32" rx="2" fill="#fbbf24"/>
+                    <rect x="42" y="40" width="2" height="16" rx="1" fill="#fbbf24"/>
+                    <rect x="20" y="8" width="4" height="32" rx="2" fill="#fbbf24"/>
+                    <rect x="22" y="40" width="2" height="16" rx="1" fill="#fbbf24"/>
+                </g>
+            </svg>
+        </div>
+        <h2 style="color:#fff;font-weight:800;margin-top:1.2rem;letter-spacing:-1px;">Welcome back, {{ user.first_name|default:user.username }}!</h2>
+        <p style="color:#e0e0e0;font-size:1.2rem;margin-top:0.5rem;">Ready to discover something delicious?</p>
+    </div>
+</div>
+<script>
+    setTimeout(function(){
+        var overlay = document.getElementById('welcomeOverlay');
+        if(overlay){
+            overlay.style.opacity = 0;
+            setTimeout(function(){ overlay.style.display = 'none'; }, 700);
+        }
+        // Remove the session flag by making a request
+        fetch(window.location.pathname + '?clear_welcome=1', { credentials: 'same-origin' });
+    }, 2000);
+</script>
+{% endif %}
+{% block scripts %}
+{{ block.super }}
+{% if request.GET.clear_welcome %}
+<script>
+    // Remove the overlay session flag server-side
+    fetch(window.location.pathname + '?clear_welcome=0', { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRFToken': '{{ csrf_token }}' } });
+</script>
+{% endif %}
+{% endblock %}
 <div class="customer-dashboard">
     <!-- Header Section -->
     <div class="dashboard-header">
@@ -710,11 +785,11 @@
         </div>
     </div>
     
-    <div class="container">
+    <div class="container-fluid px-2 px-md-4">
         <!-- Stats Cards -->
         <div class="stats-container">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
+            <div class="row g-3 g-md-4">
+                <div class="col-12 col-sm-6 col-lg-3">
                     <div class="stat-card gradient-1">
                         <div class="stat-icon">
                             <i class="fas fa-shopping-bag"></i>

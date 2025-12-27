@@ -10,25 +10,17 @@
 :root {
     /* Brand Colors - Premium Food Platform */
     --primary: #FF6B6B;
-    /* Vibrant Red - Appetite-stimulating */
     --primary-dark: #E84A4A;
     --primary-light: #FF8787;
-
     --secondary: #4ECDC4;
-    /* Teal - Fresh, Clean */
     --secondary-dark: #3DB8AF;
     --secondary-light: #6FD9D0;
-
     --accent: #FFD93D;
-    /* Golden Yellow - Premium */
     --accent-dark: #F5C92B;
-
     --success: #2ECC71;
     --warning: #F39C12;
     --danger: #E74C3C;
     --info: #3498DB;
-
-    /* Neutral Colors */
     --dark: #1A1A2E;
     --gray-900: #2D3436;
     --gray-800: #505762;
@@ -40,24 +32,18 @@
     --gray-200: #E9ECEF;
     --gray-100: #F8F9FA;
     --white: #FFFFFF;
-
-    /* Gradients - Modern Premium Feel */
     --gradient-primary: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
     --gradient-secondary: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
     --gradient-dark: linear-gradient(135deg, #1A1A2E 0%, #2D3436 100%);
     --gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
-
-    /* Shadows - Professional Depth */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15);
-    --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.2);
-
-    /* Shadow Colors (for colored elements) */
-    --shadow-primary: 0 8px 24px rgba(255, 107, 107, 0.3);
-    --shadow-secondary: 0 8px 24px rgba(78, 205, 196, 0.3);
+    --shadow-xs: 0 1.5px 4px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2.5px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.10);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.13);
+    --shadow-xl: 0 20px 56px rgba(0, 0, 0, 0.16);
+    --shadow-2xl: 0 32px 80px rgba(0, 0, 0, 0.22);
+    --shadow-primary: 0 8px 32px rgba(255, 107, 107, 0.18);
+    --shadow-secondary: 0 8px 32px rgba(78, 205, 196, 0.18);
 
     /* Border Radius - Modern, Friendly */
     --radius-sm: 8px;
@@ -359,26 +345,33 @@
    ========================================== */
 .menu-item-card {
     background: var(--white);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     transition: var(--transition-base);
-    border: 1px solid var(--gray-200);
+    border: 1.5px solid var(--gray-200);
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
+    min-height: 340px;
+    will-change: transform, box-shadow;
+    animation: fadeIn 0.7s cubic-bezier(.2, .8, .2, 1);
 }
 
 .menu-item-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-10px) scale(1.025);
     border-color: var(--primary-light);
+    z-index: 2;
 }
 
 .menu-item-image {
     position: relative;
-    height: 220px;
+    height: 210px;
     overflow: hidden;
+    background: var(--gradient-secondary);
+    border-bottom: 1.5px solid var(--gray-200);
 }
 
 .menu-item-image img {
@@ -386,10 +379,11 @@
     height: 100%;
     object-fit: cover;
     transition: var(--transition-slow);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .menu-item-card:hover .menu-item-image img {
-    transform: scale(1.1);
+    transform: scale(1.08) rotate(-1deg);
 }
 
 .menu-item-badge {
@@ -398,34 +392,38 @@
     right: var(--spacing-md);
     background: var(--gradient-primary);
     color: var(--white);
-    padding: 6px 14px;
+    padding: 7px 16px;
     border-radius: var(--radius-full);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
     z-index: 2;
+    letter-spacing: 0.5px;
+    animation: fadeIn 0.7s cubic-bezier(.2, .8, .2, 1);
 }
 
 .menu-item-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
 .menu-item-title {
     font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 800;
     color: var(--dark);
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.5px;
 }
 
 .menu-item-description {
     color: var(--gray-600);
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: var(--spacing-md);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: var(--spacing-sm);
     flex-grow: 1;
 }
 
@@ -434,13 +432,15 @@
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
+    gap: 1.5rem;
 }
 
 .menu-item-price {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     font-weight: 800;
     color: var(--primary);
+    letter-spacing: -1px;
 }
 
 .menu-item-price small {
@@ -485,31 +485,32 @@
    BADGES & TAGS
    ========================================== */
 .badge-modern {
-    padding: 6px 14px;
+    padding: 7px 16px;
     border-radius: var(--radius-full);
-    font-weight: 600;
-    font-size: 13px;
+    font-weight: 700;
+    font-size: 14px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
+    box-shadow: var(--shadow-xs);
 }
 
 .badge-success-modern {
     background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
     color: var(--white);
-    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.18);
 }
 
 .badge-warning-modern {
     background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
     color: var(--white);
-    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.18);
 }
 
 .badge-info-modern {
     background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
     color: var(--white);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.18);
 }
 
 /* ==========================================
@@ -517,11 +518,30 @@
    ========================================== */
 @media (max-width: 768px) {
     .hero-premium-title {
-        font-size: 2.5rem;
+        font-size: 2.1rem;
     }
 
     .menu-item-card {
         margin-bottom: var(--spacing-lg);
+        min-height: 260px;
+    }
+
+    .menu-item-image {
+        height: 140px;
+    }
+
+    .menu-item-content {
+        padding: var(--spacing-lg);
+    }
+
+    .menu-item-title {
+        font-size: 1.1rem;
+    }
+
+    .menu-item-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
     }
 
     .nav-modern {

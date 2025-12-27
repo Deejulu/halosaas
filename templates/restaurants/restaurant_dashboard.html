@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <style>
+
     :root {
         --rd-bg: #f0f2f5;
         --rd-card-bg: #ffffff;
@@ -570,41 +571,32 @@
         .action-btn-group {
             grid-template-columns: repeat(5, 1fr);
         }
-        
         .restaurant-info-grid {
             grid-template-columns: 1fr;
         }
     }
-    
     @media (max-width: 768px) {
         .dashboard-header {
             padding: 30px 0 80px;
         }
-        
         .welcome-content h1 {
             font-size: 1.75rem;
         }
-        
         .stats-container {
             margin-top: -40px;
         }
-        
         .stat-card {
             padding: 18px;
         }
-        
         .stat-value {
             font-size: 1.4rem;
         }
-        
         .action-btn-group {
             grid-template-columns: repeat(3, 1fr);
         }
-        
         .action-btn span {
             display: none;
         }
-        
         .action-btn i {
             margin-bottom: 0;
         }
@@ -613,7 +605,29 @@
 {% endblock %}
 
 {% block content %}
-<div class="restaurant-dashboard">
+    
+    <div class="restaurant-dashboard">
+        <!-- Header Section -->
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="welcome-content">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h1 class="mb-0" style="display: inline-flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-store me-2"></i>Restaurant Dashboard
+                            </h1>
+                        </div>
+                        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                            <a href="{% url 'manage_restaurant' %}" class="btn btn-light btn-lg px-4">
+                                <i class="fas fa-plus me-2"></i>Add Restaurant
+                            </a>
+                        </div>
+                    </div>
+                    <p class="mb-0 mt-2">Manage your restaurants, orders, and grow your business</p>
+                </div>
+            </div>
+        </div>
+    <!-- ...existing code... -->
     <!-- Header Section -->
     <div class="dashboard-header">
         <div class="container">

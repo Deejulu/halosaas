@@ -2658,7 +2658,7 @@ html {
             <div class="nav nav-pills">
                 {% for category in categories %}
                 <div class="nav-item">
-                    <a class="nav-link {% if forloop.first %}active{% endif %}" href="#category-{{ category.id }}" data-category="{{ category.id }}">
+                    <a class="nav-link {% if forloop.first %}active{% endif %}" href="#category-{{ category.id }}" data-category="{{ category.id }}" tabindex="0">
                         <i class="fas fa-utensils me-2"></i>{{ category.name }}
                         <span class="badge bg-light text-dark ms-2">{{ category.menuitem_set.all|length }}</span>
                     </a>
@@ -2670,7 +2670,7 @@ html {
         <!-- Menu Items by Category -->
         <div class="menu-container">
             {% for category in categories %}
-            <div class="category-section {% if forloop.first %}active{% endif %}" id="category-{{ category.id }}" data-category="{{ category.id }}">
+            <div class="category-section {% if forloop.first %}active{% endif %}" id="category-{{ category.id }}" data-category="{{ category.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
                 <div class="category-header">
                     <div class="row align-items-center">
                         <div class="col-md-8">
@@ -2690,9 +2690,9 @@ html {
                 <div class="row">
                     {% for item in category.menuitem_set.all %}
                     {% if item.is_available %}
-                    <div class="col-lg-4 col-md-6 mb-4 menu-item fade-in" data-name="{{ item.name|lower }}"
-                        data-price="{{ item.price }}" data-category="{{ category.id }}">
-                        <div class="menu-item-card hover-lift">
+                    <div class="col-lg-4 col-md-6 mb-4 menu-item fade-in d-flex justify-content-center"
+                        data-name="{{ item.name|default:''|lower }}" data-price="{{ item.price|default:'0' }}">
+                        <div class="menu-item-card hover-lift w-100 h-100 d-flex flex-column" style="max-width: 420px; min-width: 260px; min-height: 340px;">
                             <div class="menu-item-image">
                                 {% if item.image %}
                                 <img src="{{ item.image.url }}" alt="{{ item.name }}">
@@ -2702,39 +2702,37 @@ html {
                                     <i class="fas fa-utensils fa-3x text-white opacity-50"></i>
                                 </div>
                                 {% endif %}
-                                <span class="menu-item-badge">
+                                <span class="menu-item-badge animate__animated animate__fadeInDown">
                                     <i class="fas fa-fire me-1"></i>Popular
                                 </span>
                             </div>
-
                             <div class="menu-item-content">
                                 <h3 class="menu-item-title">{{ item.name }}</h3>
-
                                 {% if item.description %}
                                 <p class="menu-item-description">{{ item.description|truncatewords:15 }}</p>
                                 {% endif %}
-
-                                <div class="d-flex align-items-center gap-2 mb-3">
-                                    <span class="badge-modern badge-success-modern">
+                                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                    <span class="badge-modern badge-success-modern animate__animated animate__fadeInLeft">
                                         <i class="fas fa-check-circle me-1"></i>Available
                                     </span>
-                                    <span class="badge-modern badge-info-modern">
+                                    <span class="badge-modern badge-info-modern animate__animated animate__fadeInRight">
                                         <i class="fas fa-clock me-1"></i>{{ item.preparation_time }} min
                                     </span>
                                 </div>
-
                                 <div class="menu-item-footer">
                                     <div class="menu-item-price">
                                         ₦<small>{{ item.price }}</small>
                                     </div>
                                     {% if user.role == 'customer' %}
-                                    <button type="button" class="btn-modern btn-gradient-primary btn-sm add-to-cart-btn"
-                                        data-item-id="{{ item.id }}" data-item-name="{{ item.name }}"
-                                        data-item-price="{{ item.price }}">
-                                        <i class="fas fa-cart-plus me-1"></i>Add
+                                    <button type="button" class="btn-modern btn-gradient-primary btn-lg add-to-cart-btn w-100 py-3 mt-2"
+                                        data-item-id="{{ item.id|default:'' }}" data-item-name="{{ item.name|default:'' }}"
+                                        data-item-price="{{ item.price|default:'' }}"
+                                        aria-label="Add {{ item.name }} to cart"
+                                        style="font-size:1.15rem; border-radius:{% if restaurant.button_style == 'rounded' %}8px{% elif restaurant.button_style == 'pill' %}50px{% elif restaurant.button_style == 'square' %}0{% elif restaurant.button_style == 'soft' %}4px{% else %}8px{% endif %} !important;">
+                                        <i class="fas fa-cart-plus me-1"></i>Add to Cart
                                     </button>
                                     {% else %}
-                                    <a href="{% url 'login' %}" class="btn-modern btn-outlined btn-sm">
+                                    <a href="{% url 'login' %}" class="btn-modern btn-outlined btn-lg w-100 py-3 mt-2">
                                         <i class="fas fa-sign-in-alt me-1"></i>Login
                                     </a>
                                     {% endif %}
@@ -3504,13 +3502,14 @@ document.addEventListener('DOMContentLoaded', function(){
                 // Hide all category sections
                 categorySections.forEach(section => {
                     section.classList.remove('active');
+                    section.style.display = 'none';
                 });
 
                 // Show only selected category
                 const targetSection = document.getElementById(`category-${selectedCategory}`);
                 if (targetSection) {
                     targetSection.classList.add('active');
-                    
+                    targetSection.style.display = 'block';
                     // Clear search when switching categories
                     const searchInput = document.getElementById('menuSearch');
                     if (searchInput && searchInput.value) {
@@ -3624,7 +3623,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 const itemId = btn.getAttribute('data-item-id');
                 const itemName = btn.getAttribute('data-item-name');
                 const price = btn.getAttribute('data-item-price');
-                
+                const originalText = btn.innerHTML;
                 // Disable button temporarily
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
@@ -3657,7 +3656,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 .finally(() => {
                     // Re-enable button
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-cart-plus me-1"></i>Add';
+                    btn.innerHTML = originalText;
                 });
             }
         });

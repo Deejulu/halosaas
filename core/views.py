@@ -89,7 +89,15 @@ def dashboard(request):
     user = request.user
     print(f"🎯 DASHBOARD ROUTING: {user.username} → {user.role}")
     
+    # Clear welcome overlay session flag if requested
     if user.role == 'customer':
+        if request.method == 'GET' and request.GET.get('clear_welcome') == '1':
+            if 'show_welcome_overlay' in request.session:
+                del request.session['show_welcome_overlay']
+        elif request.method == 'POST' and request.GET.get('clear_welcome') == '0':
+            if 'show_welcome_overlay' in request.session:
+                del request.session['show_welcome_overlay']
+            return JsonResponse({'cleared': True})
         # CUSTOMER DASHBOARD - Enhanced with more data
         
         # All orders for this customer
