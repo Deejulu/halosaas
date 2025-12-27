@@ -840,10 +840,14 @@
                                     </div>
                                     <div class="restaurant-card-footer">
                                         <div class="action-btn-group">
+                                            {% if restaurant.slug %}
                                             <a href="{% url 'restaurant_detail' restaurant.slug %}" class="action-btn view" title="View Public Page">
                                                 <i class="fas fa-eye"></i>
                                                 <span>View</span>
                                             </a>
+                                            {% else %}
+                                            <span class="action-btn disabled" title="No Public Page"><i class="fas fa-eye-slash"></i><span>View</span></span>
+                                            {% endif %}
                                             <a href="{% url 'manage_menu' restaurant.id %}" class="action-btn menu" title="Manage Menu">
                                                 <i class="fas fa-utensils"></i>
                                                 <span>Menu</span>
@@ -852,10 +856,14 @@
                                                 <i class="fas fa-receipt"></i>
                                                 <span>Orders</span>
                                             </a>
+                                            {% if restaurant.slug %}
                                             <a href="{% url 'manage_staff' restaurant.slug %}" class="action-btn staff" title="Manage Staff">
                                                 <i class="fas fa-users"></i>
                                                 <span>Staff</span>
                                             </a>
+                                            {% else %}
+                                            <span class="action-btn disabled" title="No Staff Management"><i class="fas fa-users"></i><span>Staff</span></span>
+                                            {% endif %}
                                             <a href="{% url 'manage_restaurant' restaurant.id %}" class="action-btn settings" title="Settings">
                                                 <i class="fas fa-cog"></i>
                                                 <span>Edit</span>
