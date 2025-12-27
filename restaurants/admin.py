@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Restaurant, Category, MenuItem, GalleryImage
+from restaurants.management.commands.populate_sample_menus import SAMPLE_MENUS
 
 class GalleryImageInline(admin.TabularInline):
     model = GalleryImage
@@ -50,7 +51,7 @@ class RestaurantAdmin(admin.ModelAdmin):
     )
     
     prepopulated_fields = {'slug': ('name',)}
-    actions = ['activate_restaurants', 'deactivate_restaurants']
+    actions = ['activate_restaurants', 'deactivate_restaurants', 'populate_menu']
     
     def activate_restaurants(self, request, queryset):
         updated = queryset.update(is_active=True)
@@ -61,6 +62,36 @@ class RestaurantAdmin(admin.ModelAdmin):
         updated = queryset.update(is_active=False)
         self.message_user(request, f'{updated} restaurants deactivated successfully.')
     deactivate_restaurants.short_description = "Deactivate selected restaurants"
+    
+    def populate_menu(self, request, queryset):
+        total_items = 0
+        for restaurant in queryset:
+            # Ensure a default category exists
+            category, _ = Category.objects.get_or_create(
+                restaurant=restaurant,
+                name="Main Dishes",
+                defaults={"description": "Signature and popular dishes."}
+            )
+            menu = SAMPLE_MENUS.get(restaurant.name)
+            if not menu:
+                menu = [
+                    {'name': 'Chef Special', 'description': 'Signature dish of the house.', 'price': 3000},
+                    {'name': 'Classic Rice', 'description': 'Rice with sauce and protein.', 'price': 2500},
+                    {'name': 'Fresh Juice', 'description': 'Seasonal fruit juice.', 'price': 1000},
+                ]
+            for item in menu:
+                MenuItem.objects.get_or_create(
+                    category=category,
+                    name=item['name'],
+                    defaults={
+                        'description': item['description'],
+                        'price': item['price'],
+                        'is_available': True,
+                    }
+                )
+                total_items += 1
+        self.message_user(request, f'Menu populated successfully! Added {total_items} items across {queryset.count()} restaurants.')
+    populate_menu.short_description = "Populate menu with sample items"
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
