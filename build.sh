@@ -8,8 +8,8 @@ pip install -r requirements.txt
 
 python manage.py migrate --noinput
 
-# TEMP: Reset admin password on next deploy
-python manage.py reset_admin_password
+# TEMP: Create admin user if missing on next deploy
+python manage.py create_admin_user
 
 # Load restaurant data if none exist
 if python manage.py shell -c "from restaurants.models import Restaurant; exit(0 if Restaurant.objects.count() == 0 else 1)"; then
