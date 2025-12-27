@@ -3,7 +3,7 @@
         "model": "restaurants.restaurant",
         "pk": 1,
         "fields": {
-            "owner": 2,
+            "owner": null,
             "name": "Naija Grill House",
             "slug": "naija-grill-house",
             "description": "A vibrant spot for suya, grilled fish, and classic Nigerian barbecue.",
@@ -68,7 +68,7 @@
         "model": "restaurants.restaurant",
         "pk": 2,
         "fields": {
-            "owner": 3,
+            "owner": null,
             "name": "Bukka Republic",
             "slug": "bukka-republic",
             "description": "Authentic Nigerian home-cooked meals, amala, efo riro, and more.",
@@ -133,7 +133,7 @@
         "model": "restaurants.restaurant",
         "pk": 3,
         "fields": {
-            "owner": 4,
+            "owner": null,
             "name": "Jollof City",
             "slug": "jollof-city",
             "description": "The best jollof rice, fried rice, and party platters in Lagos.",
@@ -198,7 +198,7 @@
         "model": "restaurants.restaurant",
         "pk": 4,
         "fields": {
-            "owner": 5,
+            "owner": null,
             "name": "Palmwine Place",
             "slug": "palmwine-place",
             "description": "Chill spot for palm wine, nkwobi, and Nigerian small chops.",
@@ -263,7 +263,7 @@
         "model": "restaurants.restaurant",
         "pk": 5,
         "fields": {
-            "owner": 6,
+            "owner": null,
             "name": "Pepper Soup Spot",
             "slug": "pepper-soup-spot",
             "description": "Spicy catfish, goat meat pepper soup, and Nigerian drinks.",
@@ -328,7 +328,7 @@
         "model": "restaurants.restaurant",
         "pk": 6,
         "fields": {
-            "owner": 7,
+            "owner": null,
             "name": "Chop Life Lounge",
             "slug": "chop-life-lounge",
             "description": "Trendy lounge for Nigerian snacks, cocktails, and live music.",
@@ -393,7 +393,7 @@
         "model": "restaurants.restaurant",
         "pk": 7,
         "fields": {
-            "owner": 8,
+            "owner": null,
             "name": "Ofada Kitchen",
             "slug": "ofada-kitchen",
             "description": "Specialist in ofada rice, ayamase, and Nigerian local delicacies.",
