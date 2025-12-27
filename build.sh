@@ -13,6 +13,9 @@ python manage.py migrate --noinput
 
 
 
+# Create admin user if it doesn't exist
+python manage.py createadmin
+
 # Only import restaurants using add_restaurants.py
 python add_restaurants.py
 
