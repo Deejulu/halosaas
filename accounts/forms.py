@@ -5,7 +5,9 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, label='Email address')
     phone_number = forms.CharField(max_length=15, required=False, label='Phone (optional)')
-    role = forms.ChoiceField(choices=CustomUser.ROLE_CHOICES, label='I am a')
+    # Only allow 'restaurant_owner' and 'customer' roles for registration
+    NON_ADMIN_ROLES = [role for role in CustomUser.ROLE_CHOICES if role[0] != 'admin']
+    role = forms.ChoiceField(choices=NON_ADMIN_ROLES, label='I am a')
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
