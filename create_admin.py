@@ -12,9 +12,10 @@ django.setup()
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-username = 'admin'
-email = 'admin@example.com'
-password = os.environ.get('ADMIN_PASSWORD', 'ChangeMe123!')
+
+username = 'halosaasadmin'
+email = 'halosaasadmin@example.com'
+password = os.environ.get('ADMIN_PASSWORD', 'david0011')
 
 if User.objects.filter(username=username).exists():
     print("✅ Admin user already exists")
