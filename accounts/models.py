@@ -60,6 +60,16 @@ class CustomUser(AbstractUser):
         help_text='Answer to third security question'
     )
 
+    # Preferred restaurant (customer feature)
+    preferred_restaurant = models.ForeignKey(
+        'restaurants.Restaurant',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='preferred_by_users',
+        help_text='Customer preferred restaurant for quick access'
+    )
+
     # Add related_name to avoid clashes with default User model
     groups = models.ManyToManyField(
         'auth.Group',
