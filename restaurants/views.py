@@ -16,39 +16,59 @@ User = get_user_model()
 # PUBLIC VIEW - Restaurant detail page
 def restaurant_detail(request, slug):
     """Public restaurant detail page with menu"""
-    restaurant = get_object_or_404(Restaurant, slug=slug, is_active=True)
-    categories = Category.objects.filter(restaurant=restaurant).prefetch_related('menuitem_set')
-    
-    # Check if this is user's preferred restaurant
-    is_preferred = False
-    if request.user.is_authenticated and request.user.role == 'customer':
-        is_preferred = request.user.preferred_restaurant == restaurant
+    import logging
+    logger = logging.getLogger(__name__)
+    try:
+        restaurant = get_object_or_404(Restaurant, slug=slug, is_active=True)
+        categories = Category.objects.filter(restaurant=restaurant).prefetch_related('menuitem_set')
 
-    # If the viewer is the customer, include their past orders/payments for this restaurant
-    user_orders = None
-    user_payments = None
-    if request.user.is_authenticated and request.user.role == 'customer':
-        try:
-            user_orders = Order.objects.filter(customer=request.user, restaurant=restaurant).order_by('-created_at')[:5]
-        except Exception:
-            user_orders = None
-        try:
-            user_payments = Payment.objects.filter(order__customer=request.user, order__restaurant=restaurant).order_by('-created_at')[:5]
-        except Exception:
-            user_payments = None
+        # Check if this is user's preferred restaurant
+        is_preferred = False
+        if request.user.is_authenticated and getattr(request.user, 'role', None) == 'customer':
+            is_preferred = getattr(request.user, 'preferred_restaurant', None) == restaurant
 
-    # Recent public feedback for this restaurant
-    recent_feedback = Feedback.objects.filter(restaurant=restaurant, is_public=True).order_by('-created_at')[:5]
-    
-    context = {
-        'restaurant': restaurant,
-        'categories': categories,
-        'is_preferred': is_preferred,
-        'user_orders': user_orders,
-        'user_payments': user_payments,
-        'recent_feedback': recent_feedback,
-    }
-    return render(request, 'restaurants/restaurant_detail.html', context)
+        # If the viewer is the customer, include their past orders/payments for this restaurant
+        user_orders = None
+        user_payments = None
+        if request.user.is_authenticated and getattr(request.user, 'role', None) == 'customer':
+            try:
+                user_orders = Order.objects.filter(customer=request.user, restaurant=restaurant).order_by('-created_at')[:5]
+            except Exception as e:
+                logger.error(f"Error fetching user orders: {e}")
+                user_orders = None
+            try:
+                user_payments = Payment.objects.filter(order__customer=request.user, order__restaurant=restaurant).order_by('-created_at')[:5]
+            except Exception as e:
+                logger.error(f"Error fetching user payments: {e}")
+                user_payments = None
+
+        # Recent public feedback for this restaurant
+        try:
+            recent_feedback = Feedback.objects.filter(restaurant=restaurant, is_public=True).order_by('-created_at')[:5]
+        except Exception as e:
+            logger.error(f"Error fetching feedback: {e}")
+            recent_feedback = None
+
+        context = {
+            'restaurant': restaurant,
+            'categories': categories,
+            'is_preferred': is_preferred,
+            'user_orders': user_orders,
+            'user_payments': user_payments,
+            'recent_feedback': recent_feedback,
+        }
+        return render(request, 'restaurants/restaurant_detail.html', context)
+    except Exception as e:
+        logger.exception(f"Error in restaurant_detail view for slug '{slug}': {e}")
+        return render(request, 'restaurants/restaurant_detail.html', {
+            'restaurant': None,
+            'categories': [],
+            'is_preferred': False,
+            'user_orders': None,
+            'user_payments': None,
+            'recent_feedback': None,
+            'error_message': f"An error occurred: {e}"
+        })
 
 @login_required
 def set_preferred_restaurant(request, slug):
