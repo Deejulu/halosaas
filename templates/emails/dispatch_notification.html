@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Your Order is Out for Delivery</title>
+</head>
+<body>
+    <h2>Order #{{ order.id }} is Out for Delivery!</h2>
+    <p>Dear {{ delivery_info.name }},</p>
+    <p>Your order from <strong>{{ restaurant.name }}</strong> is now being dispatched to your address.</p>
+    <p>We will contact you at:
+        <ul>
+            <li>Phone: {{ delivery_info.phone }}</li>
+            <li>Email: {{ delivery_info.email }}</li>
+            <li>WhatsApp: {{ delivery_info.whatsapp }}</li>
+        </ul>
+    </p>
+    <p>If you have any questions, reply to this email or contact the restaurant directly.</p>
+    <p>Thank you for ordering with us!</p>
+</body>
+</html>

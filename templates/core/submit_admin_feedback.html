@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Send Feedback to Admin{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="mb-4 text-center"><i class="fas fa-comment-dots me-2"></i>Send Feedback to Admin</h2>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+              {{ form.subject.label_tag }}
+              {{ form.subject }}
+              {{ form.subject.errors }}
+            </div>
+            <div class="mb-3">
+              {{ form.message.label_tag }}
+              {{ form.message }}
+              {{ form.message.errors }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Send Feedback</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

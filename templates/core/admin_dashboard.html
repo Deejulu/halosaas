@@ -3,6 +3,27 @@
 {% block title %}Admin Dashboard - Restaurant SaaS{% endblock %}
 
 {% block content %}
+{% if request.session.show_loader_after_login %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof showSiteLoader === 'function') {
+        showSiteLoader();
+        setTimeout(hideSiteLoader, 2000);
+    }
+    fetch(window.location.pathname + '?clear_loader=1', { credentials: 'same-origin' });
+});
+</script>
+{% endif %}
+<script>
+// Show loader for 2 seconds on dashboard load
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.performance && window.performance.navigation && window.performance.navigation.type === 1) return; // skip on reload
+    if (typeof showSiteLoader === 'function') {
+        showSiteLoader();
+        setTimeout(hideSiteLoader, 2000);
+    }
+});
+</script>
 <div class="container-fluid py-4">
     <!-- Admin Header -->
     <div class="row mb-4">
@@ -15,6 +36,14 @@
                                 <i class="fas fa-crown me-3"></i>Admin Dashboard
                             </h1>
                             <p class="lead mb-0">Platform Management & Analytics</p>
+                            <div class="d-flex flex-wrap align-items-center mt-4" style="gap: 0.75rem 1rem;">
+                                <a href="{% url 'owner_instructions' %}" class="btn btn-warning btn-lg me-2 mb-2 mt-2">
+                                    <i class="fas fa-info-circle me-2"></i>Owner Instructions
+                                </a>
+                                <a href="{% url 'tutorial' %}" class="btn btn-success btn-lg mb-2 mt-2">
+                                    <i class="fas fa-graduation-cap me-2"></i>Website Tutorial
+                                </a>
+                            </div>
                         </div>
                         <div class="col-md-4 text-md-end">
                             <span class="badge bg-light text-dark fs-6 me-2">
@@ -172,6 +201,9 @@
                             </a>
                             <a href="{% url 'settings_dashboard' %}" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-cog me-1"></i>Settings
+                            </a>
+                            <a href="{% url 'admin_feedback_list' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-comments me-1"></i>View Feedback
                             </a>
                         </div>
                     </div>

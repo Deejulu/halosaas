@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Choose Delivery Method{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>How would you like to receive your order?</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label><input type="radio" name="delivery_method" value="pickup" required {% if not order.delivery_method or order.delivery_method == 'pickup' %}checked{% endif %}> Pick Up (I will come to the restaurant)</label>
+        </div>
+        <div class="mb-3">
+            <label><input type="radio" name="delivery_method" value="delivery" {% if order.delivery_method == 'delivery' %}checked{% endif %}> Delivery (Send a dispatch rider)</label>
+        </div>
+        <div id="delivery-info-fields" style="display:none;">
+            <div class="mb-2">
+                <label>Name:</label>
+                <input type="text" name="name" class="form-control" value="{{ order.delivery_info.name|default:'' }}">
+            </div>
+            <div class="mb-2">
+                <label>Phone:</label>
+                <input type="text" name="phone" class="form-control" value="{{ order.delivery_info.phone|default:'' }}">
+            </div>
+            <div class="mb-2">
+                <label>Email:</label>
+                <input type="email" name="email" class="form-control" value="{{ order.delivery_info.email|default:'' }}">
+            </div>
+            <div class="mb-2">
+                <label>WhatsApp Number:</label>
+                <input type="text" name="whatsapp" class="form-control" value="{{ order.delivery_info.whatsapp|default:'' }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Continue</button>
+    </form>
+</div>
+<script>
+    function toggleDeliveryFields() {
+        var deliveryRadio = document.querySelector('input[name="delivery_method"][value="delivery"]');
+        var pickupRadio = document.querySelector('input[name="delivery_method"][value="pickup"]');
+        var fields = document.getElementById('delivery-info-fields');
+        if (deliveryRadio.checked) {
+            fields.style.display = 'block';
+        } else {
+            fields.style.display = 'none';
+        }
+    }
+    document.querySelectorAll('input[name="delivery_method"]').forEach(function(radio) {
+        radio.addEventListener('change', toggleDeliveryFields);
+    });
+    window.onload = toggleDeliveryFields;
+</script>
+{% endblock %}

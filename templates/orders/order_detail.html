@@ -1,3 +1,36 @@
+                    <div class="mb-3">
+                        <strong>Delivery Method:</strong><br>
+                        {% if order.delivery_method == 'pickup' %}
+                            <span class="badge bg-info">Pick Up</span>
+                        {% elif order.delivery_method == 'delivery' %}
+                            <span class="badge bg-primary">Delivery</span>
+                            <div class="mt-2 ms-2">
+                                <strong>Delivery Info:</strong><br>
+                                Name: {{ order.delivery_info.name }}<br>
+                                Phone: {{ order.delivery_info.phone }}<br>
+                                Email: {{ order.delivery_info.email }}<br>
+                                WhatsApp: {{ order.delivery_info.whatsapp }}
+                            </div>
+                        {% else %}
+                            <span class="badge bg-secondary">Not specified</span>
+                        {% endif %}
+                    </div>
+            <!-- Staff Actions for Pickup/Delivery -->
+            {% if user.role == 'restaurant_owner' and order.status in 'pending,awaiting_confirmation,confirmed,ready' %}
+                {% if order.delivery_method == 'pickup' and order.status != 'completed' %}
+                <form method="post" action="{% url 'update_order_status' order.id %}" class="mt-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="completed">
+                    <button type="submit" class="btn btn-success w-100">Confirm Customer Pickup</button>
+                </form>
+                {% elif order.delivery_method == 'delivery' and order.status != 'completed' %}
+                <form method="post" action="{% url 'update_order_status' order.id %}" class="mt-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="completed">
+                    <button type="submit" class="btn btn-primary w-100">Mark as Delivered</button>
+                </form>
+                {% endif %}
+            {% endif %}
 {% extends 'base.html' %}
 
 {% block title %}Order #{{ order.id }} - Restaurant SaaS{% endblock %}

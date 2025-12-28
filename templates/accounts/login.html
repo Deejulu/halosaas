@@ -200,5 +200,25 @@ function showAuthForm(form) {
         slider.classList.remove('sliding');
     }, 800);
 }
+
+// Show loader after successful login
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm').querySelector('form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            // Only show loader if form is valid (let server handle actual validation)
+            setTimeout(function() {
+                if (typeof showSiteLoader === 'function') {
+                    showSiteLoader();
+                }
+            }, 50);
+        });
+    }
+    // Hide loader after 2 seconds (simulate login redirect)
+    if (window.location.search.includes('showloader=1')) {
+        showSiteLoader();
+        setTimeout(hideSiteLoader, 2000);
+    }
+});
 </script>
 {% endblock %}

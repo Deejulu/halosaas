@@ -1,3 +1,66 @@
+/* ==========================================
+   STICKY STATS BAR & CATEGORY ACCESSIBILITY
+   ========================================== */
+.stats-container {
+    position: sticky;
+    top: 56px;
+    z-index: var(--z-sticky);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-xl);
+    padding: 10px 24px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-item {
+    text-align: center;
+    min-width: 80px;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+}
+
+@media (max-width: 768px) {
+    .stats-container {
+        top: 48px;
+        padding: 8px 8px;
+        border-radius: var(--radius-lg);
+        font-size: 0.98rem;
+    }
+
+    .stat-item {
+        min-width: 60px;
+    }
+
+    .stat-value {
+        font-size: 1.05rem;
+    }
+}
+
+/* Collapsible category accessibility */
+.category-section[aria-labelledby] {
+    outline: none;
+}
+
+.nav-modern .nav-link:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--accent-dark);
+}
+
 /**
  * Professional Restaurant Theme - 2025
  * Modern, Clean, Premium Design System

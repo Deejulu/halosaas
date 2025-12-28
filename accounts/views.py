@@ -29,6 +29,8 @@ def user_login(request):
             messages.success(request, f'Welcome back, {username}!')
             # Set session flag for welcome overlay
             request.session['show_welcome_overlay'] = True
+            # Set loader flag for all users after login
+            request.session['show_loader_after_login'] = True
             # If customer has a preferred restaurant, redirect there
             if user.role == 'customer' and user.preferred_restaurant:
                 messages.info(request, f'Taking you to {user.preferred_restaurant.name}!')

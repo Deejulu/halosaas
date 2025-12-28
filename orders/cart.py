@@ -62,7 +62,8 @@ class Cart:
                 'name': menu_item.name,
                 'special_requests': special_requests,
                 'restaurant_id': restaurant_id,
-                'restaurant_name': menu_item.category.restaurant.name
+                'restaurant_name': menu_item.category.restaurant.name,
+                'restaurant_slug': menu_item.category.restaurant.slug
             }
 
         subcart[menu_item_id]['quantity'] += quantity
@@ -215,8 +216,17 @@ class Cart:
                 'total_price': float(item_data['price']) * item_data['quantity'],
                 'name': item_data['name'],
                 'special_requests': item_data['special_requests'],
-                'restaurant_name': item_data['restaurant_name']
+                'restaurant_name': item_data['restaurant_name'],
+                'restaurant_slug': item_data.get('restaurant_slug')
             }
 
     def __len__(self):
         return self.get_total_items()
+
+    def get_total_items_all_restaurants(self):
+        """Get total items from ALL restaurants, not just active one"""
+        total = 0
+        for rid, subcart in self.cart.items():
+            if isinstance(subcart, dict):
+                total += sum(item.get('quantity', 0) for item in subcart.values())
+        return total

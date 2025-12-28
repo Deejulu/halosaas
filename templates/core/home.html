@@ -16,28 +16,35 @@
                     Complete online ordering system, menu management, and customer analytics in one powerful platform.
                     Start accepting orders 24/7 and grow your restaurant like never before.
                 </p>
-                <div class="hero-buttons">
+                <div class="hero-buttons d-flex flex-wrap align-items-center" style="gap: 0.75rem 1rem;">
                     {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg me-3">
+                    <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg me-3 mb-2">
                         <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
                     </a>
                     {% if user.role == 'restaurant_owner' %}
-                    <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'restaurant_dashboard' %}" class="btn btn-outline-light btn-lg me-3 mb-2">
                         <i class="fas fa-store me-2"></i>My Restaurants
                     </a>
                     {% elif user.role == 'customer' %}
-                    <a href="{% url 'browse_restaurants' %}" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'browse_restaurants' %}" class="btn btn-outline-light btn-lg me-3 mb-2">
                         <i class="fas fa-utensils me-2"></i>Order Food
                     </a>
                     {% endif %}
                     {% else %}
-                    <a href="{% url 'register' %}" class="btn btn-light btn-lg me-3">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg me-3 mb-2">
                         <i class="fas fa-rocket me-2"></i>Start Free Trial
                     </a>
-                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg me-3 mb-2">
                         <i class="fas fa-sign-in-alt me-2"></i>Restaurant Login
                     </a>
                     {% endif %}
+                    <!-- Instructions and Tutorial Buttons -->
+                    <a href="{% url 'owner_instructions' %}" class="btn btn-warning btn-lg me-3 mb-2 mt-2">
+                        <i class="fas fa-info-circle me-2"></i>Owner Instructions
+                    </a>
+                    <a href="{% url 'tutorial' %}" class="btn btn-success btn-lg mb-2 mt-2">
+                        <i class="fas fa-graduation-cap me-2"></i>Website Tutorial
+                    </a>
                 </div>
                 <div class="hero-stats mt-5">
                     <div class="row">

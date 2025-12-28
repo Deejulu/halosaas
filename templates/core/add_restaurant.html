@@ -4,6 +4,13 @@
 
 {% block content %}
 <div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <a href="{% url 'restaurant_help' %}" class="btn btn-info btn-lg px-5 py-3" style="font-size:1.25rem;">
+                <i class="fas fa-question-circle me-2"></i> How to Use This Page
+            </a>
+        </div>
+    </div>
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card shadow-lg">
@@ -14,22 +21,32 @@
                 </div>
                 <div class="card-body p-4">
                     <form method="post" enctype="multipart/form-data">
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Welcome!</strong> This page lets you create a new restaurant profile. Fill out each section below. Look for tips and instructions under each field to help you succeed.
+                        </div>
                         {% csrf_token %}
 
                         <!-- Basic Information Section -->
                         <div class="section-header mb-4">
                             <h5 class="text-primary"><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                            <div class="alert alert-info mb-2">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Tip:</strong> Fill out your restaurant's name, contact details, and a short description. This helps customers find and recognize your business.
+                            </div>
                             <hr>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Restaurant Name *</label>
+                                                                <small class="text-muted">Choose a clear, descriptive name that represents your restaurant. This will be displayed to customers.</small>
                                 <input type="text" class="form-control" id="name" name="name" required 
                                     placeholder="Enter restaurant name">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Email Address *</label>
+                                                                <small class="text-muted">Provide an email address for customer inquiries and notifications.</small>
                                 <input type="email" class="form-control" id="email" name="email" required
                                     placeholder="restaurant@example.com">
                             </div>
@@ -38,11 +55,13 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Phone Number *</label>
+                                                                <small class="text-muted">Enter a phone number customers can use to reach your restaurant.</small>
                                 <input type="tel" class="form-control" id="phone" name="phone" required
                                     placeholder="+234 XXX XXX XXXX">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="website" class="form-label">Website URL</label>
+                                                                <small class="text-muted">If you have a website, enter it here. This is optional.</small>
                                 <input type="url" class="form-control" id="website" name="website"
                                     placeholder="https://yourrestaurant.com">
                             </div>
@@ -50,6 +69,7 @@
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Short Description</label>
+                                                        <small class="text-muted">Write a brief tagline or description that highlights what makes your restaurant special.</small>
                             <textarea class="form-control" id="description" name="description" rows="2"
                                 placeholder="A brief tagline or description for your restaurant..."></textarea>
                             <small class="text-muted">This appears in restaurant listings and hero section.</small>
@@ -57,6 +77,7 @@
 
                         <div class="mb-3">
                             <label for="address" class="form-label">Full Address *</label>
+                                                        <small class="text-muted">Provide your full address so customers can find you and for map location.</small>
                             <textarea class="form-control" id="address" name="address" rows="2" required
                                 placeholder="Street address, City, State, Country"></textarea>
                             <small class="text-muted">This will be used for the map location.</small>
@@ -65,10 +86,12 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="opening_time" class="form-label">Opening Time *</label>
+                                                                <small class="text-muted">Set the time your restaurant opens each day.</small>
                                 <input type="time" class="form-control" id="opening_time" name="opening_time" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="closing_time" class="form-label">Closing Time *</label>
+                                                                <small class="text-muted">Set the time your restaurant closes each day.</small>
                                 <input type="time" class="form-control" id="closing_time" name="closing_time" required>
                             </div>
                         </div>
@@ -76,17 +99,23 @@
                         <!-- Images Section -->
                         <div class="section-header mb-4 mt-4">
                             <h5 class="text-primary"><i class="fas fa-images me-2"></i>Images</h5>
+                            <div class="alert alert-info mb-2">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Tip:</strong> Upload a logo and banner image to make your restaurant stand out. Good images attract more customers!
+                            </div>
                             <hr>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="logo" class="form-label">Restaurant Logo</label>
+                                                                <small class="text-muted">Upload a square logo (recommended: 200x200px). This appears in the header.</small>
                                 <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
                                 <small class="text-muted">Square image recommended (e.g., 200x200)</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="banner_image" class="form-label">Banner / Cover Image</label>
+                                                                <small class="text-muted">Upload a wide banner image (recommended: 1200x600px) for your restaurant's hero section.</small>
                                 <input type="file" class="form-control" id="banner_image" name="banner_image" accept="image/*">
                                 <small class="text-muted">Wide image for About section (e.g., 1200x600)</small>
                             </div>
@@ -95,18 +124,23 @@
                         <!-- About Section -->
                         <div class="section-header mb-4 mt-4">
                             <h5 class="text-primary"><i class="fas fa-book-open me-2"></i>About / Our Story</h5>
-                            <p class="text-muted mb-0">Tell your customers about your restaurant's story, values, and what makes you special.</p>
+                            <div class="alert alert-info mb-2">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Tip:</strong> Share your restaurant's story, values, and what makes you unique. This helps build a connection with your customers.
+                            </div>
                             <hr>
                         </div>
 
                         <div class="mb-3">
                             <label for="about_title" class="form-label">About Section Title</label>
+                                                        <small class="text-muted">Give a title to your About section, e.g., 'Our Story'.</small>
                             <input type="text" class="form-control" id="about_title" name="about_title" 
                                 value="Our Story" placeholder="Our Story">
                         </div>
 
                         <div class="mb-3">
                             <label for="about_content" class="form-label">About Content</label>
+                                                        <small class="text-muted">Write about your restaurant's history, mission, and what makes your food special.</small>
                             <textarea class="form-control" id="about_content" name="about_content" rows="5"
                                 placeholder="Share your restaurant's story, history, mission, and what makes your food special. This is your chance to connect with customers and tell them why they should dine with you.
 
@@ -117,24 +151,30 @@ Example: Founded in 2015, our restaurant brings authentic African flavors to eve
                         <!-- Chef Information -->
                         <div class="section-header mb-4 mt-4">
                             <h5 class="text-primary"><i class="fas fa-user-tie me-2"></i>Chef Information (Optional)</h5>
-                            <p class="text-muted mb-0">Add your head chef's profile to build trust with customers.</p>
+                            <div class="alert alert-info mb-2">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Tip:</strong> Add your head chef's profile to build trust and show expertise. This section is optional but can help customers connect with your brand.
+                            </div>
                             <hr>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="chef_name" class="form-label">Chef Name</label>
+                                                                <small class="text-muted">Enter the name of your head chef.</small>
                                 <input type="text" class="form-control" id="chef_name" name="chef_name"
                                     placeholder="Chef John Doe">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="chef_image" class="form-label">Chef Photo</label>
+                                                                <small class="text-muted">Upload a photo of your chef.</small>
                                 <input type="file" class="form-control" id="chef_image" name="chef_image" accept="image/*">
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="chef_bio" class="form-label">Chef Bio</label>
+                                                        <small class="text-muted">Describe your chef's experience and background.</small>
                             <textarea class="form-control" id="chef_bio" name="chef_bio" rows="3"
                                 placeholder="With over 15 years of culinary experience, Chef John trained at the prestigious Culinary Institute and has worked in top restaurants across West Africa..."></textarea>
                         </div>
@@ -142,22 +182,29 @@ Example: Founded in 2015, our restaurant brings authentic African flavors to eve
                         <!-- Social Media Section -->
                         <div class="section-header mb-4 mt-4">
                             <h5 class="text-primary"><i class="fas fa-share-alt me-2"></i>Social Media (Optional)</h5>
+                            <div class="alert alert-info mb-2">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Tip:</strong> Add links to your restaurant's social media pages so customers can follow and connect with you online.
+                            </div>
                             <hr>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="facebook" class="form-label"><i class="fab fa-facebook text-primary me-1"></i> Facebook</label>
+                                                                <small class="text-muted">Enter your Facebook page URL.</small>
                                 <input type="url" class="form-control" id="facebook" name="facebook"
                                     placeholder="https://facebook.com/yourpage">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="instagram" class="form-label"><i class="fab fa-instagram text-danger me-1"></i> Instagram</label>
+                                                                <small class="text-muted">Enter your Instagram profile URL.</small>
                                 <input type="url" class="form-control" id="instagram" name="instagram"
                                     placeholder="https://instagram.com/yourpage">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="twitter" class="form-label"><i class="fab fa-twitter text-info me-1"></i> Twitter</label>
+                                                                <small class="text-muted">Enter your Twitter profile URL.</small>
                                 <input type="url" class="form-control" id="twitter" name="twitter"
                                     placeholder="https://twitter.com/yourpage">
                             </div>
@@ -166,7 +213,10 @@ Example: Founded in 2015, our restaurant brings authentic African flavors to eve
                         <!-- Payment Methods Section -->
                         <div class="section-header mb-4 mt-4">
                             <h5 class="text-primary"><i class="fas fa-credit-card me-2"></i>Payment Methods</h5>
-                            <p class="text-muted mb-0">Select the payment methods your restaurant will accept. Customers will see these options.</p>
+                            <div class="alert alert-info mb-2">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Tip:</strong> Select all payment methods your restaurant accepts. More options make it easier for customers to pay.
+                            </div>
                             <hr>
                         </div>
 

@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-for-dev')
 # Default to False unless explicitly set
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 # Allow hosts to be set via comma-separated env var
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0,testserver').split(',') if h.strip()]
 
 # Application definition
 INSTALLED_APPS = [
@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.owner_notifications',  # Restaurant owner notifications
+                'orders.cart_context_processor.cart_context',  # Global cart context for badge
             ],
         },
     },

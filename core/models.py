@@ -273,3 +273,26 @@ class AuditLog(models.Model):
         if x_forwarded_for:
             return x_forwarded_for.split(',')[0].strip()
         return request.META.get('REMOTE_ADDR')
+
+
+# ============================================
+# ADMIN FEEDBACK SYSTEM
+# ============================================
+class AdminFeedback(models.Model):
+    """Direct feedback from customers or restaurant owners to admin"""
+    
+    SENDER_ROLES = [
+        ('customer', 'Customer'),
+        ('restaurant_owner', 'Restaurant Owner'),
+    ]
+    
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    sender_role = models.CharField(max_length=20, choices=SENDER_ROLES)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        who = self.sender.username if self.sender else 'Anonymous'
+        return f"Feedback from {who} ({self.sender_role})"

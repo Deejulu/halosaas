@@ -605,9 +605,30 @@
 {% endblock %}
 
 {% block content %}
+    {% if request.session.show_loader_after_login %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof showSiteLoader === 'function') {
+            showSiteLoader();
+            setTimeout(hideSiteLoader, 2000);
+        }
+        fetch(window.location.pathname + '?clear_loader=1', { credentials: 'same-origin' });
+    });
+    </script>
+    {% endif %}
     
+    <script>
+    // Show loader for 2 seconds on dashboard load
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.performance && window.performance.navigation && window.performance.navigation.type === 1) return; // skip on reload
+        if (typeof showSiteLoader === 'function') {
+            showSiteLoader();
+            setTimeout(hideSiteLoader, 2000);
+        }
+    });
+    </script>
     <div class="restaurant-dashboard">
-        <!-- Header Section -->
+        <!-- Header Section (single instance) -->
         <div class="dashboard-header">
             <div class="container">
                 <div class="welcome-content">
@@ -616,10 +637,21 @@
                             <h1 class="mb-0" style="display: inline-flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-store me-2"></i>Restaurant Dashboard
                             </h1>
+                                <div class="d-flex flex-wrap align-items-center mt-4" style="gap: 0.75rem 1rem;">
+                                    <a href="{% url 'owner_instructions' %}" class="btn btn-warning btn-lg me-2 mb-2 mt-2">
+                                        <i class="fas fa-info-circle me-2"></i>Owner Instructions
+                                    </a>
+                                    <a href="{% url 'tutorial' %}" class="btn btn-success btn-lg mb-2 mt-2">
+                                        <i class="fas fa-graduation-cap me-2"></i>Website Tutorial
+                                    </a>
+                                    <a href="{% url 'submit_admin_feedback' %}" class="btn btn-outline-primary btn-lg mb-2 mt-2">
+                                        <i class="fas fa-comment-dots me-2"></i>Send Feedback to Admin
+                                    </a>
+                                </div>
                         </div>
                         <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                            <a href="{% url 'manage_restaurant' %}" class="btn btn-light btn-lg px-4">
-                                <i class="fas fa-plus me-2"></i>Add Restaurant
+                            <a href="{% url 'manage_restaurant' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-1"></i> Add Restaurant
                             </a>
                         </div>
                     </div>
@@ -627,27 +659,6 @@
                 </div>
             </div>
         </div>
-    <!-- ...existing code... -->
-    <!-- Header Section -->
-    <div class="dashboard-header">
-        <div class="container">
-            <div class="welcome-content">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <h1>
-                            <i class="fas fa-store me-3"></i>Restaurant Dashboard
-                        </h1>
-                        <p class="mb-0">Manage your restaurants, orders, and grow your business</p>
-                    </div>
-                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                        <a href="{% url 'manage_restaurant' %}" class="btn btn-light btn-lg px-4">
-                            <i class="fas fa-plus me-2"></i>Add Restaurant
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <div class="container">
         <!-- Stats Cards -->
@@ -895,9 +906,7 @@
                             </div>
                             <h3>No Restaurants Yet</h3>
                             <p>Start your journey by adding your first restaurant. Manage orders, create menus, and grow your business.</p>
-                            <a href="{% url 'manage_restaurant' %}" class="btn btn-primary btn-lg rounded-pill px-5">
-                                <i class="fas fa-plus me-2"></i>Add Your First Restaurant
-                            </a>
+                            <p class="mb-0">Use the "Add Restaurant" option in the Quick Actions or the navigation menu to create your first restaurant.</p>
                         </div>
                         {% endif %}
                     </div>

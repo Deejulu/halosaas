@@ -1,3 +1,13 @@
+def owner_instructions(request):
+    """Instructions page for restaurant owners."""
+    return render(request, 'instructions/owner_instructions.html')
+
+def tutorial(request):
+    """Comprehensive tutorial page for all users."""
+    return render(request, 'instructions/tutorial.html')
+def restaurant_help(request):
+    """Help page with step-by-step instructions for restaurant owners."""
+    return render(request, 'core/restaurant_help.html')
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -89,6 +99,10 @@ def dashboard(request):
     user = request.user
     print(f"🎯 DASHBOARD ROUTING: {user.username} → {user.role}")
     
+    # Clear loader session flag if requested
+    if request.method == 'GET' and request.GET.get('clear_loader') == '1':
+        if 'show_loader_after_login' in request.session:
+            del request.session['show_loader_after_login']
     # Clear welcome overlay session flag if requested
     if user.role == 'customer':
         if request.method == 'GET' and request.GET.get('clear_welcome') == '1':
@@ -1721,3 +1735,36 @@ def validate_promo_code(request):
         'code': promo.code,
         'new_total': order_total - float(discount),
     })
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import AdminFeedbackForm
+from .models import AdminFeedback
+
+@login_required
+def submit_admin_feedback(request):
+    if request.user.role not in ['customer', 'restaurant_owner']:
+        messages.error(request, 'Only customers and restaurant owners can send feedback to admin.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = AdminFeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.sender = request.user
+            feedback.sender_role = request.user.role
+            feedback.save()
+            messages.success(request, 'Your feedback has been sent to the admin.')
+            return redirect('dashboard')
+    else:
+        form = AdminFeedbackForm()
+    return render(request, 'core/submit_admin_feedback.html', {'form': form})
+
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import AdminFeedback
+
+@staff_member_required
+def admin_feedback_list(request):
+    feedbacks = AdminFeedback.objects.all().order_by('-created_at')
+    return render(request, 'core/admin_feedback_list.html', {'feedbacks': feedbacks})

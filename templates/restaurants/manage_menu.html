@@ -78,22 +78,19 @@
                                 <small class="text-muted">{{ category.menuitem_set.count }} items</small>
                             </div>
                             <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                    data-bs-target="#addItemModal" data-category-id="{{ category.id }}"
-                                    data-category-name="{{ category.name }}">
-                                    <i class="fas fa-plus"></i>
+                                <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addItemModal" data-category-id="{{ category.id }}" data-category-name="{{ category.name }}" title="Add Item">
+                                    <i class="fas fa-plus"></i> Add
                                 </button>
-                                <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
-                                    data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}"
-                                    data-category-name="{{ category.name }}"
-                                    data-category-description="{{ category.description }}">
-                                    <i class="fas fa-edit"></i>
+                                <button class="btn btn-sm btn-warning me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-category-id="{{ category.id }}" data-category-name="{{ category.name }}"
+                                    data-category-description="{{ category.description }}" title="Edit Category">
+                                    <i class="fas fa-edit"></i> Edit
                                 </button>
                                 <form method="post" action="{% url 'delete_category' category.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Delete {{ category.name }} and all its items?')">
-                                        <i class="fas fa-trash"></i>
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Delete {{ category.name }} and all its items?')"
+                                        title="Delete Category">
+                                        <i class="fas fa-trash"></i> Delete
                                     </button>
                                 </form>
                             </div>
@@ -165,38 +162,37 @@
                                         <small class="text-muted d-block mt-1">Low stock alert at: {{ item.low_stock_threshold }} portions</small>
                                     </div>
                                     {% endif %}
-                                </div>
-                            </div>
-                        </div>
-{% else %}
-<div class="mt-2">
-<small class="text-muted"><i class="fas fa-info-circle me-1"></i>Stock tracking OFF - using manual availability</small>
-</div>
-{% endif %}
-{% if not item.is_available and item.disabled_reason %}
-<div class="mt-2 p-2 rounded bg-danger bg-opacity-10 border border-danger">
-<small class="text-danger fw-bold"><i class="fas fa-ban me-1"></i>Disabled: {{ item.get_disabled_reason_display }}</small>
-{% if item.disabled_reason_note %}
-<small class="d-block text-muted">{{ item.disabled_reason_note }}</small>
-{% endif %}
-{% if item.disabled_at %}
-<small class="d-block text-muted">Since: {{ item.disabled_at|date:"M d, Y H:i" }}</small>
-{% endif %}
-</div>
-{% endif %}
+                                    {% if not item.is_available and item.disabled_reason %}
+                                    <div class="mt-2 p-2 rounded bg-danger bg-opacity-10 border border-danger">
+                                        <small class="text-danger fw-bold"><i class="fas fa-ban me-1"></i>Disabled: {{ item.get_disabled_reason_display }}</small>
+                                        {% if item.disabled_reason_note %}
+                                        <small class="d-block text-muted">{{ item.disabled_reason_note }}</small>
+                                        {% endif %}
+                                        {% if item.disabled_at %}
+                                        <small class="d-block text-muted">Since: {{ item.disabled_at|date:"M d, Y H:i" }}</small>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <div class="btn-group w-100">
-<button type="button" class="btn btn-sm {% if item.is_available %}btn-warning{% else %}btn-success{% endif %} toggle-availability-btn" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-is-available="{{ item.is_available }}" data-track-stock="{{ item.track_stock }}" data-bs-toggle="modal" data-bs-target="#toggleAvailabilityModal"><i class="fas fa-power-off me-1"></i>{% if item.is_available %}Disable{% else %}Enable{% endif %}</button>
-<button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-item-description="{{ item.description }}" data-item-price="{{ item.price }}" data-item-prep-time="{{ item.preparation_time }}" data-item-category="{{ category.id }}" data-item-track-stock="{{ item.track_stock }}" data-item-stock="{{ item.stock_quantity }}" data-item-low-stock="{{ item.low_stock_threshold }}"><i class="fas fa-edit me-1"></i>Edit</button>
+                                        <button type="button" class="btn btn-sm {% if item.is_available %}btn-warning{% else %}btn-success{% endif %} toggle-availability-btn me-2" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-is-available="{{ item.is_available }}" data-track-stock="{{ item.track_stock }}" data-bs-toggle="modal" data-bs-target="#toggleAvailabilityModal" title="Toggle Availability">
+                                            <i class="fas fa-power-off me-1"></i>{% if item.is_available %}Disable{% else %}Enable{% endif %}
+                                        </button>
+                                        <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editItemModal" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-item-description="{{ item.description }}" data-item-price="{{ item.price }}" data-item-prep-time="{{ item.preparation_time }}" data-item-category="{{ category.id }}" data-item-track-stock="{{ item.track_stock }}" data-item-stock="{{ item.stock_quantity }}" data-item-low-stock="{{ item.low_stock_threshold }}" title="Edit Item">
+                                            <i class="fas fa-edit me-1"></i>Edit
+                                        </button>
                                         <form method="post" action="{% url 'delete_menu_item' item.id %}" class="d-inline">
                                             {% csrf_token %}
-<button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete {{ item.name }}?')"><i class="fas fa-trash me-1"></i></button>
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete {{ item.name }}?')" title="Delete Item">
+                                                <i class="fas fa-trash me-1"></i> Delete
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {% endfor %}
                         {% empty %}
                         <div class="col-12">
                             <div class="text-center py-4">
@@ -207,7 +203,6 @@
                                 </button>
                             </div>
                         </div>
-                        {% endfor %}
                         {% endfor %}
                     </div>
                     {% else %}

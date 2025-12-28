@@ -1,0 +1,304 @@
+html,
+body {
+    font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    color: #222;
+    background: #f7f8fa;
+}
+
+@media (prefers-color-scheme: dark) {
+
+    html,
+    body {
+        background: #181a1b;
+        color: #f1f3f6;
+    }
+
+    .card,
+    .list-group-item,
+    .order-timestamp,
+    .d-flex.justify-content-between.mt-3.pt-2.border-top {
+        background: #23272b !important;
+        color: #f1f3f6 !important;
+        border-color: #343a40 !important;
+    }
+
+    .card-header {
+        background: linear-gradient(90deg, #23272b 60%, #1a1d1f 100%) !important;
+        color: #f1f3f6 !important;
+    }
+
+    .badge.bg-primary {
+        background: linear-gradient(90deg, #339cff 60%, #00e6ff 100%) !important;
+        color: #181a1b !important;
+    }
+
+    .btn-outline-primary,
+    .btn-outline-danger {
+        color: #f1f3f6;
+        border-color: #339cff;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus {
+        background: #339cff;
+        color: #181a1b;
+        border-color: #339cff;
+    }
+
+    .btn-outline-danger:hover,
+    .btn-outline-danger:focus {
+        background: #ff4d6d;
+        color: #181a1b;
+        border-color: #ff4d6d;
+    }
+
+    .btn-success.btn-lg {
+        background: linear-gradient(90deg, #00e676 60%, #28a745 100%) !important;
+        color: #181a1b !important;
+    }
+
+    .form-control.text-center {
+        background: #23272b;
+        color: #f1f3f6;
+        border: 1.5px solid #339cff;
+    }
+
+    .form-control.text-center:focus {
+        background: #181a1b;
+        color: #fff;
+        border: 1.5px solid #00e6ff;
+    }
+
+    .text-primary {
+        color: #339cff !important;
+    }
+
+    .text-success,
+    .h4.text-success {
+        color: #00e676 !important;
+    }
+
+    .empty-cart-icon {
+        opacity: 0.7;
+    }
+}
+
+/* Light mode overrides for clarity */
+.card,
+.list-group-item,
+.order-timestamp,
+.d-flex.justify-content-between.mt-3.pt-2.border-top {
+    background: #fff;
+    color: #222;
+}
+
+.card-header {
+    color: #222;
+}
+
+.badge.bg-primary {
+    color: #fff;
+}
+
+.form-control.text-center {
+    color: #222;
+    background: #f7f8fa;
+}
+
+.form-control.text-center:focus {
+    color: #222;
+    background: #fff;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-success,
+.h4.text-success {
+    color: #28a745 !important;
+}
+
+body {
+    background: #f7f8fa;
+}
+
+.empty-cart-icon {
+    opacity: 0.5;
+}
+
+.card {
+    border: none;
+    border-radius: 1.1rem;
+    box-shadow: 0 4px 24px 0 rgba(60, 72, 88, 0.08);
+    margin-bottom: 2rem;
+    background: #fff;
+    transition: box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 32px 0 rgba(60, 72, 88, 0.16);
+}
+
+.card-header {
+    border-bottom: 1px solid #e9ecef;
+    background: linear-gradient(90deg, #f8fafc 60%, #e9f5ff 100%);
+    border-radius: 1.1rem 1.1rem 0 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.01em;
+    padding: 1.1rem 1.5rem;
+}
+
+.card-header[aria-expanded="true"] {
+    background: linear-gradient(90deg, #e9f5ff 60%, #f8fafc 100%);
+}
+
+.dropdown-arrow {
+    transition: transform 0.2s;
+}
+
+.card-header[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.badge.bg-primary {
+    background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+    font-size: 1rem;
+    padding: 0.5em 1em;
+    border-radius: 1em;
+    box-shadow: 0 2px 8px 0 rgba(0, 123, 255, 0.08);
+}
+
+.btn-outline-primary,
+.btn-outline-danger {
+    border-radius: 2em;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus {
+    background: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+}
+
+.btn-success.btn-lg {
+    background: linear-gradient(90deg, #28a745 60%, #00e676 100%);
+    border: none;
+    font-size: 1.15rem;
+    font-weight: 600;
+    border-radius: 2em;
+    box-shadow: 0 2px 8px 0 rgba(40, 167, 69, 0.08);
+    padding: 0.9rem 2.2rem;
+    transition: background 0.2s;
+}
+
+.btn-success.btn-lg:hover,
+.btn-success.btn-lg:focus {
+    background: linear-gradient(90deg, #00e676 60%, #28a745 100%);
+}
+
+.sticky-top {
+    position: sticky;
+    z-index: 1020;
+    top: 100px;
+}
+
+.order-timestamp {
+    background: #f1f3f6;
+    border-radius: 0.7em;
+    padding: 0.7em 1em;
+    margin-bottom: 1.2em;
+    font-size: 0.97em;
+}
+
+.row.align-items-center.mb-3.pb-3.border-bottom {
+    background: #f8fafc;
+    border-radius: 0.7em;
+    margin-bottom: 1.2em;
+    padding: 1em 0.7em;
+    border-bottom: 1px solid #e9ecef !important;
+    box-shadow: 0 1px 4px 0 rgba(60, 72, 88, 0.04);
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.h4.text-success {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.h5 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.form-control.text-center {
+    border-radius: 1.5em;
+    font-size: 1.1em;
+    font-weight: 500;
+    background: #f7f8fa;
+    border: 1px solid #e9ecef;
+    box-shadow: none;
+    transition: border 0.2s;
+}
+
+.form-control.text-center:focus {
+    border: 1.5px solid #007bff;
+    background: #fff;
+}
+
+.input-group-sm>.form-control,
+.input-group-sm>.input-group-text,
+.input-group-sm>.btn {
+    font-size: 1em;
+    border-radius: 1.5em;
+}
+
+.d-flex.justify-content-between.mt-3.pt-2.border-top {
+    background: #f1f3f6;
+    border-radius: 0.7em;
+    padding: 0.7em 1em;
+    margin-top: 1.2em;
+    font-size: 1.08em;
+}
+
+.d-flex.justify-content-between.mb-4 {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.d-grid.gap-2 {
+    margin-top: 1.5em;
+}
+
+.list-group-item {
+    border-radius: 0.7em;
+    margin-bottom: 0.7em;
+    background: #f8fafc;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 4px 0 rgba(60, 72, 88, 0.04);
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 2em;
+}

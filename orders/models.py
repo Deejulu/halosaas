@@ -5,6 +5,14 @@ from restaurants.models import Restaurant, MenuItem
 User = get_user_model()
 
 class Order(models.Model):
+    DELIVERY_METHOD_CHOICES = (
+        ('pickup', 'Pick Up'),
+        ('delivery', 'Delivery'),
+        ('', 'Not Specified'),
+    )
+
+    delivery_method = models.CharField(max_length=20, choices=DELIVERY_METHOD_CHOICES, default='', blank=True)
+    delivery_info = models.JSONField(blank=True, null=True, help_text='Extra info for delivery orders (name, phone, email, WhatsApp)')
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('awaiting_confirmation', 'Awaiting Payment Confirmation'),

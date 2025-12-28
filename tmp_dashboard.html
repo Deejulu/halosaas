@@ -1,11 +1,13 @@
+﻿
+
 <!DOCTYPE html>
-{% load static %}
+
 <html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Restaurant SaaS - Online Ordering System{% endblock %}</title>
+    <title>Login / Register - Restaurant SaaS</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,7 +16,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    {% block extra_css %}{% endblock %}
     <style>
         /* ========== CSS VARIABLES FOR THEMING ========== */
         :root {
@@ -316,47 +317,12 @@
         
         /* User dropdown styling */
         .navbar .dropdown-menu {
-            background: #fff;
+            background: var(--dropdown-bg);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: 0 10px 40px var(--shadow-heavy);
             padding: 0.5rem;
             margin-top: 10px;
-            color: #222;
-        }
-        .navbar .dropdown-menu, .navbar .dropdown-menu * {
-            color: #222 !important;
-        }
-        [data-theme="dark"] .navbar .dropdown-menu {
-            background: #23242a;
-            color: #f1f1f1;
-        }
-        [data-theme="dark"] .navbar .dropdown-menu, [data-theme="dark"] .navbar .dropdown-menu * {
-            color: #f1f1f1 !important;
-        }
-        .navbar .dropdown-item {
-            background: transparent;
-            color: #222 !important;
-        }
-        [data-theme="dark"] .navbar .dropdown-item {
-            color: #f1f1f1 !important;
-        }
-        .navbar .dropdown-item:hover {
-            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
-            color: #fff !important;
-        }
-        .navbar .dropdown-header, .navbar .dropdown-header * {
-            color: #e94560 !important;
-            font-weight: 700;
-        }
-        .navbar .badge.bg-primary {
-            background: #e94560 !important;
-            color: #fff !important;
-        }
-        [data-theme="dark"] .navbar .badge.bg-primary {
-            background: #ff6b6b !important;
-            color: #23242a !important;
-        }
         }
         
         .navbar .dropdown-menu::before {
@@ -1331,115 +1297,18 @@
         }
     </style>
 
-
+    
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-        <!-- Site Loader Overlay -->
-        <div id="site-loader-overlay" style="position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg,#232526 0%,#414345 100%);display:none;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.3s;">
-                <div style="display:flex;flex-direction:column;align-items:center;">
-                        <div style="font-size:1.5rem;color:#ffe066;font-family:'Segoe UI',sans-serif;font-weight:700;margin-bottom:10px;letter-spacing:1px;text-shadow:0 2px 8px #232526;">Welcome</div>
-                        <div style="margin-bottom:18px;">
-                                <!-- Animated Angel Eating SVG Icon -->
-                                <svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-                                    <!-- Halo -->
-                                    <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5"/>
-                                    <ellipse cx="55" cy="28" rx="22" ry="6" fill="none" stroke="#fffbe6" stroke-width="2"/>
-                                    <!-- Angel head -->
-                                    <circle cx="55" cy="45" r="13" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                    <!-- Angel body -->
-                                    <ellipse cx="55" cy="70" rx="18" ry="22" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                    <!-- Angel wings -->
-                                    <path d="M30 65 Q10 85 40 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                                    <path d="M80 65 Q100 85 70 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                                    <!-- Plate -->
-                                    <ellipse cx="55" cy="95" rx="20" ry="7" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                    <!-- Fork (left hand) -->
-                                    <rect x="38" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(-20 38 80)"/>
-                                    <rect x="37" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 37 80)"/>
-                                    <rect x="39" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 39 80)"/>
-                                    <rect x="41" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 41 80)"/>
-                                    <!-- Spoon (right hand) -->
-                                    <rect x="69" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(20 69 80)"/>
-                                    <ellipse cx="70.5" cy="82.5" rx="2.5" ry="4" fill="#ffe066"/>
-                                    <!-- Burger on plate -->
-                                    <ellipse cx="55" cy="95" rx="8" ry="3" fill="#f9d923"/>
-                                    <ellipse cx="55" cy="93" rx="8" ry="3" fill="#ffe066"/>
-                                    <ellipse cx="55" cy="95" rx="6" ry="1.5" fill="#b68973"/>
-                                    <!-- Angel mouth (animated eating) -->
-                                    <path id="angel-mouth" d="M51 52 Q55 56 59 52" stroke="#b68973" stroke-width="2" fill="none">
-                                        <animate attributeName="d" values="M51 52 Q55 56 59 52;M51 54 Q55 58 59 54;M51 52 Q55 56 59 52" dur="1.2s" repeatCount="indefinite"/>
-                                    </path>
-                                    <!-- Animated halo glow -->
-                                    <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5">
-                                        <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                                    </ellipse>
-                                </svg>
-                        </div>
-                        <div style="font-size:2.3rem;font-weight:900;color:#ffe066;letter-spacing:2px;font-family:'Segoe UI',sans-serif;text-shadow:0 2px 12px #232526;">HaloSaaS Restaurants</div>
-                        <div style="font-size:1.2rem;color:#fffbe6;margin-top:12px;font-family:'Segoe UI',sans-serif;">Loading your dashboard...</div>
-                </div>
-        </div>
-        <script>
-        // Loader control functions
-        function showSiteLoader() {
-            var overlay = document.getElementById('site-loader-overlay');
-            if (overlay) {
-                overlay.style.display = 'flex';
-                overlay.style.opacity = '1';
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        function hideSiteLoader() {
-            var overlay = document.getElementById('site-loader-overlay');
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(function() {
-                    overlay.style.display = 'none';
-                    document.body.style.overflow = '';
-                }, 300);
-            }
-        }
-
-        // Show loader for 2 seconds if window.showLoaderAfterLogin is set (set by dashboard templates after login)
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.showLoaderAfterLogin) {
-                showSiteLoader();
-                setTimeout(hideSiteLoader, 2000);
-            }
-        });
-        </script>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <!-- Brand -->
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <div class="brand-logo-icon" style="background:none;box-shadow:none;border:none;width:54px;height:54px;padding:0;">
-                    <!-- Animated Angel Eating SVG Icon (Logo) -->
-                    <svg width="48" height="48" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-                        <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5"/>
-                        <ellipse cx="55" cy="28" rx="22" ry="6" fill="none" stroke="#fffbe6" stroke-width="2"/>
-                        <circle cx="55" cy="45" r="13" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                        <ellipse cx="55" cy="70" rx="18" ry="22" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                        <path d="M30 65 Q10 85 40 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                        <path d="M80 65 Q100 85 70 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                        <ellipse cx="55" cy="95" rx="20" ry="7" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                        <rect x="38" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(-20 38 80)"/>
-                        <rect x="37" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 37 80)"/>
-                        <rect x="39" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 39 80)"/>
-                        <rect x="41" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 41 80)"/>
-                        <rect x="69" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(20 69 80)"/>
-                        <ellipse cx="70.5" cy="82.5" rx="2.5" ry="4" fill="#ffe066"/>
-                        <ellipse cx="55" cy="95" rx="8" ry="3" fill="#f9d923"/>
-                        <ellipse cx="55" cy="93" rx="8" ry="3" fill="#ffe066"/>
-                        <ellipse cx="55" cy="95" rx="6" ry="1.5" fill="#b68973"/>
-                        <path id="angel-mouth-logo" d="M51 52 Q55 56 59 52" stroke="#b68973" stroke-width="2" fill="none">
-                            <animate attributeName="d" values="M51 52 Q55 56 59 52;M51 54 Q55 58 59 54;M51 52 Q55 56 59 52" dur="1.2s" repeatCount="indefinite"/>
-                        </path>
-                        <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5">
-                            <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                        </ellipse>
-                    </svg>
+            <a class="navbar-brand" href="/">
+                <div class="brand-logo-icon">
+                    <i class="fas fa-utensils icon-fork"></i>
+                    <i class="fas fa-utensils icon-knife"></i>
                 </div>
                 <div class="brand-text">
                     <span class="brand-name">HaloSaaS</span>
@@ -1457,57 +1326,12 @@
                 <!-- Left Navigation -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">
+                        <a class="nav-link" href="/">
                             <i class="fas fa-home me-1"></i>Main
                         </a>
                     </li>
 
-                    {% if user.is_authenticated %}
-                    <!-- Dashboard Link - Different for each role -->
-                    {% if user.role != 'restaurant_owner' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dash
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <!-- Restaurant Owner Links -->
-                    {% if user.role == 'restaurant_owner' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'restaurant_dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dash
-                        </a>
-                    </li>
-                    <!-- Navbar link to manage restaurants removed for restaurant owners
-                         to avoid duplicate 'Add Restaurant' CTAs on the dashboard. -->
-                    {% endif %}
-
-                    <!-- Customer Links -->
-                    {% if user.role == 'customer' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'browse_restaurants' %}">
-                            <i class="fas fa-search me-1"></i>Browse
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <!-- Orders Link for All Authenticated Users -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'order_history' %}">
-                            <i class="fas fa-receipt me-1"></i>Orders
-                        </a>
-                    </li>
-
-                    <!-- Admin Link -->
-                    {% if user.role == 'admin' or user.is_staff %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/">
-                            <i class="fas fa-cog me-1"></i>Admin
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% else %}
+                    
                     <!-- Public Links -->
                     <li class="nav-item">
                         <a class="nav-link" href="#features">
@@ -1519,7 +1343,7 @@
                             <i class="fas fa-tag me-1"></i>Pricing
                         </a>
                     </li>
-                    {% endif %}
+                    
                 </ul>
 
                 <!-- Right Navigation -->
@@ -1533,390 +1357,19 @@
                         </button>
                     </li>
                     
-                    {% if user.is_authenticated %}
                     
-                    <!-- NOTIFICATION BELL - Admin -->
-                    {% if user.role == 'admin' %}
-                    <li class="nav-item dropdown me-2">
-                        <a class="nav-link position-relative notification-bell {% if admin_total_notifications > 0 %}has-notifications{% endif %}" href="#" id="adminNotificationBell" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell fa-lg"></i>
-                            {% if admin_total_notifications > 0 %}
-                            <span class="notification-dot"></span>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count">
-                                {{ admin_total_notifications }}
-                            </span>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg" style="min-width: 350px; border-radius: 12px;">
-                            <li class="notification-header">
-                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                                    <span class="fw-bold"><i class="fas fa-bell me-2"></i>Platform Activity</span>
-                                    {% if admin_total_notifications > 0 %}
-                                    <span class="badge bg-danger rounded-pill">{{ admin_total_notifications }} alerts</span>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            {% if admin_total_notifications > 0 %}
-                            <!-- All Pending Orders -->
-                            {% if admin_total_pending_orders > 0 %}
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'admin_dashboard' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-warning">
-                                            <i class="fas fa-clock text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ admin_total_pending_orders }} Pending Order{{ admin_total_pending_orders|pluralize }}</div>
-                                            <small class="text-muted">Across all restaurants</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            <!-- Active Carts Platform-wide -->
-                            {% if admin_total_active_carts > 0 %}
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'admin_dashboard' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-info">
-                                            <i class="fas fa-shopping-cart text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ admin_total_active_carts }} Active Cart{{ admin_total_active_carts|pluralize }}</div>
-                                            <small class="text-muted">Potential orders incoming</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            {% else %}
-                            <li>
-                                <div class="text-center py-4">
-                                    <div class="notification-icon bg-light mx-auto mb-2" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-check-circle text-success" style="font-size: 1.2rem;"></i>
-                                    </div>
-                                    <p class="text-muted mb-0">All systems running smoothly</p>
-                                    <small class="text-muted">No urgent alerts 👍</small>
-                                </div>
-                            </li>
-                            {% endif %}
-                            <!-- Today's Stats -->
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <li class="px-3 py-2 bg-light">
-                                <div class="d-flex justify-content-around text-center">
-                                    <div>
-                                        <div class="fw-bold text-primary">{{ admin_today_orders }}</div>
-                                        <small class="text-muted">Today's Orders</small>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-success">{{ admin_new_restaurants }}</div>
-                                        <small class="text-muted">New This Week</small>
-                                    </div>
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <li>
-                                <a class="dropdown-item text-center py-2 fw-bold text-primary" href="{% url 'notifications_dashboard' %}">
-                                    View All Notifications <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    {% endif %}
-                    
-                    <!-- NOTIFICATION BELL - Restaurant Owner -->
-                    {% if user.role == 'restaurant_owner' %}
-                    <li class="nav-item dropdown me-2">
-                        <a class="nav-link position-relative notification-bell {% if owner_total_notifications > 0 %}has-notifications{% endif %}" href="#" id="notificationBell" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell fa-lg"></i>
-                            {% if owner_total_notifications > 0 %}
-                            <span class="notification-dot"></span>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count">
-                                {{ owner_total_notifications }}
-                            </span>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg" style="min-width: 320px; border-radius: 12px;">
-                            <li class="notification-header">
-                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                                    <span class="fw-bold"><i class="fas fa-bell me-2"></i>Notifications</span>
-                                    {% if owner_total_notifications > 0 %}
-                                    <span class="badge bg-danger rounded-pill">{{ owner_total_notifications }} new</span>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            {% if owner_total_notifications > 0 %}
-                            <!-- Pending Orders Alert -->
-                            {% if owner_pending_orders > 0 %}
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'restaurant_dashboard' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-warning">
-                                            <i class="fas fa-exclamation-circle text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ owner_pending_orders }} Pending Order{{ owner_pending_orders|pluralize }}</div>
-                                            <small class="text-muted">Needs immediate attention!</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            <!-- Active Carts -->
-                            {% if owner_active_carts > 0 %}
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'restaurant_dashboard' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-info">
-                                            <i class="fas fa-shopping-cart text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ owner_active_carts }} Active Cart{{ owner_active_carts|pluralize }}</div>
-                                            <small class="text-muted">Customers ready to order</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            <!-- Today's Orders Summary -->
-                            {% if owner_today_orders > 0 %}
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'restaurant_dashboard' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-success">
-                                            <i class="fas fa-check text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ owner_today_orders }} Order{{ owner_today_orders|pluralize }} Today</div>
-                                            <small class="text-muted">Great job!</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            {% else %}
-                            <li>
-                                <div class="text-center py-4">
-                                    <div class="notification-icon bg-light mx-auto mb-2" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-bell-slash text-muted" style="font-size: 1.2rem;"></i>
-                                    </div>
-                                    <p class="text-muted mb-0">No new notifications</p>
-                                    <small class="text-muted">You're all caught up! 🎉</small>
-                                </div>
-                            </li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <li>
-                                <a class="dropdown-item text-center py-2 fw-bold text-primary" href="{% url 'notifications_dashboard' %}">
-                                    View All Notifications <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    {% endif %}
-                    
-                    <!-- NOTIFICATION BELL - Customer -->
-                    {% if user.role == 'customer' %}
-                    <li class="nav-item dropdown me-2">
-                        <a class="nav-link position-relative notification-bell {% if customer_total_notifications > 0 %}has-notifications{% endif %}" href="#" id="customerNotificationBell" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell fa-lg"></i>
-                            {% if customer_total_notifications > 0 %}
-                            <span class="notification-dot"></span>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-count">
-                                {{ customer_total_notifications }}
-                            </span>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow-lg" style="min-width: 320px; border-radius: 12px;">
-                            <li class="notification-header">
-                                <div class="d-flex justify-content-between align-items-center px-3 py-2">
-                                    <span class="fw-bold"><i class="fas fa-bell me-2"></i>My Orders</span>
-                                    {% if customer_total_notifications > 0 %}
-                                    <span class="badge bg-danger rounded-pill">{{ customer_total_notifications }} active</span>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            {% if customer_active_orders > 0 %}
-                            <!-- Active Orders -->
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'order_history' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-primary">
-                                            <i class="fas fa-utensils text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ customer_active_orders }} Active Order{{ customer_active_orders|pluralize }}</div>
-                                            <small class="text-muted">Being prepared for you</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% else %}
-                            <li>
-                                <div class="text-center py-4">
-                                    <div class="notification-icon bg-light mx-auto mb-2" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-receipt text-muted" style="font-size: 1.2rem;"></i>
-                                    </div>
-                                    <p class="text-muted mb-0">No active orders</p>
-                                    <small class="text-muted">Time to order something delicious! 🍔</small>
-                                </div>
-                            </li>
-                            {% endif %}
-                            <!-- Cart Summary -->
-                            {% if customer_cart_items > 0 %}
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <li>
-                                <a class="dropdown-item notification-item py-3" href="{% url 'cart' %}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="notification-icon bg-success">
-                                            <i class="fas fa-shopping-cart text-white"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-bold text-dark">{{ customer_cart_items }} Item{{ customer_cart_items|pluralize }} in Cart</div>
-                                            <small class="text-muted">Ready to checkout</small>
-                                        </div>
-                                        <i class="fas fa-chevron-right text-muted"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <li>
-                                <a class="dropdown-item text-center py-2 fw-bold text-primary" href="{% url 'notifications_dashboard' %}">
-                                    View All Notifications <i class="fas fa-arrow-right ms-1"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <!-- Cart Icon for Customers -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link position-relative" href="#" id="floatingCartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-shopping-cart me-1"></i>Cart
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge" id="floatingCartTotal">{{ cart_total_items }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="floatingCartDropdown" style="min-width: 320px;">
-                            <li class="px-3 pt-3 pb-2">
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="bg-gradient rounded-circle d-flex align-items-center justify-content-center me-2" style="width:36px;height:36px;background:linear-gradient(135deg,#e94560 0%,#ff6b6b 100%);color:#fff;"><i class="fas fa-shopping-cart"></i></span>
-                                    <span class="fw-bold fs-6">Your Cart by Restaurant</span>
-                                </div>
-                            </li>
-                            <li>
-                                <ul id="floatingCartList" class="list-unstyled mb-0 px-2" style="max-height:260px;overflow-y:auto;">
-                                    <li class="dropdown-item text-muted">Loading...</li>
-                                </ul>
-                            </li>
-                            <li><hr class="dropdown-divider my-2"></li>
-                            <li class="px-3 pb-2">
-                                <a class="btn btn-gradient-primary w-100 fw-bold d-flex align-items-center justify-content-center" href="{% url 'cart' %}" style="border-radius: 8px;">
-                                    <span>View Active Cart</span> <i class="fas fa-arrow-right ms-2"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                        <script>
-                        // Fetch total cart items and per-restaurant breakdown for floating cart
-                        function updateFloatingCart() {
-                            fetch('/orders/cart/ajax/summary/')
-                                .then(response => response.json())
-                                .then(data => {
-                                    document.getElementById('floatingCartTotal').textContent = data.total_items;
-                                    const list = document.getElementById('floatingCartList');
-                                    list.innerHTML = '';
-                                    if (data.restaurants.length === 0) {
-                                        list.innerHTML = '<li class="dropdown-item text-muted">Your cart is empty.</li>';
-                                    } else {
-                                        data.restaurants.forEach(r => {
-                                            list.innerHTML += `
-                                                <li class="dropdown-item d-flex justify-content-between align-items-center mb-1 px-2 py-2" style="border-radius:8px;transition:background 0.2s;">
-                                                    <a href="/restaurants/${r.slug}/" class="fw-bold text-decoration-none text-dark" style="flex:1;">${r.name}</a>
-                                                    <span class="badge bg-primary ms-2" style="font-size:0.95em;">${r.count}</span>
-                                                </li>
-                                            `;
-                                        });
-                                    }
-                                });
-                        }
-                        document.addEventListener('DOMContentLoaded', updateFloatingCart);
-                        document.getElementById('floatingCartDropdown').addEventListener('show.bs.dropdown', updateFloatingCart);
-                        </script>
-                    {% endif %}
-
-                    <!-- User Menu -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                            data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i>
-                            {{ user.username }}
-                            <small class="badge bg-light text-dark ms-1">{{ user.get_role_display }}</small>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <span class="dropdown-item-text">
-                                    <small>Signed in as</small><br>
-                                    <strong>{{ user.username }}</strong>
-                                </span>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'dashboard' %}">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'security_questions' %}">
-                                    <i class="fas fa-shield-alt me-2"></i>Security Questions
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user me-2"></i>Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'order_history' %}">
-                                    <i class="fas fa-receipt me-2"></i>My Orders
-                                </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="post" action="{% url 'logout' %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-
-                    {% else %}
                     <!-- Authentication Links -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">
+                        <a class="nav-link" href="/accounts/login/">
                             <i class="fas fa-sign-in-alt me-1"></i>Login
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">
+                        <a class="nav-link" href="/accounts/register/">
                             <i class="fas fa-user-plus me-1"></i>Register
                         </a>
                     </li>
-                    {% endif %}
+                    
                 </ul>
             </div>
         </div>
@@ -1927,82 +1380,217 @@
         <div class="banner-text">
             <i class="fas fa-gift" style="color: #fff; background: rgba(0,0,0,0.12); padding: 6px 8px; border-radius: 8px;"></i>
             <span>Holiday Special: Free delivery from selected restaurants today — order now!</span>
-            <a href="{% url 'browse_restaurants' %}" class="banner-cta ms-2">Browse Restaurants</a>
+            <a href="/browse/" class="banner-cta ms-2">Browse Restaurants</a>
         </div>
         <button class="banner-close" id="bannerClose" aria-label="Dismiss announcement">&times;</button>
     </div>
 
     <!-- Messages -->
-    {% if messages %}
-    <div class="container mt-3">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-            <div class="d-flex align-items-center">
-                <i class="fas 
-                            {% if message.tags == 'success' %}fa-check-circle
-                            {% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle
-                            {% elif message.tags == 'warning' %}fa-exclamation-triangle
-                            {% else %}fa-info-circle{% endif %}
-                            me-2"></i>
-                <div>{{ message }}</div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+    
 
     <!-- Main Content -->
     <main class="flex-grow-1">
-        {% block content %}
-        <!-- Content will be injected here -->
-        {% endblock %}
-    </main>
-    <!-- Global Scroll Arrow (Up/Down) -->
-        <!-- Global Back Arrow (Left) -->
-        <button id="back-arrow" type="button" class="btn btn-dark shadow rounded-circle" style="position: fixed; right: 24px; bottom: 32px; z-index: 2000; width:48px;height:48px;display:flex;align-items:center;justify-content:center;" title="Go Back">
-            <i class="fas fa-arrow-left fa-lg"></i>
-        </button>
-        <script>
-        // Back arrow click handler
-        document.getElementById('back-arrow').addEventListener('click', function() {
-            window.history.back();
-        });
-        </script>
-    <button id="scroll-arrow" type="button" class="btn btn-dark shadow rounded-circle" style="position: fixed; left: 24px; bottom: 32px; z-index: 2000; width:48px;height:48px;display:flex;align-items:center;justify-content:center;" title="Scroll">
-        <i id="scroll-arrow-icon" class="fas fa-arrow-down fa-lg"></i>
-    </button>
-    <script>
-    // Toggle scroll arrow direction and behavior
-    (function() {
-        const scrollArrow = document.getElementById('scroll-arrow');
-        const scrollIcon = document.getElementById('scroll-arrow-icon');
-        function updateArrow() {
-            if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
-                // At bottom, show up arrow
-                scrollIcon.classList.remove('fa-arrow-down');
-                scrollIcon.classList.add('fa-arrow-up');
-                scrollArrow.title = 'Scroll to Top';
-            } else {
-                // Not at bottom, show down arrow
-                scrollIcon.classList.remove('fa-arrow-up');
-                scrollIcon.classList.add('fa-arrow-down');
-                scrollArrow.title = 'Scroll to Bottom';
-            }
+        
+<style>
+/* Container for the authentication forms */
+.auth-container {
+    max-width: 420px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+    overflow: hidden;
+    position: relative;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Tab navigation styles */
+.auth-tabs {
+    display: flex;
+    border-bottom: 1.5px solid #e0e0e0;
+    background: #f4f6fb;
+}
+.auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 18px 0 14px 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #7a7a7a;
+    letter-spacing: 0.5px;
+    font-size: 1.08rem;
+    transition: color 0.2s, background 0.2s;
+    user-select: none;
+}
+.auth-tab.active {
+    color: #2563eb;
+    border-bottom: 2.5px solid #2563eb;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.04);
+}
+
+/* Sliding animation for forms */
+/* Sliding animation for forms */
+.auth-slider {
+    display: flex;
+    width: 200%;
+    transition: transform 0.7s cubic-bezier(.77,0,.18,1), box-shadow 0.4s, filter 0.4s;
+    background: #f9fafb;
+    will-change: transform, box-shadow, filter;
+}
+.auth-slider.sliding {
+    box-shadow: 0 8px 32px rgba(37,99,235,0.10);
+    filter: brightness(0.98) blur(1px);
+}
+
+/* Individual form styling */
+.auth-form {
+    width: 100%;
+    padding: 36px 32px 28px 32px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 0 0 16px 16px;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Headings */
+.auth-form h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Form labels and inputs */
+.auth-form .form-label {
+    font-weight: 500;
+    color: #222 !important;
+    margin-bottom: 0.3rem;
+    background: transparent;
+}
+.auth-form .form-control {
+    border-radius: 8px;
+    border: 1.5px solid #e0e0e0;
+    padding: 10px 12px;
+    font-size: 1rem;
+    margin-bottom: 1.1rem;
+    background: #f7f8fa;
+    color: #222 !important;
+    transition: border-color 0.2s;
+}
+.auth-form .form-control:focus {
+    border-color: #2563eb;
+    outline: none;
+    background: #fff;
+}
+
+/* Buttons */
+.auth-form .btn-primary {
+    background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.08rem;
+    padding: 12px 0;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.auth-form .btn-primary:hover {
+    background: linear-gradient(90deg, #1e40af 60%, #2563eb 100%);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.12);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .auth-container {
+        max-width: 98vw;
+        border-radius: 0;
+        margin: 0;
+    }
+    .auth-form {
+        padding: 24px 8px 18px 8px;
+        min-height: 320px;
+    }
+    .auth-tabs {
+        font-size: 0.98rem;
+    }
+}
+
+/* Accessibility: focus for tabs */
+.auth-tab:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: -2px;
+}
+</style>
+<div class="auth-container">
+    <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab" onclick="showAuthForm('login')">Login</div>
+        <div class="auth-tab" id="registerTab" onclick="showAuthForm('register')">Create Account</div>
+    </div>
+    <div class="auth-slider" id="authSlider">
+        <div class="auth-form" id="loginForm">
+            <h4 class="mb-4">Login to Your Account</h4>
+            <form method="post" action="/accounts/login/" autocomplete="off">
+                <input type="hidden" name="csrfmiddlewaretoken" value="2kXK43PQSVMSoVCq24xF5oPo2WYiJ1Iw5u80km7AHWvWPVjWRbcslbQdjtPVdE5N">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <div class="text-center mt-3">
+                    <a href="/accounts/password_reset/" class="text-decoration-none small">Forgot password?</a> | 
+                    <a href="/accounts/account_recovery/" class="text-decoration-none small">Forgot username?</a>
+                </div>
+            </form>
+        </div>
+        <div class="auth-form" id="registerForm">
+            <h4 class="mb-4">Create Your Account</h4>
+            <form method="post" action="/accounts/register/" autocomplete="off">
+                <input type="hidden" name="csrfmiddlewaretoken" value="2kXK43PQSVMSoVCq24xF5oPo2WYiJ1Iw5u80km7AHWvWPVjWRbcslbQdjtPVdE5N">
+                
+
+
+
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+function showAuthForm(form) {
+    const slider = document.getElementById('authSlider');
+    const loginTab = document.getElementById('loginTab');
+    const registerTab = document.getElementById('registerTab');
+    // Add sliding class for animation effect
+    slider.classList.add('sliding');
+    setTimeout(() => {
+        if (form === 'login') {
+            slider.style.transform = 'translateX(0)';
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+        } else {
+            slider.style.transform = 'translateX(-50%)';
+            loginTab.classList.remove('active');
+            registerTab.classList.add('active');
         }
-        window.addEventListener('scroll', updateArrow);
-        window.addEventListener('resize', updateArrow);
-        scrollArrow.addEventListener('click', function() {
-            if (scrollIcon.classList.contains('fa-arrow-down')) {
-                window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
-            } else {
-                window.scrollTo({top: 0, behavior: 'smooth'});
-            }
-        });
-        // Initial state
-        updateArrow();
-    })();
-    </script>
+    }, 10);
+    // Remove sliding class after animation
+    setTimeout(() => {
+        slider.classList.remove('sliding');
+    }, 800);
+}
+</script>
+
+    </main>
 
     <!-- Footer -->
     <footer class="footer mt-5 py-5">
@@ -2010,32 +1598,9 @@
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-brand">
-                        <div class="footer-logo-icon" style="background:none;box-shadow:none;border:none;width:60px;height:60px;padding:0;">
-                            <!-- Animated Angel Eating SVG Icon (Logo) -->
-                            <svg width="54" height="54" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-                                <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5"/>
-                                <ellipse cx="55" cy="28" rx="22" ry="6" fill="none" stroke="#fffbe6" stroke-width="2"/>
-                                <circle cx="55" cy="45" r="13" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                <ellipse cx="55" cy="70" rx="18" ry="22" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                <path d="M30 65 Q10 85 40 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                                <path d="M80 65 Q100 85 70 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                                <ellipse cx="55" cy="95" rx="20" ry="7" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                <rect x="38" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(-20 38 80)"/>
-                                <rect x="37" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 37 80)"/>
-                                <rect x="39" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 39 80)"/>
-                                <rect x="41" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 41 80)"/>
-                                <rect x="69" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(20 69 80)"/>
-                                <ellipse cx="70.5" cy="82.5" rx="2.5" ry="4" fill="#ffe066"/>
-                                <ellipse cx="55" cy="95" rx="8" ry="3" fill="#f9d923"/>
-                                <ellipse cx="55" cy="93" rx="8" ry="3" fill="#ffe066"/>
-                                <ellipse cx="55" cy="95" rx="6" ry="1.5" fill="#b68973"/>
-                                <path id="angel-mouth-footer" d="M51 52 Q55 56 59 52" stroke="#b68973" stroke-width="2" fill="none">
-                                    <animate attributeName="d" values="M51 52 Q55 56 59 52;M51 54 Q55 58 59 54;M51 52 Q55 56 59 52" dur="1.2s" repeatCount="indefinite"/>
-                                </path>
-                                <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5">
-                                    <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                                </ellipse>
-                            </svg>
+                        <div class="footer-logo-icon">
+                            <i class="fas fa-utensils icon-fork"></i>
+                            <i class="fas fa-utensils icon-knife"></i>
                         </div>
                         <div class="footer-brand-text">
                             <span class="footer-brand-name">Halo Sass</span>
@@ -2055,15 +1620,11 @@
                 <div class="col-lg-2 col-md-6">
                     <h6 class="mb-3">Quick Links</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{% url 'home' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Home</a></li>
-                        {% if user.is_authenticated %}
-                        <li class="mb-2"><a href="{% url 'dashboard' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Dashboard</a></li>
-                        <li class="mb-2"><a href="{% url 'order_history' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Orders</a></li>
-                        <li class="mb-2"><a href="{% url 'analytics_dashboard' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Analytics</a></li>
-                        {% else %}
-                        <li class="mb-2"><a href="{% url 'login' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Login</a></li>
-                        <li class="mb-2"><a href="{% url 'register' %}" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Register</a></li>
-                        {% endif %}
+                        <li class="mb-2"><a href="/" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Home</a></li>
+                        
+                        <li class="mb-2"><a href="/accounts/login/" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Login</a></li>
+                        <li class="mb-2"><a href="/accounts/register/" class="text-decoration-none"><i class="fas fa-chevron-right me-2" style="font-size: 0.7rem;"></i>Register</a></li>
+                        
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -2204,7 +1765,7 @@
         }
     </script>
 
-    {% block scripts %}{% endblock %}
+    
 </body>
 
 </html>

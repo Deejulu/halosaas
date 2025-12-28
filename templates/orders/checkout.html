@@ -160,8 +160,8 @@
                                     <input type="radio" name="payment_method" id="payment_cash" value="cash" checked>
                                     <span class="payment-method-icon text-success"><i class="fas fa-money-bill-wave"></i></span>
                                     <div>
-                                        <strong>Cash on Delivery</strong>
-                                        <small class="d-block text-muted">Pay when you receive your order</small>
+                                        <strong>Cash on Pickup</strong>
+                                        <small class="d-block text-muted">Pay when you pick up your order</small>
                                     </div>
                                 </label>
                                 {% endif %}
@@ -266,7 +266,7 @@
                                 </div>
 
                                 <div class="text-center mt-3">
-                                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary">
+                                    <a href="{% url 'cart' %}" class="btn btn-outline-secondary">
                                         <i class="fas fa-arrow-left me-2"></i>Back to Cart
                                     </a>
                                 </div>
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateButtonText(method) {
         const texts = {
-            'cash': 'Place Order - Pay on Delivery',
+            'cash': 'Place Order - Pay on Pickup',
             'paystack': 'Pay ₦{{ total_price }} with Card',
             'bank_transfer': 'Submit Order - Awaiting Transfer',
             'mobile_money': 'Submit Order - Awaiting Payment',

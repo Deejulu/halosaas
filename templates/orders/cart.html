@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load cart_tags %}
+<link rel="stylesheet" href="{% static 'css/cart.css' %}">
 
 {% block title %}Shopping Cart - Restaurant SaaS{% endblock %}
 
@@ -8,96 +11,119 @@
         <div class="col-12">
             <h1><i class="fas fa-shopping-cart me-2"></i>Shopping Cart</h1>
 
-            {% if cart_items %}
+            {% if grouped_cart %}
             <div class="row">
                 <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">
-                                <i class="fas fa-list me-2"></i>
-                                Order Items
-                                <span class="badge bg-primary">{{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }}</span>
+                    {% for group in grouped_cart %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-light" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#cart-group-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="cart-group-{{ forloop.counter }}">
+                            <h5 class="mb-0 d-flex align-items-center justify-content-between">
+                                <span>
+                                    <i class="fas fa-store me-2"></i>
+                                    {% if group.restaurant_slug %}
+                                        <a href="{% url 'restaurant_detail' group.restaurant_slug %}" onclick="event.stopPropagation();">{{ group.restaurant_name }}</a>
+                                    {% else %}
+                                        {{ group.restaurant_name }}
+                                    {% endif %}
+                                </span>
+                                <span class="badge bg-primary ms-2">{{ group.items|length }} item{{ group.items|length|pluralize }}</span>
+                                <span class="dropdown-arrow ms-2"><i class="fas fa-chevron-down"></i></span>
                             </h5>
                         </div>
-                        <div class="card-body">
-                            <!-- Cart Session Info -->
-                            <div class="order-timestamp mb-3">
-                                <div class="ts-label">Cart Session</div>
-                                <div class="ts-value">
-                                    <i class="fas fa-clock"></i>
-                                    <span class="text-muted small">Items will be saved for your session</span>
-                                </div>
-                            </div>
-                            
-                            {% for item in cart_items %}
-                            <div class="row align-items-center mb-3 pb-3 border-bottom">
-                                <div class="col-md-6">
-                                    <h6 class="mb-1 text-primary">{{ item.name }}</h6>
-                                    {% if item.special_requests %}
-                                    <p class="text-muted small mb-1">
-                                        <i class="fas fa-sticky-note me-1"></i>
-                                        <em>{{ item.special_requests }}</em>
-                                    </p>
-                                    {% endif %}
-                                    <p class="text-success mb-0">
-                                        <strong>₦{{ item.price }} each</strong>
-                                    </p>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <form method="post" action="{% url 'update_cart_item' item.menu_item_id %}"
-                                        class="d-flex align-items-center">
-                                        {% csrf_token %}
-                                        <div class="input-group input-group-sm me-2" style="width: 130px;">
-                                            <button class="btn btn-outline-secondary" type="button"
-                                                onclick="decrementQuantity(this)">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
-                                                class="form-control text-center">
-                                            <button class="btn btn-outline-secondary" type="button"
-                                                onclick="incrementQuantity(this)">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                        <input type="hidden" name="special_requests"
-                                            value="{{ item.special_requests }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-sync-alt me-1"></i>Update
-                                        </button>
-                                    </form>
-                                </div>
-
-                                <div class="col-md-2 text-end">
-                                    <div class="mb-2">
-                                        <strong class="text-primary">₦{{ item.total_price|floatformat:2 }}</strong>
+                        <div id="cart-group-{{ forloop.counter }}" class="collapse {% if forloop.first %}show{% endif %}">
+                            <div class="card-body">
+                                {% for item in group.items %}
+                                <div class="row align-items-center mb-3 pb-3 border-bottom">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-1 text-primary">{{ item.name }}</h6>
+                                        {% if item.special_requests %}
+                                        <p class="text-muted small mb-1">
+                                            <i class="fas fa-sticky-note me-1"></i>
+                                            <em>{{ item.special_requests }}</em>
+                                        </p>
+                                        {% endif %}
+                                        <p class="text-success mb-0">
+                                            <strong>₦{{ item.price }} each</strong>
+                                        </p>
                                     </div>
-                                    <form method="post" action="{% url 'remove_from_cart' item.menu_item_id %}"
-                                        class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove item">
-                                            <i class="fas fa-trash"></i> Remove
-                                        </button>
-                                    </form>
+                                    <div class="col-md-4">
+                                        <form method="post" action="{% url 'update_cart_item' item.menu_item_id %}"
+                                            class="d-flex align-items-center">
+                                            {% csrf_token %}
+                                            <div class="input-group input-group-sm me-2" style="width: 130px;">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="decrementQuantity(this)">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                                                    class="form-control text-center">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="incrementQuantity(this)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                            <input type="hidden" name="special_requests"
+                                                value="{{ item.special_requests }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-sync-alt me-1"></i>Update
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <div class="mb-2">
+                                            <strong class="text-primary">₦{{ item.total_price|floatformat:2 }}</strong>
+                                        </div>
+                                        <form method="post" action="{% url 'remove_from_cart' item.menu_item_id %}"
+                                            class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove item">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                            {% endfor %}
-
-                            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                                <form method="post" action="{% url 'clear_cart' %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-outline-danger">
-                                        <i class="fas fa-trash me-1"></i>Clear Entire Cart
-                                    </button>
-                                </form>
-                                <a href="{% url 'home' %}" class="btn btn-outline-primary">
-                                    <i class="fas fa-utensils me-1"></i>Continue Shopping
-                                </a>
+                                {% endfor %}
+                                <div class="d-flex justify-content-between mt-3 pt-2 border-top">
+                                    <div><strong>Subtotal:</strong></div>
+                                    <div><strong>₦{{ group.subtotal|floatformat:2 }}</strong></div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
+                    <style>
+                        .dropdown-arrow {
+                            transition: transform 0.2s;
+                        }
+                        .card-header[aria-expanded="true"] .dropdown-arrow {
+                            transform: rotate(180deg);
+                        }
+                    </style>
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <form method="post" action="{% url 'clear_cart' %}" id="clear-cart-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" id="clear-cart-btn">
+                                <i class="fas fa-trash me-1"></i>Clear Entire Cart
+                            </button>
+                        </form>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var clearBtn = document.getElementById('clear-cart-btn');
+                            var clearForm = document.getElementById('clear-cart-form');
+                            if (clearBtn && clearForm) {
+                                clearBtn.addEventListener('click', function(e) {
+                                    if (!confirm('Are you sure you want to clear your entire cart?')) {
+                                        e.preventDefault();
+                                    }
+                                });
+                            }
+                        });
+                        </script>
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-utensils me-1"></i>Continue Shopping
+                        </a>
+                    </div>
                 </div>
-
                 <!-- Order Summary -->
                 <div class="col-lg-4">
                     <div class="card sticky-top" style="top: 100px;">
@@ -108,8 +134,8 @@
                         </div>
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-2">
-                                <span>Items ({{ cart.get_total_items }}):</span>
-                                <strong>₦{{ total_price|floatformat:2 }}</strong>
+                                <span>Items ({{ grouped_cart|length }} restaurants):</span>
+                                <strong>₦{{ grand_total|floatformat:2 }}</strong>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Delivery Fee:</span>
@@ -126,15 +152,13 @@
                             <hr>
                             <div class="d-flex justify-content-between mb-4">
                                 <span class="h5">Total:</span>
-                                <strong class="h4 text-success">₦{{ total_price|floatformat:2 }}</strong>
+                                <strong class="h4 text-success">₦{{ grand_total|floatformat:2 }}</strong>
                             </div>
-
                             <div class="d-grid gap-2">
                                 <a href="{% url 'checkout' %}" class="btn btn-success btn-lg">
                                     <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
                                 </a>
                             </div>
-
                             <div class="text-center mt-3">
                                 <small class="text-muted">
                                     <i class="fas fa-lock me-1"></i>Secure SSL Encryption
@@ -142,21 +166,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Restaurant Info -->
-                    {% if cart_items.0.restaurant_name %}
-                    <div class="card mt-3">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">
-                                <i class="fas fa-store me-2"></i>Restaurant
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-1"><strong>{{ cart_items.0.restaurant_name }}</strong></p>
-                            <p class="text-muted small mb-0">All items from this restaurant</p>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
             {% else %}
@@ -167,37 +176,60 @@
                         <h5 class="mb-3">Your active cart is empty.</h5>
                         <p class="text-muted">You have saved items in carts for other restaurants. Switch to one below to view them.</p>
                         <div class="list-group mb-3">
-                            {% for rid, sub in session_cart.items %}
-                                {% if sub %}
-                                    {% with first=sub.values|first %}
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>{{ first.restaurant_name }}</strong>
-                                            <div class="small text-muted">{{ sub|length }} item{{ sub|length|pluralize }}</div>
+                                {% with non_empty_subcarts=session_cart.items|dictsort:"0" %}
+                                    {% if non_empty_subcarts|length > 0 and non_empty_subcarts|yesno:"yes,no" == "yes" %}
+                                        {% with has_non_empty=False %}
+                                            {% for rid, sub in session_cart.items %}
+                                                {% if sub %}{% with has_non_empty=True %}{% endwith %}{% endif %}
+                                            {% endfor %}
+                                            {% if has_non_empty %}
+                                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>
+                                                            <a href="{% url 'restaurant_detail' first.restaurant_slug %}">{{ first.restaurant_name }}</a>
+                                                        </strong>
+                                                        <div class="small text-muted">{{ sub|length }} item{{ sub|length|pluralize }}</div>
+                                                    </div>
+                                                    <div>
+                                                        <a href="{% url 'switch_cart_restaurant' rid %}" class="btn btn-sm btn-outline-primary">Switch to this cart</a>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center py-5">
+                                                    <div class="empty-cart-icon mb-4">
+                                                        <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                                                    </div>
+                                                    <h3 class="text-muted">Your cart is empty</h3>
+                                                    <p class="text-muted mb-4">Looks like you haven't added any delicious items yet!</p>
+                                                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                                        <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                                                            <i class="fas fa-utensils me-2"></i>Browse Restaurants
+                                                        </a>
+                                                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% else %}
+                                        <div class="text-center py-5">
+                                            <div class="empty-cart-icon mb-4">
+                                                <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                                            </div>
+                                            <h3 class="text-muted">Your cart is empty</h3>
+                                            <p class="text-muted mb-4">Looks like you haven't added any delicious items yet!</p>
+                                            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                                                <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
+                                                    <i class="fas fa-utensils me-2"></i>Browse Restaurants
+                                                </a>
+                                                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg px-4">
+                                                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <a href="{% url 'switch_cart_restaurant' rid %}" class="btn btn-sm btn-outline-primary">Switch to this cart</a>
-                                        </div>
-                                    </div>
-                                    {% endwith %}
-                                {% endif %}
-                            {% empty %}
-                                <div class="text-center py-5">
-                                    <div class="empty-cart-icon mb-4">
-                                        <i class="fas fa-shopping-cart fa-4x text-muted"></i>
-                                    </div>
-                                    <h3 class="text-muted">Your cart is empty</h3>
-                                    <p class="text-muted mb-4">Looks like you haven't added any delicious items yet!</p>
-                                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                                        <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-4">
-                                            <i class="fas fa-utensils me-2"></i>Browse Restaurants
-                                        </a>
-                                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-lg px-4">
-                                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
-                                        </a>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
                         </div>
                     </div>
                 {% else %}
@@ -253,28 +285,5 @@
     });
 </script>
 
-<style>
-    .empty-cart-icon {
-        opacity: 0.5;
-    }
 
-    .card {
-        border: none;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-
-    .card-header {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-    }
-
-    .sticky-top {
-        position: sticky;
-        z-index: 1020;
-    }
-
-    .btn-lg {
-        padding: 0.75rem 1.5rem;
-        font-size: 1.1rem;
-    }
-</style>
 {% endblock %}

@@ -719,6 +719,27 @@
 {% endblock %}
 
 {% block content %}
+{% if request.session.show_loader_after_login %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof showSiteLoader === 'function') {
+        showSiteLoader();
+        setTimeout(hideSiteLoader, 2000);
+    }
+    fetch(window.location.pathname + '?clear_loader=1', { credentials: 'same-origin' });
+});
+</script>
+{% endif %}
+<script>
+// Show loader for 2 seconds on dashboard load
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.performance && window.performance.navigation && window.performance.navigation.type === 1) return; // skip on reload
+    if (typeof showSiteLoader === 'function') {
+        showSiteLoader();
+        setTimeout(hideSiteLoader, 2000);
+    }
+});
+</script>
 {% if request.session.show_welcome_overlay %}
 <div id="welcomeOverlay" style="position:fixed;z-index:3000;top:0;left:0;width:100vw;height:100vh;background:rgba(20,20,40,0.65);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;transition:opacity 0.7s;">
     <div style="text-align:center;animation:slideUp 0.7s cubic-bezier(.77,0,.18,1);max-width:90vw;">
@@ -774,6 +795,17 @@
                             Hello, {{ user.first_name|default:user.username }}!
                         </h1>
                         <p class="mb-0">Ready to discover delicious food today?</p>
+                        <div class="d-flex flex-wrap align-items-center mt-4" style="gap: 0.75rem 1rem;">
+                            <a href="{% url 'owner_instructions' %}" class="btn btn-warning btn-lg me-2 mb-2 mt-2">
+                                <i class="fas fa-info-circle me-2"></i>Owner Instructions
+                            </a>
+                            <a href="{% url 'tutorial' %}" class="btn btn-success btn-lg mb-2 mt-2">
+                                <i class="fas fa-graduation-cap me-2"></i>Website Tutorial
+                            </a>
+                            <a href="{% url 'submit_admin_feedback' %}" class="btn btn-outline-primary btn-lg mb-2 mt-2">
+                                <i class="fas fa-comment-dots me-2"></i>Send Feedback to Admin
+                            </a>
+                        </div>
                     </div>
                     <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                         <a href="{% url 'browse_restaurants' %}" class="btn btn-light btn-lg px-4">
@@ -923,7 +955,7 @@
                                 </a>
                             </div>
                             <div class="col-6 col-md-3">
-                                <a href="{% url 'view_cart' %}" class="quick-action-card">
+                                <a href="{% url 'cart' %}" class="quick-action-card">
                                     <div class="quick-action-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--cd-warning);">
                                         <i class="fas fa-shopping-cart"></i>
                                     </div>

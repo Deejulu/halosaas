@@ -1,9 +1,13 @@
 
+
 from django.urls import path
 from . import views
 from .views_load_restaurants import load_restaurants
 
 urlpatterns = [
+    path('instructions/owner/', views.owner_instructions, name='owner_instructions'),
+    path('instructions/tutorial/', views.tutorial, name='tutorial'),
+        path('restaurants/help/', views.restaurant_help, name='restaurant_help'),
     # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
     # TEMP: Load restaurants.json into DB (superuser only)
@@ -31,6 +35,9 @@ urlpatterns = [
     path('notifications/', views.notifications_dashboard, name='notifications_dashboard'),
     
     # ADMIN USER MANAGEMENT URLs
+        # ADMIN FEEDBACK URLs
+        path('feedback/submit/', views.submit_admin_feedback, name='submit_admin_feedback'),
+        path('admin/feedback/', views.admin_feedback_list, name='admin_feedback_list'),
     path('admin/users/<int:user_id>/toggle/', views.admin_toggle_user, name='admin_toggle_user'),
     path('admin/users/<int:user_id>/change-role/', views.admin_change_user_role, name='admin_change_user_role'),
     path('admin/users/<int:user_id>/delete/', views.admin_delete_user, name='admin_delete_user'),

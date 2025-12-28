@@ -1,12 +1,131 @@
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def choose_delivery_method(request, order_id):
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
+    if order.delivery_method:
+        return redirect('order_detail', order_id=order.id)
+    if request.method == 'POST':
+        method = request.POST.get('delivery_method')
+        if method == 'pickup':
+            order.delivery_method = 'pickup'
+            order.save()
+            messages.success(request, 'You selected Pick Up. Please come to the restaurant to collect your order.')
+            return redirect('order_detail', order_id=order.id)
+        elif method == 'delivery':
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            whatsapp = request.POST.get('whatsapp')
+            if not (name and phone and email and whatsapp):
+                messages.error(request, 'All delivery info fields are required.')
+            else:
+                order.delivery_method = 'delivery'
+                order.delivery_info = {
+                    'name': name,
+                    'phone': phone,
+                    'email': email,
+                    'whatsapp': whatsapp
+                }
+                order.save()
+                messages.success(request, 'Delivery details submitted! We will contact you about your dispatch.')
+                return redirect('order_detail', order_id=order.id)
+    return render(request, 'orders/choose_delivery_method.html', {'order': order})
+
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import Order, OrderItem
 from restaurants.models import Restaurant, MenuItem
+
+# Delete canceled order (customer only)
+@login_required
+@require_POST
+def delete_order(request, order_id):
+    """Allow customers to delete their own canceled orders."""
+    order = get_object_or_404(Order, id=order_id)
+    if request.user.role != 'customer' or order.customer != request.user:
+        messages.error(request, 'You do not have permission to delete this order.')
+        return redirect('order_history')
+    if order.status != 'cancelled':
+        messages.error(request, 'Only canceled orders can be deleted.')
+        return redirect('order_history')
+    order.delete()
+    messages.success(request, 'Canceled order deleted successfully.')
+    return redirect('order_history')
+
+# Unified cart summary for floating cart badge and dropdown
+@csrf_exempt
+@require_GET
+def ajax_cart_summary(request):
+    cart = request.session.get('cart', {}) or {}
+    total = 0
+    restaurants = []
+    for rid, sub in cart.items():
+        if not sub:
+            continue
+        count = sum(item.get('quantity', 0) for item in sub.values())
+        # Try to get restaurant name and slug
+        try:
+            # Use any item to get the slug
+            first_item = next(iter(sub.values()))
+            slug = first_item.get('restaurant_slug')
+            name = first_item.get('restaurant_name')
+        except Exception:
+            slug = name = None
+        if not slug or not name:
+            try:
+                r = Restaurant.objects.get(id=rid)
+                slug = r.slug
+                name = r.name
+            except Exception:
+                slug = rid
+                name = f"Restaurant {rid}"
+        restaurants.append({'id': rid, 'slug': slug, 'name': name, 'count': count})
+        total += count
+    return JsonResponse({'total_items': total, 'restaurants': restaurants})
+
+# AJAX: Return the total cart item count across all restaurants (matches header logic)
+@login_required
+@require_GET
+def ajax_cart_total_count(request):
+    """Return the total cart item count across all restaurants (for floating cart badge)."""
+    cart = request.session.get('cart', {}) or {}
+    total = 0
+    # Count items from ALL restaurants
+    for restaurant_id, subcart in cart.items():
+        if isinstance(subcart, dict):
+            for item_id, item_data in subcart.items():
+                total += item_data.get('quantity', 0)
+    print(f"DEBUG: Cart session: {cart}")
+    print(f"DEBUG: Total cart items (all restaurants): {total}")
+    return JsonResponse({'cart_total_items': total, 'success': True})
 from .cart import Cart
-from django.http import JsonResponse
 from django.urls import reverse
+
+@login_required
+def ajax_switch_cart_restaurant(request, restaurant_id):
+    """AJAX: Set the active cart restaurant in session and return JSON."""
+    print(f"DEBUG: Switching to restaurant {restaurant_id}")
+    print(f"DEBUG: Session before: {request.session.get('current_cart_restaurant')}")
+    request.session['current_cart_restaurant'] = str(restaurant_id)
+    request.session.modified = True
+    print(f"DEBUG: Session after: {request.session.get('current_cart_restaurant')}")
+    return JsonResponse({'success': True, 'current_cart_restaurant': str(restaurant_id)})
+
+@login_required
+def ajax_cart_count(request):
+    """Return the cart count for the current active restaurant in session."""
+    cart = Cart(request)
+    return JsonResponse({
+        'cart_total_items': cart.get_total_items(),
+        'restaurant_id': cart.get_restaurant_id(),
+    })
 
 @login_required
 def create_order(request, restaurant_slug):
@@ -40,9 +159,11 @@ def add_to_cart(request, item_id):
                 logger.exception('Failed to log session cart')
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Use Cart method for total items across all restaurants
+                total_items = cart.get_total_items_all_restaurants()
                 return JsonResponse({
                     'success': True,
-                    'cart_total_items': cart.get_total_items(),
+                    'cart_total_items': total_items,
                     'message': f'{menu_item.name} added to cart!'
                 })
             else:
@@ -64,21 +185,43 @@ def add_to_cart(request, item_id):
 @login_required
 def view_cart(request):
     cart = Cart(request)
-    cart_items = list(cart)
-    total_price = cart.get_total_price()
-    # Debug logging to inspect why cart might be empty
-    import logging
-    logger = logging.getLogger(__name__)
-    try:
-        logger.debug('Viewing cart - session cart: %s', request.session.get('cart'))
-        logger.debug('Viewing cart - current_cart_restaurant: %s', request.session.get('current_cart_restaurant'))
-        logger.debug('Cart items computed: %s', cart_items)
-    except Exception:
-        logger.exception('Failed to log cart view state')
-    
+    session_cart = request.session.get('cart', {}) or {}
+    grouped_cart = []
+    grand_total = 0
+    for rid, subcart in session_cart.items():
+        if not subcart:
+            continue
+        # Get restaurant info from first item or fallback
+        first_item = next(iter(subcart.values()))
+        restaurant_name = first_item.get('restaurant_name', f'Restaurant {rid}')
+        restaurant_slug = first_item.get('restaurant_slug', None)
+        items = []
+        subtotal = 0
+        for item_id, item in subcart.items():
+            item_data = {
+                'menu_item_id': item_id,
+                'quantity': item['quantity'],
+                'price': float(item['price']),
+                'total_price': float(item['price']) * item['quantity'],
+                'name': item['name'],
+                'special_requests': item.get('special_requests', ''),
+                'restaurant_name': restaurant_name,
+                'restaurant_slug': restaurant_slug
+            }
+            subtotal += item_data['total_price']
+            items.append(item_data)
+        grouped_cart.append({
+            'restaurant_id': rid,
+            'restaurant_name': restaurant_name,
+            'restaurant_slug': restaurant_slug,
+            'items': items,
+            'subtotal': subtotal
+        })
+        grand_total += subtotal
+
     context = {
-        'cart_items': cart_items,
-        'total_price': total_price,
+        'grouped_cart': grouped_cart,
+        'grand_total': grand_total,
         'cart': cart
     }
     return render(request, 'orders/cart.html', context)
@@ -109,7 +252,7 @@ def update_cart_item(request, item_id):
         print(f"DEBUG: Cart after: {cart.cart}")
         
         messages.success(request, f'Cart updated! {menu_item.name} x {quantity}')
-        return redirect('view_cart')
+        return redirect('cart')
 
 @login_required
 def remove_from_cart(request, item_id):
@@ -119,7 +262,7 @@ def remove_from_cart(request, item_id):
         cart.remove(menu_item)
         
         messages.success(request, 'Item removed from cart!')
-        return redirect('view_cart')
+        return redirect('cart')
 
 @login_required
 def clear_cart(request):
@@ -127,7 +270,7 @@ def clear_cart(request):
         cart = Cart(request)
         cart.clear()
         messages.success(request, 'Cart cleared!')
-        return redirect('view_cart')
+        return redirect('cart')
 
 @login_required
 def checkout(request):
@@ -135,7 +278,7 @@ def checkout(request):
     
     if not cart:
         messages.error(request, 'Your cart is empty!')
-        return redirect('view_cart')
+        return redirect('cart')
     
     cart_items = list(cart)
     total_price = cart.get_total_price()
@@ -145,7 +288,7 @@ def checkout(request):
         restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     else:
         messages.error(request, 'No restaurant selected!')
-        return redirect('view_cart')
+        return redirect('cart')
     
     context = {
         'cart_items': cart_items,
@@ -166,7 +309,7 @@ def process_checkout(request):
     
     if not cart:
         messages.error(request, 'Your cart is empty!')
-        return redirect('view_cart')
+        return redirect('cart')
     
     cart_items = list(cart)
     total_price = cart.get_total_price()
@@ -174,7 +317,7 @@ def process_checkout(request):
     
     if not restaurant_id:
         messages.error(request, 'No restaurant selected!')
-        return redirect('view_cart')
+        return redirect('cart')
     
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     payment_method = request.POST.get('payment_method', 'cash')
@@ -184,7 +327,7 @@ def process_checkout(request):
         menu_item = get_object_or_404(MenuItem, id=item['menu_item_id'])
         if not menu_item.is_available:
             messages.error(request, f"{menu_item.name} is no longer available. Please update your cart.")
-            return redirect('view_cart')
+            return redirect('cart')
     
     try:
         # Determine initial status based on payment method
@@ -244,16 +387,16 @@ def process_checkout(request):
         except Exception as e:
             print(f"Email sending failed: {e}")
         
-        # Redirect based on payment method
-        if payment_method == 'cash':
-            messages.success(request, 'Order placed successfully! Pay cash on delivery.')
-        elif payment_method in ['bank_transfer', 'mobile_money']:
-            messages.success(request, 'Order placed! We\'re awaiting your payment confirmation.')
+        # Redirect to delivery method selection for transfer/mobile/Paystack
+        if payment_method in ['bank_transfer', 'mobile_money', 'paystack']:
+            messages.info(request, 'Order placed! Please choose how you want to receive your order.')
+            return redirect('choose_delivery_method', order_id=order.id)
+        elif payment_method == 'cash':
+            messages.success(request, 'Order placed successfully! Pay cash on pickup.')
         elif payment_method == 'pos':
             messages.success(request, 'Order placed successfully! Pay at pickup with POS.')
         else:
             messages.success(request, 'Order placed successfully!')
-        
         return redirect('order_detail', order_id=order.id)
         
     except Exception as e:
@@ -435,6 +578,13 @@ def update_order_status(request, order_id):
         if new_status in valid_statuses:
             order.status = new_status
             order.save()
+            # If delivery and marked as completed, send dispatch notification
+            if order.delivery_method == 'delivery' and new_status == 'completed':
+                try:
+                    from core.dispatch_notification import send_dispatch_notification
+                    send_dispatch_notification(order)
+                except Exception as e:
+                    print(f"Dispatch notification failed: {e}")
             messages.success(request, f'Order status updated to {order.get_status_display()}')
         else:
             messages.error(request, 'Invalid status.')

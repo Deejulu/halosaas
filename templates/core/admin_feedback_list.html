@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Admin Feedback Submissions{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4"><i class="fas fa-inbox me-2"></i>Feedback Submissions</h2>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Sender</th>
+          <th>Role</th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fb in feedbacks %}
+        <tr>
+          <td>{{ fb.sender.username|default:'Anonymous' }}</td>
+          <td>{{ fb.get_sender_role_display }}</td>
+          <td>{{ fb.subject }}</td>
+          <td>{{ fb.message|linebreaksbr }}</td>
+          <td>{{ fb.created_at|date:'M d, Y H:i' }}</td>
+          <td>
+            {% if fb.is_resolved %}
+              <span class="badge bg-success">Resolved</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Open</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center">No feedback submissions yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

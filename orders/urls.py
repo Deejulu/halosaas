@@ -11,12 +11,15 @@ urlpatterns = [
     path('<int:order_id>/confirm-payment/', views.confirm_payment, name='confirm_payment'),
     path('<int:order_id>/reject-payment/', views.reject_payment, name='reject_payment'),
     path('<int:order_id>/cancel/', views.cancel_order, name='cancel_order'),
+    path('<int:order_id>/delete/', views.delete_order, name='delete_order'),
+    path('<int:order_id>/delivery-method/', views.choose_delivery_method, name='choose_delivery_method'),
     
     # Cart URLs
     path('cart/add/<int:item_id>/', views.add_to_cart, name='add_to_cart'),
-    path('cart/', views.view_cart, name='cart'),  # Changed from view_cart to cart
-    path('cart/view/', views.view_cart, name='view_cart'),  # Keep both for compatibility
+    path('cart/ajax/summary/', views.ajax_cart_summary, name='ajax_cart_summary'),
+    path('cart/ajax/total_count/', views.ajax_cart_total_count, name='ajax_cart_total_count'),
     path('cart/switch/<int:restaurant_id>/', views.switch_cart_restaurant, name='switch_cart_restaurant'),
+    path('cart/', views.view_cart, name='cart'),
     path('cart/update/<int:item_id>/', views.update_cart_item, name='update_cart_item'),
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/clear/', views.clear_cart, name='clear_cart'),

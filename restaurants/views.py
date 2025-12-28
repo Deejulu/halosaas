@@ -80,6 +80,10 @@ def remove_preferred_restaurant(request):
 # RESTAURANT OWNER VIEWS
 @login_required
 def restaurant_dashboard(request):
+    # Clear loader session flag if requested
+    if request.method == 'GET' and request.GET.get('clear_loader') == '1':
+        if 'show_loader_after_login' in request.session:
+            del request.session['show_loader_after_login']
     """Restaurant owner dashboard"""
     if request.user.role != 'restaurant_owner':
         messages.error(request, 'Access denied. Restaurant owners only.')

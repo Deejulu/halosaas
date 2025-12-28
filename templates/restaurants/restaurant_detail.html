@@ -2314,47 +2314,6 @@ html {
 {{ restaurant.custom_css|safe }}
 {% endif %}
  </style>
-<style>
-    .hero-premium { padding: 60px 0; min-height: 460px; display: flex; align-items: center; justify-content: center; text-align: center; }
-    .hero-premium-content { max-width: 1100px; margin: 0 auto; }
-    .hero-premium-title { font-size: 2.8rem; letter-spacing: -0.6px; margin-top: 0.5rem; color: #1a1a1a; text-shadow: 0 6px 24px rgba(255,218,185,0.25); }
-    .hero-premium-subtitle { font-size: 1.05rem; color: rgba(26,26,46,0.95); max-width: 900px; margin: 0.6rem auto 1.25rem; }
-
-    .btn-modern { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.72rem 1.1rem; border-radius: 12px; font-weight: 700; }
-    .hero-premium .btn-gradient-primary { background: linear-gradient(90deg, #ffb199 0%, #ffd37a 100%); color: #1a1a1a; border: none; box-shadow: 0 8px 30px rgba(255,183,120,0.18); }
-    .hero-premium .btn-gradient-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 22px 45px rgba(255,183,120,0.24); }
-
-    /* Menu grid improvements */
-    .menu-section .menu-item-card { border-radius: 14px; overflow: hidden; transition: transform 0.32s cubic-bezier(.2,.8,.2,1), box-shadow 0.32s; }
-    .menu-section .menu-item-card:hover { transform: translateY(-8px); box-shadow: 0 28px 60px rgba(11,22,40,0.18); }
-
-    .menu-item-image { height: 200px; display: block; overflow: hidden; position: relative; }
-    .menu-item-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .menu-item-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 0.8rem; box-shadow: 0 8px 18px rgba(0,0,0,0.25); }
-
-    .menu-item-content { padding: 18px; }
-    .menu-item-title { font-size: 1.15rem; margin-bottom: 8px; }
-    .menu-item-description { font-size: 0.95rem; color: var(--rd-text-secondary); }
-
-    .menu-item-footer { display:flex; align-items:center; justify-content:space-between; gap: 12px; margin-top: 14px; }
-    .menu-item-price { font-size: 1.05rem; font-weight: 800; color: var(--restaurant-primary); }
-
-    /* Floating cart summary (large screens) */
-    #cartSummary { position: sticky; bottom: 30px; right: 30px; width: 320px; z-index: 1050; }
-    @media (min-width: 992px) {
-        .menu-section .row { gap: 1.5rem; }
-        #cartSummary { position: fixed; right: 32px; bottom: 32px; }
-    }
-
-    /* Improve responsive stacking */
-    @media (max-width: 767px) {
-        .hero-premium-title { font-size: 1.9rem; }
-        .hero-premium-subtitle { font-size: 0.95rem; }
-        .menu-item-image { height: 160px; }
-        #cartSummary { width: calc(100% - 32px); left: 16px; right: 16px; bottom: 16px; }
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -2367,59 +2326,31 @@ html {
 {% if restaurant.show_hero %}
 <section class="hero-premium"
     style="background: linear-gradient(180deg, rgba(255,183,120,0.55) 0%, rgba(255,218,185,0.35) 60%), url('{% if restaurant.banner_image %}{{ restaurant.banner_image.url }}{% else %}/static/images/default-restaurant-banner.svg{% endif %}') center center / cover no-repeat;">
-    <!-- Pattern Overlay -->
     <div class="pattern-overlay"></div>
-    
-    <!-- Wave Divider Bottom -->
-    <div class="wave-divider bottom">
-        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C57.1,118.92,156.63,69.08,321.39,56.44Z" class="shape-fill"></path>
-        </svg>
-    </div>
-    
-    <div class="hero-premium-content" style="position: relative; z-index: 2;">
-        <!-- Professional Logo Display -->
-        <div class="restaurant-logo-container">
-            <div class="restaurant-logo-glow"></div>
-            {% if restaurant.logo %}
-            <img src="{{ restaurant.logo.url }}" alt="{{ restaurant.name }}" class="restaurant-logo">
-            {% else %}
-            <div class="logo-placeholder">
-                <span class="logo-initials">{{ restaurant.name|slice:":2"|upper }}</span>
-                <span class="logo-text">Est. 2024</span>
-            </div>
-            {% endif %}
-        </div>
-        
+    <div class="hero-premium-content">
         <h1 class="hero-premium-title">{{ restaurant.name }}</h1>
         <p class="hero-premium-subtitle">{{ restaurant.description }}</p>
-
-        <div class="d-flex flex-wrap gap-3 justify-content-center align-items-center"
-            style="animation: fadeInUp 1.2s ease-out 0.4s both;">
+        <div class="mt-4">
             <a href="#menu" class="btn-modern btn-gradient-primary">
-                <i class="fas fa-utensils me-2"></i>View Menu
+                <i class="fas fa-utensils"></i>View Menu
             </a>
-            <a href="#book-table" class="btn-modern btn-outlined" style="border-color: white; color: white;">
-                <i class="fas fa-calendar me-2"></i>Book a Table
+            <a href="#book-table" class="btn-modern btn-outlined">
+                <i class="fas fa-calendar"></i>Book a Table
             </a>
-            {# The following block is correct for the hero section. #}
             {% if user.is_authenticated and user.role == 'customer' %}
                 {% if is_preferred %}
-                    <a href="{% url 'remove_preferred_restaurant' %}" class="btn-modern btn-gradient-secondary">
-                        <i class="fas fa-check-circle me-2"></i>My Restaurant
+                    <a href="{% url 'remove_preferred_restaurant' %}" class="btn-modern btn-gradient-primary">
+                        <i class="fas fa-check-circle"></i>My Restaurant
                     </a>
                 {% else %}
-                    <a href="{% url 'set_preferred_restaurant' restaurant.slug %}" class="btn-modern"
-                        style="background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px);">
-                        <i class="fas fa-star me-2"></i>Set as My Restaurant
+                    <a href="{% url 'set_preferred_restaurant' restaurant.slug %}" class="btn-modern btn-outlined">
+                        <i class="fas fa-star"></i>Set as My Restaurant
                     </a>
                 {% endif %}
             {% endif %}
         </div>
-
         <!-- Quick Stats -->
-        <div class="d-flex gap-4 justify-content-center mt-5 flex-wrap"
-            style="animation: fadeInUp 1.4s ease-out 0.6s both;">
+        <div class="d-flex gap-4 justify-content-center mt-5 flex-wrap">
             <div class="glass px-4 py-3 rounded-pill">
                 <i class="fas fa-star text-warning me-2"></i>
                 <strong>4.8</strong> <small class="text-muted">Rating</small>
@@ -2447,7 +2378,7 @@ html {
     <div class="section-decoration corner-accent corner-br"></div>
     
     <!-- Decorative Dots Pattern -->
-    <div class="section-decoration dots-pattern" style="top: 10%; right: 5%;"></div>
+    <div class="section-decoration dots-pattern" style="top: 10%; right:  5%;"></div>
     <div class="section-decoration dots-pattern" style="bottom: 10%; left: 5%;"></div>
     
     <div class="container" style="position: relative; z-index: 1;">
@@ -2626,22 +2557,46 @@ html {
             </div>
         </div>
 
+        <!-- Sticky Stats Bar -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="stats-container d-flex flex-wrap justify-content-center align-items-center sticky-top" style="top: 70px; z-index: 1020; background: var(--rd-bg-card); box-shadow: 0 2px 8px var(--rd-shadow-color);">
+                    <div class="stat-item mx-2 my-1">
+                        <div class="stat-value">{{ categories|length }}</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat-item mx-2 my-1">
+                        <div class="stat-value">{{ menu_items_count }}</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                    <div class="stat-item mx-2 my-1">
+                        <div class="stat-value">{{ available_items_count }}</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                    <div class="stat-item mx-2 my-1">
+                        <div class="stat-value">₦{{ revenue|default:'0' }}</div>
+                        <div class="stat-label">Revenue</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {% if categories %}
         <!-- Search & Filter Bar -->
-        <div class="search-filter-container mb-4">
+        <div class="search-filter-container mb-4" role="search" aria-label="Menu search and filter">
             <div class="row align-items-center g-3">
                 <div class="col-lg-7 col-md-6">
                     <div class="search-box-modern">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="menuSearch" placeholder="Search for delicious food...">
+                        <input type="text" id="menuSearch" placeholder="Search for delicious food..." aria-label="Search menu items">
                     </div>
                 </div>
                 <div class="col-lg-5 col-md-6">
                     <div class="d-flex align-items-center gap-2">
-                        <label class="sort-label mb-0">
+                        <label class="sort-label mb-0" for="sortMenu">
                             <i class="fas fa-sort-amount-down me-1"></i>Sort:
                         </label>
-                        <select class="form-select sort-select" id="sortMenu">
+                        <select class="form-select sort-select" id="sortMenu" aria-label="Sort menu items">
                             <option value="">Default Order</option>
                             <option value="price-low">Price: Low → High</option>
                             <option value="price-high">Price: High → Low</option>
@@ -2654,43 +2609,39 @@ html {
         </div>
 
         <!-- Category Navigation - Tab Style -->
-        <div class="nav-modern" id="categoryNav">
-            <div class="nav nav-pills">
+        <nav class="nav-modern" id="categoryNav" aria-label="Menu categories">
+            <div class="nav nav-pills" role="tablist">
                 {% for category in categories %}
-                <div class="nav-item">
-                    <a class="nav-link {% if forloop.first %}active{% endif %}" href="#category-{{ category.id }}" data-category="{{ category.id }}" tabindex="0">
+                <div class="nav-item" role="presentation">
+                    <button class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ category.id }}" data-bs-toggle="collapse" data-bs-target="#category-{{ category.id }}" type="button" role="tab" aria-controls="category-{{ category.id }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
                         <i class="fas fa-utensils me-2"></i>{{ category.name }}
                         <span class="badge bg-light text-dark ms-2">{{ category.menuitem_set.all|length }}</span>
-                    </a>
+                    </button>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </nav>
 
-        <!-- Menu Items by Category -->
+        <!-- Menu Items by Category (Collapsible) -->
         <div class="menu-container">
             {% for category in categories %}
-            <div class="category-section {% if forloop.first %}active{% endif %}" id="category-{{ category.id }}" data-category="{{ category.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
-                <div class="category-header">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h3 class="mb-0">{{ category.name }}</h3>
-                            {% if category.description %}
-                            <p class="mb-0 mt-2">{{ category.description }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <span class="category-badge">
-                                {{ category.menuitem_set.all|length }} items
-                            </span>
-                        </div>
+            <div class="category-section collapse {% if forloop.first %}show{% endif %}" id="category-{{ category.id }}" data-category="{{ category.id }}" aria-labelledby="tab-{{ category.id }}">
+                <div class="category-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ category.name }}</h3>
+                        {% if category.description %}
+                        <p class="mb-0 mt-2">{{ category.description }}</p>
+                        {% endif %}
                     </div>
+                    <span class="category-badge">
+                        {{ category.menuitem_set.all|length }} items
+                    </span>
                 </div>
 
-                <div class="row">
+                <div class="menu-grid">
                     {% for item in category.menuitem_set.all %}
                     {% if item.is_available %}
-                    <div class="col-lg-4 col-md-6 mb-4 menu-item fade-in d-flex justify-content-center"
+                    <div class="menu-item fade-in"
                         data-name="{{ item.name|default:''|lower }}" data-price="{{ item.price|default:'0' }}">
                         <div class="menu-item-card hover-lift w-100 h-100 d-flex flex-column" style="max-width: 420px; min-width: 260px; min-height: 340px;">
                             <div class="menu-item-image">
@@ -2720,19 +2671,19 @@ html {
                                     </span>
                                 </div>
                                 <div class="menu-item-footer">
-                                    <div class="menu-item-price">
+                                    <div class="menu-item-price" style="margin-right: 14px;">
                                         ₦<small>{{ item.price }}</small>
                                     </div>
                                     {% if user.role == 'customer' %}
-                                    <button type="button" class="btn-modern btn-gradient-primary btn-lg add-to-cart-btn w-100 py-3 mt-2"
+                                    <button type="button" class="btn-modern btn-gradient-primary add-to-cart-btn w-100 py-2 mt-2"
                                         data-item-id="{{ item.id|default:'' }}" data-item-name="{{ item.name|default:'' }}"
                                         data-item-price="{{ item.price|default:'' }}"
                                         aria-label="Add {{ item.name }} to cart"
-                                        style="font-size:1.15rem; border-radius:{% if restaurant.button_style == 'rounded' %}8px{% elif restaurant.button_style == 'pill' %}50px{% elif restaurant.button_style == 'square' %}0{% elif restaurant.button_style == 'soft' %}4px{% else %}8px{% endif %} !important;">
+                                        style="font-size:1rem; border-radius:{% if restaurant.button_style == 'rounded' %}8px{% elif restaurant.button_style == 'pill' %}50px{% elif restaurant.button_style == 'square' %}0{% elif restaurant.button_style == 'soft' %}4px{% else %}8px{% endif %} !important; min-height: 38px;">
                                         <i class="fas fa-cart-plus me-1"></i>Add to Cart
                                     </button>
                                     {% else %}
-                                    <a href="{% url 'login' %}" class="btn-modern btn-outlined btn-lg w-100 py-3 mt-2">
+                                    <a href="{% url 'login' %}" class="btn-modern btn-outlined w-100 py-2 mt-2" style="font-size:1rem; min-height: 38px;">
                                         <i class="fas fa-sign-in-alt me-1"></i>Login
                                     </a>
                                     {% endif %}
@@ -2743,7 +2694,6 @@ html {
                     {% endif %}
                     {% endfor %}
                 </div>
-
                 {% if category.menuitem_set.count == 0 %}
                 <div class="text-center py-5">
                     <i class="fas fa-utensils fa-3x text-muted mb-3"></i>
@@ -2756,153 +2706,255 @@ html {
 
         <!-- Floating Cart Summary -->
         {% if user.role == 'customer' %}
-        <div class="cart-summary" id="cartSummary" data-cart-url="{% url 'cart' %}">
+        <div class="cart-summary compact-cart-summary" id="cartSummary" data-cart-url="{% url 'cart' %}">
             <div class="d-flex align-items-center">
-                <i class="fas fa-shopping-cart fa-lg me-3"></i>
+                <i class="fas fa-shopping-cart fa-lg me-2"></i>
                 <div>
-                    <div class="fw-bold">View Cart</div>
-                    <small id="cartCount">0 items</small>
+                    <div class="fw-bold" style="font-size:1rem;">View Cart</div>
+                    <small id="cartCount">{{ cart_total_items }} item{{ cart_total_items|default:0|pluralize }}</small>
                 </div>
-                <div class="cart-badge" id="cartBadge">0</div>
+                <div class="cart-badge ms-2" id="cartBadge">{{ cart_total_items }}</div>
             </div>
         </div>
+        <style>
+        .add-to-cart-btn, .btn-modern.btn-outlined {
+            font-size: 1rem !important;
+            padding: 0.55rem 1.1rem !important;
+            min-height: 38px !important;
+            border-radius: 8px !important;
+        }
+        .add-to-cart-btn i, .btn-modern.btn-outlined i {
+            font-size: 1.05em;
+        }
+        .compact-cart-summary {
+            padding: 10px 18px !important;
+            border-radius: 32px !important;
+            font-size: 1rem !important;
+            min-width: 180px;
+            box-shadow: 0 4px 16px rgba(233,69,96,0.18);
+        }
+        .compact-cart-summary .fw-bold {
+            font-size: 1rem !important;
+        }
+        .compact-cart-summary .cart-badge {
+            font-size: 0.95rem !important;
+            padding: 4px 10px !important;
+        }
+        </style>
         {% endif %}
     </div>
 </section>
 
-<!-- Gallery Section -->
-{% if restaurant.show_gallery %}
-<section class="section-padding gallery-section" style="position: relative; overflow: hidden;">
-    <!-- Wave Divider Top -->
-    <div class="wave-divider top">
-        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C57.1,118.92,156.63,69.08,321.39,56.44Z" class="shape-fill"></path>
-        </svg>
-    </div>
-    
-    <div class="container" style="position: relative; z-index: 1;">
-        <div class="row">
-            <div class="col-12 text-center mb-5">
-                <!-- Decorative Divider -->
-                <div class="decorative-divider mb-4">
-                    <span class="line"></span>
-                    <span class="icon"><i class="fas fa-camera"></i></span>
-                    <span class="line"></span>
-                </div>
-                <h2 class="section-title">Gallery</h2>
-                <p class="section-subtitle">Take a look at our restaurant and dishes</p>
-            </div>
-        </div>
-
-        <div class="row">
-            {% if restaurant.gallery_images.all %}
-            {% for gallery_image in restaurant.gallery_images.all %}
-            <div class="col-md-4 mb-4">
-                <div class="gallery-item">
-                    <img src="{{ gallery_image.image.url }}" class="img-fluid" alt="{{ gallery_image.caption }}">
-                    {% if gallery_image.caption %}
-                    <div class="gallery-caption">
-                        <p class="mb-0">{{ gallery_image.caption }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-            {% else %}
-            <div class="col-12 text-center py-5">
-                <i class="fas fa-images fa-4x text-muted mb-4"></i>
-                <h4 class="text-muted">No Gallery Images Yet</h4>
-                <p class="text-muted">Gallery images will be added soon</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</section>
-
-<!-- Book Table Section -->
-<section id="book-table" class="section-padding booking-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="text-center mb-5">
-                    <h2 class="section-title">Book a Table</h2>
-                    <p class="section-subtitle">Reserve your dining experience at {{ restaurant.name }}</p>
-                </div>
-
-                <div class="card booking-card">
-                    <div class="card-body">
-                        <form id="reservation-form">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="name" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control form-control-lg" id="name" name="name"
-                                        required>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control form-control-lg" id="email" name="email"
-                                        required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="phone" class="form-label">Phone</label>
-                                    <input type="tel" class="form-control form-control-lg" id="phone" name="phone"
-                                        required>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <label for="guests" class="form-label">Number of Guests</label>
-                                    <select class="form-select form-select-lg" id="guests" name="guests" required>
-                                        <option value="1">1 Person</option>
-                                        <option value="2" selected>2 People</option>
-                                        <option value="3">3 People</option>
-                                        <option value="4">4 People</option>
-                                        <option value="5">5 People</option>
-                                        <option value="6">6+ People</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <label for="date" class="form-label">Date</label>
-                                    <input type="date" class="form-control form-control-lg" id="date" name="date"
-                                        required>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <label for="time" class="form-label">Time</label>
-                                    <input type="time" class="form-control form-control-lg" id="time" name="time"
-                                        required>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="special-requests" class="form-label">Special Requests</label>
-                                <textarea class="form-control form-control-lg" id="special-requests"
-                                    name="special_requests" rows="4"
-                                    placeholder="Any special requirements or celebrations..."></textarea>
-                            </div>
-                            <div class="text-center">
-                                <button type="submit" class="btn booking-btn">
-                                    <i class="fas fa-calendar-check me-2"></i>Book Table
-                                </button>
-                            </div>
-                        </form>
+<!-- Specials, Combos, and Picks Section -->
+<style>
+    .specials-section .card {
+        border: none;
+        border-radius: 1.25rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07), 0 1.5px 6px rgba(0,0,0,0.03);
+        transition: transform 0.18s, box-shadow 0.18s;
+        overflow: hidden;
+        background: #fff;
+        min-height: 340px;
+        position: relative;
+    }
+    .specials-section .card:hover {
+        transform: translateY(-6px) scale(1.025);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07);
+        z-index: 2;
+    }
+    .specials-section .card-img-top {
+        border-radius: 1.25rem 1.25rem 0 0;
+        object-fit: cover;
+        height: 170px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .specials-section .badge {
+        font-size: 0.95rem;
+        padding: 0.45em 1.1em;
+        border-radius: 1em;
+        letter-spacing: 0.02em;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .specials-section .card-title {
+        font-size: 1.18rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    .specials-section .card-text {
+        font-size: 0.98rem;
+        color: #7a7a7a;
+    }
+    .specials-section .fw-bold.fs-5 {
+        font-size: 1.25rem !important;
+        color: #e94560 !important;
+        margin-top: 0.5rem;
+    }
+    .specials-section .section-title {
+        font-size: 1.45rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: #222;
+    }
+    .specials-section .row-cols-md-3 > .col {
+        display: flex;
+        align-items: stretch;
+    }
+    .specials-section .card-body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        min-height: 170px;
+    }
+    @media (max-width: 767px) {
+        .specials-section .card-img-top {
+            height: 120px;
+        }
+        .specials-section .fw-bold.fs-5 {
+            font-size: 1.1rem !important;
+        }
+    }
+</style>
+<div class="container my-5 specials-section">
+    <div class="row g-4">
+        <!-- Today's Specials -->
+        <div class="col-12">
+            <h2 class="section-title mb-3"><i class="fas fa-star text-warning me-2"></i>Today's Specials</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Chocolate Cake">
+                        <div class="card-body">
+                            <span class="badge bg-success mb-2">Live</span>
+                            <h5 class="card-title">Chocolate Cake</h5>
+                            <p class="card-text">Naija Grill House</p>
+                            <div class="fw-bold fs-5">₦5000</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Chicken Suya">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Fresh</span>
+                            <h5 class="card-title">Chicken Suya</h5>
+                            <p class="card-text">Bukka Republic</p>
+                            <div class="fw-bold fs-5">₦2162</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Chicken Suya">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Fresh</span>
+                            <h5 class="card-title">Chicken Suya</h5>
+                            <p class="card-text">Palmwine Place</p>
+                            <div class="fw-bold fs-5">₦1453</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Chicken Suya">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Fresh</span>
+                            <h5 class="card-title">Chicken Suya</h5>
+                            <p class="card-text">Chop Life Lounge</p>
+                            <div class="fw-bold fs-5">₦3782</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Chicken Suya">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Fresh</span>
+                            <h5 class="card-title">Chicken Suya</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦2742</div>
+                        </div>
+                    </div>
+                </div>
+      </div>
     </div>
-</section>
-{% endif %}
-
-<!-- Contact Section -->
-{% if restaurant.show_contact %}
-<section id="contact" class="section-padding contact-section" style="position: relative; overflow: hidden;">
-    <!-- Decorative Elements -->
-    <div class="section-decoration dots-pattern" style="top: 5%; left: 2%;"></div>
-    <div class="section-decoration dots-pattern" style="bottom: 5%; right: 2%;"></div>
-    <div class="section-decoration line-left" style="top: 30%;"></div>
-    <div class="section-decoration line-right" style="top: 70%;"></div>
+        <!-- Combo Deals -->
+        <div class="col-12 mt-5">
+            <h2 class="section-title mb-3"><i class="fas fa-layer-group text-primary me-2"></i>Combo Deals</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Water">
+                        <div class="card-body">
+                            <span class="badge bg-secondary mb-2">Popular</span>
+                            <h5 class="card-title">Water</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦1665</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Malt">
+                        <div class="card-body">
+                            <span class="badge bg-secondary mb-2">Popular</span>
+                            <h5 class="card-title">Malt</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦4176</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Palm Wine">
+                        <div class="card-body">
+                            <span class="badge bg-secondary mb-2">Popular</span>
+                            <h5 class="card-title">Palm Wine</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦4851</div>
+                        </div>
+                    </div>
+                </div>
+      </div>
+    </div>
+        <!-- Customer Picks -->
+        <div class="col-12 mt-5">
+            <h2 class="section-title mb-3"><i class="fas fa-heart text-danger me-2"></i>Customer Picks</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Water">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Latest</span>
+                            <h5 class="card-title">Water</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦1665</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Malt">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Latest</span>
+                            <h5 class="card-title">Malt</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦4176</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{% static 'images/food-placeholder.png' %}" class="card-img-top" alt="Palm Wine">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Latest</span>
+                            <h5 class="card-title">Palm Wine</h5>
+                            <p class="card-text">Ofada Kitchen</p>
+                            <div class="fw-bold fs-5">₦4851</div>
+                        </div>
+                    </div>
+                </div>
     
     <div class="container" style="position: relative; z-index: 1;">
         <!-- Section Header -->
@@ -3225,23 +3277,24 @@ html {
 </div>
 {% endif %}
 
-<!-- Call to Action -->
+
+<!-- Modernized Call to Action -->
 {% if user.role == 'customer' and categories %}
-<section class="cta-section">
+<section class="cta-section py-5" style="background: linear-gradient(90deg, var(--restaurant-primary) 0%, var(--restaurant-secondary) 100%); border-radius: 18px; margin: 40px 0; box-shadow: 0 6px 32px rgba(233,69,96,0.10);">
     <div class="container">
-        <div class="row align-items-center cta-content">
-            <div class="col-lg-8">
-                <h3 class="mb-2 fs-2">Ready to Order?</h3>
-                <p class="mb-0 fs-5">Browse our menu and place your order for pickup or delivery.</p>
+        <div class="d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
+            <div class="text-center text-lg-start">
+                <h2 class="fw-bold mb-2" style="color: #fff; letter-spacing: 1px;">Ready to Order?</h2>
+                <p class="mb-0 fs-5" style="color: #f8f9fa; opacity: 0.92;">Browse our menu and place your order for pickup or delivery.</p>
             </div>
-            <div class="col-lg-4 text-lg-end">
-                <a href="#menu" class="btn cta-btn">
+            <div class="d-flex flex-column align-items-center align-items-lg-end gap-2">
+                <a href="#menu" class="btn btn-lg btn-light px-4 py-2 shadow-sm" style="font-weight: 600; border-radius: 32px; color: var(--restaurant-primary);">
                     <i class="fas fa-shopping-cart me-2"></i>Order Now
                 </a>
                 {% if user.is_authenticated and user.role == 'customer' %}
-                <div class="mt-2">
-                    <a href="{% url 'order_history' %}?restaurant={{ restaurant.slug }}" class="btn btn-sm btn-outline-light me-2">My Orders at {{ restaurant.name }}</a>
-                    <a href="{% url 'payments:payment_history' %}?restaurant={{ restaurant.slug }}" class="btn btn-sm btn-outline-light">My Payments at {{ restaurant.name }}</a>
+                <div class="d-flex flex-wrap gap-2 mt-1">
+                    <a href="{% url 'order_history' %}?restaurant={{ restaurant.slug }}" class="btn btn-sm btn-outline-light" style="border-radius: 24px;">My Orders</a>
+                    <a href="{% url 'payments:payment_history' %}?restaurant={{ restaurant.slug }}" class="btn btn-sm btn-outline-light" style="border-radius: 24px;">My Payments</a>
                 </div>
                 {% endif %}
             </div>
@@ -3482,7 +3535,7 @@ document.addEventListener('DOMContentLoaded', function(){
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('date').min = today;
 
-        let cartItems = 0;
+        // No local cartItems variable; always fetch from backend
 
         // Category Navigation - Tab Style (Show one category at a time)
         const categoryLinks = document.querySelectorAll('#categoryNav .nav-link');
@@ -3642,8 +3695,21 @@ document.addEventListener('DOMContentLoaded', function(){
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        cartItems = data.cart_total_items;
-                        updateCartSummary();
+                        // Update floating cart badge instantly
+                        const badge = document.getElementById('floatingCartTotal');
+                        if (badge) {
+                            const count = data.cart_total_items;
+                            badge.textContent = count;
+                            if (count > 0) {
+                                badge.style.display = 'inline-block';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                        fetchAndUpdateCartSummary();
+                        if (typeof updateFloatingCart === 'function') {
+                            updateFloatingCart();
+                        }
                         showToast(data.message || `${itemName} added to cart!`, 'success');
                     } else {
                         showToast(data.message || 'Failed to add item', 'error');
@@ -3681,20 +3747,62 @@ document.addEventListener('DOMContentLoaded', function(){
             });
         }
 
-        // Update Cart Summary
-        function updateCartSummary() {
-            const cartSummary = document.getElementById('cartSummary');
-            const cartBadge = document.getElementById('cartBadge');
-            const cartCount = document.getElementById('cartCount');
 
-            if (cartItems > 0) {
-                cartSummary.classList.remove('d-none');
-                cartBadge.textContent = cartItems;
-                cartCount.textContent = `${cartItems} item${cartItems > 1 ? 's' : ''}`;
-            } else {
-                cartSummary.classList.add('d-none');
-            }
+        // Update Cart Summary (from backend)
+        function fetchAndUpdateCartSummary() {
+            fetch('/orders/cart/ajax/total_count/', {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const cartSummary = document.getElementById('cartSummary');
+                const cartBadge = document.getElementById('cartBadge');
+                const cartCount = document.getElementById('cartCount');
+                let count = (data && typeof data.cart_total_items !== 'undefined') ? data.cart_total_items : 0;
+                // Always show the floating cart if there are items, never hide it after adding
+                if (cartSummary) {
+                    if (count > 0) {
+                        cartSummary.style.display = '';
+                        cartBadge.textContent = count;
+                        cartCount.textContent = `${count} item${count > 1 ? 's' : ''}`;
+                    } else {
+                        cartSummary.style.display = 'none';
+                        cartBadge.textContent = '0';
+                        cartCount.textContent = '0 items';
+                    }
+                }
+            })
+            .catch(error => {
+                // fallback: show empty cart but do not hide the floating cart completely
+                const cartSummary = document.getElementById('cartSummary');
+                const cartBadge = document.getElementById('cartBadge');
+                const cartCount = document.getElementById('cartCount');
+                if (cartSummary) {
+                    cartSummary.style.display = 'none';
+                    cartBadge.textContent = '0';
+                    cartCount.textContent = '0 items';
+                }
+            });
         }
+
+        // On page load, ensure the cart context is set to this restaurant via AJAX, then fetch cart count
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOMContentLoaded, switching restaurant');
+            var restaurantId = '{{ restaurant.id }}';
+            fetch('/orders/cart/ajax/switch/' + restaurantId + '/', {
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                console.log('Switch response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Switched to restaurant:', data);
+                fetchAndUpdateCartSummary();
+            });
+        });
 
         // Toast Notification
         function showToast(message, type = 'success') {
@@ -3771,4 +3879,42 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 </script>
 {% endif %}
-{% endblock %}
+{% endblock %}TemplateSyntaxError at /orders/cart/
+'block' tag with name 'extra_css' appears more than once
+Request Method:	GET
+Request URL:	http://127.0.0.1:8000/orders/cart/
+Django Version:	5.2.7
+Exception Type:	TemplateSyntaxError
+Exception Value:	
+'block' tag with name 'extra_css' appears more than once
+Exception Location:	C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader_tags.py, line 228, in do_block
+Raised during:	orders.views.view_cart
+Python Executable:	C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe
+Python Version:	3.12.10
+Python Path:	
+['C:\\Users\\user\\Documents\\web proj\\Ong',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\DLLs',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages']
+Server time:	Sun, 28 Dec 2025 08:52:39 -0600TemplateSyntaxError at /orders/cart/
+'block' tag with name 'extra_css' appears more than once
+Request Method:	GET
+Request URL:	http://127.0.0.1:8000/orders/cart/
+Django Version:	5.2.7
+Exception Type:	TemplateSyntaxError
+Exception Value:	
+'block' tag with name 'extra_css' appears more than once
+Exception Location:	C:\Users\user\AppData\Local\Programs\Python\Python312\Lib\site-packages\django\template\loader_tags.py, line 228, in do_block
+Raised during:	orders.views.view_cart
+Python Executable:	C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe
+Python Version:	3.12.10
+Python Path:	
+['C:\\Users\\user\\Documents\\web proj\\Ong',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\python312.zip',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\DLLs',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\Lib',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312',
+ 'C:\\Users\\user\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages']
+Server time:	Sun, 28 Dec 2025 08:52:39 -0600
