@@ -617,16 +617,6 @@
     </script>
     {% endif %}
     
-    <script>
-    // Show loader for 2 seconds on dashboard load
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.performance && window.performance.navigation && window.performance.navigation.type === 1) return; // skip on reload
-        if (typeof showSiteLoader === 'function') {
-            showSiteLoader();
-            setTimeout(hideSiteLoader, 2000);
-        }
-    });
-    </script>
     <div class="restaurant-dashboard">
         <!-- Header Section (single instance) -->
         <div class="dashboard-header">

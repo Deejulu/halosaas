@@ -1,3 +1,119 @@
+/* === Custom Responsive Spacing Improvements (2025-12-28) === */
+body {
+    line-height: 1.7;
+}
+
+.cart-container,
+.cart-main-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 16px;
+}
+
+.cart-section,
+.cart-card,
+.cart-summary,
+.cart-feedback,
+.cart-contact-info {
+    margin-bottom: 32px;
+    padding: 24px 14px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.cart-title,
+.cart-header,
+.cart-summary-title {
+    margin-bottom: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.cart-items,
+.cart-feedback-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cart-item,
+.cart-feedback-item {
+    flex: 1 1 220px;
+    margin-bottom: 16px;
+    padding: 16px 10px;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+button,
+.btn,
+.cart-btn {
+    padding: 12px 28px;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+input,
+textarea,
+select {
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+
+    .cart-container,
+    .cart-main-content {
+        padding: 14px 4px;
+    }
+
+    .cart-section,
+    .cart-card {
+        padding: 10px 4px;
+    }
+
+    .cart-items,
+    .cart-feedback-list {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .cart-container,
+    .cart-main-content {
+        padding: 4px 1px;
+    }
+
+    .cart-section,
+    .cart-card {
+        padding: 6px 1px;
+    }
+
+    .cart-title,
+    .cart-header {
+        font-size: 1.1rem;
+    }
+
+    .cart-items,
+    .cart-feedback-list {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    button,
+    .btn,
+    .cart-btn {
+        width: 100%;
+        font-size: 1rem;
+    }
+}
+
 html,
 body {
     font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
