@@ -290,6 +290,15 @@ def checkout(request):
         messages.error(request, 'No restaurant selected!')
         return redirect('cart')
     
+    # Debug: Log all payment method flags for this restaurant
+    import logging
+    logger = logging.getLogger("django")
+    logger.warning(f"[DEBUG] Restaurant {restaurant.id} payment methods: "
+                   f"cash={restaurant.accepts_cash}, card={restaurant.accepts_card}, "
+                   f"bank_transfer={restaurant.accepts_bank_transfer}, "
+                   f"mobile_money={restaurant.accepts_mobile_money}, "
+                   f"paystack={restaurant.accepts_paystack}, pos={restaurant.accepts_pos}")
+
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
