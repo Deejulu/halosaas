@@ -67,7 +67,19 @@ class RestaurantAdmin(admin.ModelAdmin):
     )
     
     prepopulated_fields = {'slug': ('name',)}
-    actions = ['activate_restaurants', 'deactivate_restaurants', 'populate_menu', 'add_buca_sample_menu']
+    actions = ['activate_restaurants', 'deactivate_restaurants', 'populate_menu', 'add_buca_sample_menu', 'enable_all_payment_methods']
+
+    def enable_all_payment_methods(self, request, queryset):
+        updated = queryset.update(
+            accepts_cash=True,
+            accepts_card=True,
+            accepts_bank_transfer=True,
+            accepts_mobile_money=True,
+            accepts_paystack=True,
+            accepts_pos=True
+        )
+        self.message_user(request, f"Enabled all payment methods for {updated} restaurants.")
+    enable_all_payment_methods.short_description = "Enable all payment methods for selected restaurants"
     
     def activate_restaurants(self, request, queryset):
         updated = queryset.update(is_active=True)
