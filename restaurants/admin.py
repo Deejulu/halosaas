@@ -53,6 +53,14 @@ class RestaurantAdmin(admin.ModelAdmin):
         ('Theme & Design', {
             'fields': ('primary_color', 'secondary_color', 'chef_name', 'chef_bio', 'chef_image')
         }),
+        ('Payment Methods', {
+            'fields': (
+                'accepts_cash', 'accepts_card', 'accepts_bank_transfer', 'accepts_mobile_money',
+                'accepts_paystack', 'accepts_pos',
+                'bank_name', 'bank_account_number', 'bank_account_name',
+                'mobile_money_number', 'mobile_money_provider',
+            )
+        }),
         ('Status', {
             'fields': ('is_active', 'created_at', 'updated_at')
         }),
