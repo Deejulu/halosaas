@@ -1412,48 +1412,54 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <!-- Brand -->
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <div class="brand-logo-icon" style="background:none;box-shadow:none;border:none;width:54px;height:54px;padding:0;">
-                    <!-- Animated Angel Eating SVG Icon (Logo) -->
-                    <svg width="48" height="48" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-                        <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5"/>
-                        <ellipse cx="55" cy="28" rx="22" ry="6" fill="none" stroke="#fffbe6" stroke-width="2"/>
-                        <circle cx="55" cy="45" r="13" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                        <ellipse cx="55" cy="70" rx="18" ry="22" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                        <path d="M30 65 Q10 85 40 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                        <path d="M80 65 Q100 85 70 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                        <ellipse cx="55" cy="95" rx="20" ry="7" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                        <rect x="38" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(-20 38 80)"/>
-                        <rect x="37" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 37 80)"/>
-                        <rect x="39" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 39 80)"/>
-                        <rect x="41" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 41 80)"/>
-                        <rect x="69" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(20 69 80)"/>
-                        <ellipse cx="70.5" cy="82.5" rx="2.5" ry="4" fill="#ffe066"/>
-                        <ellipse cx="55" cy="95" rx="8" ry="3" fill="#f9d923"/>
-                        <ellipse cx="55" cy="93" rx="8" ry="3" fill="#ffe066"/>
-                        <ellipse cx="55" cy="95" rx="6" ry="1.5" fill="#b68973"/>
-                        <path id="angel-mouth-logo" d="M51 52 Q55 56 59 52" stroke="#b68973" stroke-width="2" fill="none">
-                            <animate attributeName="d" values="M51 52 Q55 56 59 52;M51 54 Q55 58 59 54;M51 52 Q55 56 59 52" dur="1.2s" repeatCount="indefinite"/>
-                        </path>
-                        <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5">
-                            <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                        </ellipse>
-                    </svg>
-                </div>
-                <div class="brand-text">
-                    <span class="brand-name">HaloSaaS</span>
-                    <span class="brand-tagline">Ordering</span>
-                </div>
-            </a>
-
-            <!-- Mobile Toggle -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Navigation Links -->
-            <div class="collapse navbar-collapse" id="navbarMain">
+            <!-- Mobile-first flex row: logo, theme toggle, hamburger -->
+            <div class="d-flex w-100 align-items-center justify-content-between flex-lg-nowrap flex-wrap" style="gap: 0.5rem;">
+                <!-- Brand (always visible) -->
+                <a class="navbar-brand m-0" href="{% url 'home' %}" style="min-width:0;">
+                    <div class="brand-logo-icon" style="background:none;box-shadow:none;border:none;width:54px;height:54px;padding:0;">
+                        <!-- Animated Angel Eating SVG Icon (Logo) -->
+                        <svg width="48" height="48" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                            <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5"/>
+                            <ellipse cx="55" cy="28" rx="22" ry="6" fill="none" stroke="#fffbe6" stroke-width="2"/>
+                            <circle cx="55" cy="45" r="13" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
+                            <ellipse cx="55" cy="70" rx="18" ry="22" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
+                            <path d="M30 65 Q10 85 40 90" stroke="#ffe066" stroke-width="4" fill="none"/>
+                            <path d="M80 65 Q100 85 70 90" stroke="#ffe066" stroke-width="4" fill="none"/>
+                            <ellipse cx="55" cy="95" rx="20" ry="7" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
+                            <rect x="38" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(-20 38 80)"/>
+                            <rect x="37" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 37 80)"/>
+                            <rect x="39" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 39 80)"/>
+                            <rect x="41" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 41 80)"/>
+                            <rect x="69" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(20 69 80)"/>
+                            <ellipse cx="70.5" cy="82.5" rx="2.5" ry="4" fill="#ffe066"/>
+                            <ellipse cx="55" cy="95" rx="8" ry="3" fill="#f9d923"/>
+                            <ellipse cx="55" cy="93" rx="8" ry="3" fill="#ffe066"/>
+                            <ellipse cx="55" cy="95" rx="6" ry="1.5" fill="#b68973"/>
+                            <path id="angel-mouth-logo" d="M51 52 Q55 56 59 52" stroke="#b68973" stroke-width="2" fill="none">
+                                <animate attributeName="d" values="M51 52 Q55 56 59 52;M51 54 Q55 58 59 54;M51 52 Q55 56 59 52" dur="1.2s" repeatCount="indefinite"/>
+                            </path>
+                            <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5">
+                                <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                            </ellipse>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-name">HaloSaaS</span>
+                        <span class="brand-tagline">Ordering</span>
+                    </div>
+                </a>
+                <!-- Theme Toggle (always visible) -->
+                <button class="theme-toggle d-inline-flex align-items-center justify-content-center m-0" id="themeToggle" aria-label="Toggle theme" title="Switch theme" style="margin-right:0;">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </button>
+                <!-- Hamburger toggler (mobile only) -->
+                <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <!-- Navigation Links (collapsible) -->
+            <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarMain">
                 <!-- Left Navigation -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -1524,15 +1530,6 @@
 
                 <!-- Right Navigation -->
                 <ul class="navbar-nav ms-auto align-items-center">
-                    
-                    <!-- Theme Toggle Button -->
-                    <li class="nav-item me-2">
-                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Switch theme">
-                            <i class="fas fa-sun"></i>
-                            <i class="fas fa-moon"></i>
-                        </button>
-                    </li>
-                    
                     {% if user.is_authenticated %}
                     
                     <!-- NOTIFICATION BELL - Admin -->
@@ -1960,7 +1957,7 @@
     </main>
     <!-- Global Scroll Arrow (Up/Down) -->
         <!-- Global Back Arrow (Left) -->
-        <button id="back-arrow" type="button" class="btn btn-dark shadow rounded-circle" style="position: fixed; right: 24px; bottom: 32px; z-index: 2000; width:48px;height:48px;display:flex;align-items:center;justify-content:center;" title="Go Back">
+        <button id="back-arrow" type="button" class="btn btn-dark shadow rounded-circle" style="position: fixed; right: 24px; bottom: 100px; z-index: 2000; width:48px;height:48px;display:flex;align-items:center;justify-content:center;" title="Go Back">
             <i class="fas fa-arrow-left fa-lg"></i>
         </button>
         <script>

@@ -1,3 +1,91 @@
+/* --- HERO PREMIUM CONTENT MOBILE STACKING FIX (TIGHTER, NO DIVIDER) --- */
+@media (max-width: 700px) {
+    .hero-premium-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .hero-premium-content>.hero-btn-group,
+    .hero-premium-content>.hero-btn-group-secondary {
+        margin-bottom: 0.15rem !important;
+    }
+
+    .hero-premium-content>.d-flex {
+        margin-top: 0.5rem !important;
+    }
+}
+
+/* --- HERO BUTTON GROUPS: CLEAN RESPONSIVE RULES --- */
+.hero-btn-group {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.hero-btn-group-secondary {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-btn-divider {
+    height: 32px;
+    margin: 0 0 18px 0;
+    width: 100%;
+    border: none;
+    border-top: 2.5px solid #e0e0e0;
+    background: none;
+    display: block;
+}
+
+@media (max-width: 700px) {
+
+    .hero-btn-group,
+    .hero-btn-group-secondary {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1.5rem !important;
+    }
+
+    .hero-btn-group {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .hero-btn-group-secondary {
+        margin-top: 2rem !important;
+    }
+
+    .hero-btn-group .btn-modern,
+    .hero-btn-group-secondary .btn-modern {
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-bottom: 0.5rem !important;
+        margin-top: 0 !important;
+        border-radius: 18px !important;
+        box-sizing: border-box !important;
+        font-size: 1.1rem !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .hero-btn-divider {
+        height: 32px;
+        margin: 0 0 18px 0;
+        width: 100%;
+        border: none;
+        border-top: 2.5px solid #e0e0e0;
+        background: none;
+        display: block;
+    }
+}
+
 /* === Custom Responsive Spacing Improvements (2025-12-28) === */
 body {
     line-height: 1.7;
