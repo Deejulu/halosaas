@@ -1,5 +1,3 @@
-
-
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
@@ -45,7 +43,6 @@
 }
 
 /* Sliding animation for forms */
-/* Sliding animation for forms */
 .auth-slider {
     display: flex;
     width: 200%;
@@ -60,7 +57,7 @@
 
 /* Individual form styling */
 .auth-form {
-    width: 100%;
+    width: 50%;
     padding: 36px 32px 28px 32px;
     box-sizing: border-box;
     background: #fff;
@@ -68,7 +65,6 @@
     min-height: 380px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
 /* Headings */
@@ -80,7 +76,6 @@
     text-align: center;
 }
 
-/* Form labels and inputs */
 .auth-form .form-label {
     font-weight: 500;
     color: #222 !important;
@@ -160,10 +155,16 @@
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
+                {% if password_login_failed %}
+                <div class="alert alert-danger">Invalid username or password.</div>
+                {% endif %}
                 <button type="submit" class="btn btn-primary w-100">Login</button>
                 <div class="text-center mt-3">
                     <a href="{% url 'password_reset' %}" class="text-decoration-none small">Forgot password?</a> | 
                     <a href="{% url 'account_recovery' %}" class="text-decoration-none small">Forgot username?</a>
+                </div>
+                <div class="text-center mt-2">
+                    <a href="{% url 'security_question_login' %}" class="text-decoration-none small">Log in with security questions</a>
                 </div>
             </form>
         </div>
@@ -179,45 +180,23 @@
 </div>
 <script>
 function showAuthForm(form) {
-    const slider = document.getElementById('authSlider');
-    const loginTab = document.getElementById('loginTab');
-    const registerTab = document.getElementById('registerTab');
-    // Add sliding class for animation effect
-    slider.classList.add('sliding');
-    setTimeout(() => {
-        if (form === 'login') {
-            slider.style.transform = 'translateX(0)';
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-        } else {
-            slider.style.transform = 'translateX(-50%)';
-            loginTab.classList.remove('active');
-            registerTab.classList.add('active');
-        }
-    }, 10);
-    // Remove sliding class after animation
-    setTimeout(() => {
-        slider.classList.remove('sliding');
-    }, 800);
-}
-
-// Show loader after successful login
-document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm').querySelector('form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            // Only show loader if form is valid (let server handle actual validation)
-            setTimeout(function() {
-                if (typeof showSiteLoader === 'function') {
-                    showSiteLoader();
-                }
-            }, 50);
-        });
+    document.getElementById('loginTab').classList.remove('active');
+    document.getElementById('registerTab').classList.remove('active');
+    if (form === 'login') {
+        document.getElementById('loginTab').classList.add('active');
+        document.querySelector('.auth-slider').style.transform = 'translateX(0%)';
+    } else {
+        document.getElementById('registerTab').classList.add('active');
+        document.querySelector('.auth-slider').style.transform = 'translateX(-50%)';
     }
-    // Hide loader after 2 seconds (simulate login redirect)
-    if (window.location.search.includes('showloader=1')) {
-        showSiteLoader();
-        setTimeout(hideSiteLoader, 2000);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var registerForm = document.getElementById('registerForm');
+    var hasRegisterError = registerForm && registerForm.querySelector('.is-invalid, .alert-danger, .errorlist');
+    if (hasRegisterError) {
+        showAuthForm('register');
+    } else {
+        showAuthForm('login');
     }
 });
 </script>

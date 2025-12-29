@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm, AccountRecoveryForm, SecurityQuestionsForm
 from .models import CustomUser
+from .security_question_login_form import SecurityQuestionLoginForm
 
 def register(request):
     if request.method == 'POST':
@@ -19,27 +20,26 @@ def register(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 def user_login(request):
+    password_login_failed = False
+    user = None
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-        
         if user is not None:
             login(request, user)
             messages.success(request, f'Welcome back, {username}!')
-            # Set session flag for welcome overlay
             request.session['show_welcome_overlay'] = True
-            # Set loader flag for all users after login
             request.session['show_loader_after_login'] = True
-            # If customer has a preferred restaurant, redirect there
-            if user.role == 'customer' and user.preferred_restaurant:
+            if user.role == 'customer' and hasattr(user, 'preferred_restaurant') and user.preferred_restaurant:
                 messages.info(request, f'Taking you to {user.preferred_restaurant.name}!')
                 return redirect('restaurant_detail', slug=user.preferred_restaurant.slug)
             return redirect('dashboard')
         else:
-            messages.error(request, 'Invalid username or password.')
-    
-    return render(request, 'accounts/login.html')
+            password_login_failed = True
+    return render(request, 'accounts/login.html', {
+        'password_login_failed': password_login_failed,
+    })
 
 
 def account_recovery(request):
@@ -75,3 +75,21 @@ def security_questions(request):
         form = SecurityQuestionsForm(instance=request.user)
     
     return render(request, 'accounts/security_questions.html', {'form': form})
+
+def security_question_login(request):
+    form = SecurityQuestionLoginForm(request.POST or None)
+    login_failed = False
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            login(request, user)
+            messages.success(request, f'Welcome back, {user.username}! (Security Questions)')
+            request.session['show_welcome_overlay'] = True
+            request.session['show_loader_after_login'] = True
+            return redirect('dashboard')
+        else:
+            login_failed = True
+    return render(request, 'accounts/security_question_login.html', {
+        'form': form,
+        'login_failed': login_failed,
+    })
