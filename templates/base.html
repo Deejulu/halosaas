@@ -1337,49 +1337,76 @@
 <body class="d-flex flex-column min-vh-100">
         <!-- Site Loader Overlay -->
         <div id="site-loader-overlay" style="position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg,#232526 0%,#414345 100%);display:none;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.3s;">
-                <div style="display:flex;flex-direction:column;align-items:center;">
-                        <div style="font-size:1.5rem;color:#ffe066;font-family:'Segoe UI',sans-serif;font-weight:700;margin-bottom:10px;letter-spacing:1px;text-shadow:0 2px 8px #232526;">Welcome</div>
-                        <div style="margin-bottom:18px;">
-                                <!-- Animated Angel Eating SVG Icon -->
-                                <svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-                                    <!-- Halo -->
-                                    <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5"/>
-                                    <ellipse cx="55" cy="28" rx="22" ry="6" fill="none" stroke="#fffbe6" stroke-width="2"/>
-                                    <!-- Angel head -->
-                                    <circle cx="55" cy="45" r="13" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                    <!-- Angel body -->
-                                    <ellipse cx="55" cy="70" rx="18" ry="22" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                    <!-- Angel wings -->
-                                    <path d="M30 65 Q10 85 40 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                                    <path d="M80 65 Q100 85 70 90" stroke="#ffe066" stroke-width="4" fill="none"/>
-                                    <!-- Plate -->
-                                    <ellipse cx="55" cy="95" rx="20" ry="7" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
-                                    <!-- Fork (left hand) -->
-                                    <rect x="38" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(-20 38 80)"/>
-                                    <rect x="37" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 37 80)"/>
-                                    <rect x="39" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 39 80)"/>
-                                    <rect x="41" y="80" width="1" height="5" rx="0.5" fill="#ffe066" transform="rotate(-20 41 80)"/>
-                                    <!-- Spoon (right hand) -->
-                                    <rect x="69" y="80" width="3" height="15" rx="1.5" fill="#ffe066" transform="rotate(20 69 80)"/>
-                                    <ellipse cx="70.5" cy="82.5" rx="2.5" ry="4" fill="#ffe066"/>
-                                    <!-- Burger on plate -->
-                                    <ellipse cx="55" cy="95" rx="8" ry="3" fill="#f9d923"/>
-                                    <ellipse cx="55" cy="93" rx="8" ry="3" fill="#ffe066"/>
-                                    <ellipse cx="55" cy="95" rx="6" ry="1.5" fill="#b68973"/>
-                                    <!-- Angel mouth (animated eating) -->
-                                    <path id="angel-mouth" d="M51 52 Q55 56 59 52" stroke="#b68973" stroke-width="2" fill="none">
-                                        <animate attributeName="d" values="M51 52 Q55 56 59 52;M51 54 Q55 58 59 54;M51 52 Q55 56 59 52" dur="1.2s" repeatCount="indefinite"/>
-                                    </path>
-                                    <!-- Animated halo glow -->
-                                    <ellipse cx="55" cy="28" rx="28" ry="8" fill="none" stroke="#ffe066" stroke-width="5">
-                                        <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
-                                    </ellipse>
-                                </svg>
-                        </div>
-                        <div style="font-size:2.3rem;font-weight:900;color:#ffe066;letter-spacing:2px;font-family:'Segoe UI',sans-serif;text-shadow:0 2px 12px #232526;">HaloSaaS Restaurants</div>
-                        <div style="font-size:1.2rem;color:#fffbe6;margin-top:12px;font-family:'Segoe UI',sans-serif;">Loading your dashboard...</div>
+            <div style="backdrop-filter: blur(12px); background: rgba(40,40,60,0.45); border-radius: 32px; box-shadow: 0 8px 40px 0 rgba(233,69,96,0.18), 0 1.5px 8px 0 rgba(255,255,255,0.08); padding: 48px 36px 36px 36px; display: flex; flex-direction: column; align-items: center; min-width: 320px; max-width: 90vw;">
+                <div style="font-size:2.1rem;color:#ffe066;font-family:'Segoe UI',sans-serif;font-weight:900;margin-bottom:10px;letter-spacing:2px;text-shadow:0 2px 12px #232526;">Welcome!</div>
+                <div style="margin-bottom:22px;">
+                    <!-- Upgraded Animated Loader SVG -->
+                    <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                        <defs>
+                            <radialGradient id="haloGradient" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffe066" stop-opacity="0.7"/>
+                                <stop offset="100%" stop-color="#e94560" stop-opacity="0.2"/>
+                            </radialGradient>
+                            <linearGradient id="bodyGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#fffbe6"/>
+                                <stop offset="100%" stop-color="#ffe066"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Glowing Halo -->
+                        <ellipse cx="60" cy="32" rx="32" ry="10" fill="url(#haloGradient)">
+                            <animate attributeName="rx" values="32;36;32" dur="1.2s" repeatCount="indefinite"/>
+                        </ellipse>
+                        <!-- Angel head -->
+                        <circle cx="60" cy="52" r="15" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
+                        <!-- Angel body -->
+                        <ellipse cx="60" cy="80" rx="22" ry="28" fill="url(#bodyGradient)" stroke="#ffe066" stroke-width="3"/>
+                        <!-- Angel wings -->
+                        <path d="M32 75 Q8 105 48 110" stroke="#ffe066" stroke-width="5" fill="none">
+                            <animate attributeName="d" values="M32 75 Q8 105 48 110;M32 75 Q16 100 48 110;M32 75 Q8 105 48 110" dur="1.2s" repeatCount="indefinite"/>
+                        </path>
+                        <path d="M88 75 Q112 105 72 110" stroke="#ffe066" stroke-width="5" fill="none">
+                            <animate attributeName="d" values="M88 75 Q112 105 72 110;M88 75 Q104 100 72 110;M88 75 Q112 105 72 110" dur="1.2s" repeatCount="indefinite"/>
+                        </path>
+                        <!-- Plate -->
+                        <ellipse cx="60" cy="112" rx="24" ry="8" fill="#fffbe6" stroke="#ffe066" stroke-width="3"/>
+                        <!-- Fork (left hand) -->
+                        <rect x="41" y="95" width="3" height="18" rx="1.5" fill="#ffe066" transform="rotate(-20 41 95)"/>
+                        <rect x="40" y="95" width="1" height="6" rx="0.5" fill="#ffe066" transform="rotate(-20 40 95)"/>
+                        <rect x="42" y="95" width="1" height="6" rx="0.5" fill="#ffe066" transform="rotate(-20 42 95)"/>
+                        <rect x="44" y="95" width="1" height="6" rx="0.5" fill="#ffe066" transform="rotate(-20 44 95)"/>
+                        <!-- Spoon (right hand) -->
+                        <rect x="77" y="95" width="3" height="18" rx="1.5" fill="#ffe066" transform="rotate(20 77 95)"/>
+                        <ellipse cx="78.5" cy="98.5" rx="2.5" ry="5" fill="#ffe066"/>
+                        <!-- Burger on plate -->
+                        <ellipse cx="60" cy="112" rx="10" ry="3.5" fill="#f9d923"/>
+                        <ellipse cx="60" cy="109" rx="10" ry="3.5" fill="#ffe066"/>
+                        <ellipse cx="60" cy="112" rx="7" ry="2" fill="#b68973"/>
+                        <!-- Angel mouth (animated eating) -->
+                        <path id="angel-mouth" d="M54 60 Q60 66 66 60" stroke="#b68973" stroke-width="2" fill="none">
+                            <animate attributeName="d" values="M54 60 Q60 66 66 60;M54 62 Q60 68 66 62;M54 60 Q60 66 66 60" dur="1.2s" repeatCount="indefinite"/>
+                        </path>
+                        <!-- Animated halo glow -->
+                        <ellipse cx="60" cy="32" rx="32" ry="10" fill="none" stroke="#ffe066" stroke-width="5">
+                            <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                        </ellipse>
+                    </svg>
                 </div>
+                <div style="font-size:2.3rem;font-weight:900;color:#ffe066;letter-spacing:2px;font-family:'Segoe UI',sans-serif;text-shadow:0 2px 12px #232526;">HaloSaaS Restaurants</div>
+                <div style="font-size:1.2rem;color:#fffbe6;margin-top:12px;font-family:'Segoe UI',sans-serif;">Loading your dashboard...</div>
+                <div style="width: 100%; margin-top: 24px;">
+                    <div id="site-loader-progress" style="height: 8px; width: 100%; background: rgba(255,255,255,0.12); border-radius: 6px; overflow: hidden;">
+                        <div style="height: 100%; width: 0%; background: linear-gradient(90deg, #e94560 0%, #ffe066 100%); border-radius: 6px; animation: loader-progress-bar 2s linear forwards;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <style>
+        @keyframes loader-progress-bar {
+            0% { width: 0%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+        </style>
         <script>
         // Loader control functions
         function showSiteLoader() {
