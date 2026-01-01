@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+
                     <div class="mb-3">
                         <strong>Delivery Method:</strong><br>
                         {% if order.delivery_method == 'pickup' %}
@@ -31,7 +33,6 @@
                 </form>
                 {% endif %}
             {% endif %}
-{% extends 'base.html' %}
 
 {% block title %}Order #{{ order.id }} - Restaurant SaaS{% endblock %}
 
